@@ -59,8 +59,9 @@ const registerUser = async (req, res) => {
 
     let pieceFilename = null;
 if (req.file) {
-  pieceFilename = req.file.filename; // 👉 on garde uniquement le nom du fichier
+  pieceFilename = req.file.path; // ✅ Cloudinary renvoie l'URL du fichier
 }
+
 
     const newUser = new User({
       nom,

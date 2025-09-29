@@ -262,7 +262,7 @@ router.post('/reset-password', async (req, res) => {
       });
     }
 
-    user.password = password; // à sécuriser avec bcrypt
+    user.password = await bcrypt.hash(password, 10);
     user.resetCode = null;
     user.resetCodeExpiration = null;
     await user.save();
