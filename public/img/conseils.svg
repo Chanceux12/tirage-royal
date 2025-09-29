@@ -1,0 +1,22 @@
+<svg width="380" height="90" viewBox="0 0 380 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title>CONSEILS AUX JEUX — Logo</title>
+  <desc>Wordmark blanc avec icône ampoule accent or, fond transparent.</desc>
+  <defs>
+    <style>
+      :root { --text: #FFFFFF; --accent: #F59E0B; }
+      text { font-family: "Poppins", Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+
+  <g transform="translate(14,14)">
+    <circle cx="22" cy="22" r="16" fill="none" stroke="var(--accent)" stroke-width="4"/>
+    <rect x="18" y="40" width="8" height="10" rx="2" fill="var(--accent)"/>
+    <line x1="22" y1="0" x2="22" y2="8" stroke="var(--accent)" stroke-width="3"/>
+    <line x1="6" y1="6" x2="12" y2="12" stroke="var(--accent)" stroke-width="3"/>
+    <line x1="38" y1="6" x2="32" y2="12" stroke="var(--accent)" stroke-width="3"/>
+  </g>
+
+  <text x="82" y="44" font-size="30" font-weight="800" fill="var(--text)" letter-spacing="0.5">CONSEILS</text>
+  <text x="82" y="70" font-size="20" font-weight="600" fill="var(--text)" opacity="0.95">AUX JEUX</text>
+  <rect x="82" y="75" width="188" height="4" rx="2" fill="var(--accent)"/>
+</svg>

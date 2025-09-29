@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes participations – Tirage Royal</title>
+  <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+  <h1>🎫 Historique de vos participations</h1>
+
+  <% if (tickets.length === 0) { %>
+    <p>Vous n’avez encore participé à aucun jeu.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Jeu</th>
+          <th>Montant (€)</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tickets.forEach(ticket => { %>
+          <tr>
+            <td><%= ticket.jeuNom %></td>
+            <td><%= ticket.prix.toFixed(2) %></td>
+            <td><%= new Date(ticket.dateParticipation).toLocaleString('fr-FR') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <a href="/">← Retour à l’accueil</a>
+</body>
+</html>

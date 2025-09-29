@@ -1,0 +1,403 @@
+<style>
+  /* === Styles intégrés pour Mes Participations === */
+  .mes-participations-wrap {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 18px;
+    color: #fff;
+    font-family: "Segoe UI", Arial, sans-serif;
+    box-sizing: border-box;
+  }
+
+  .mes-participations-wrap h2 {
+    font-size: 1.9rem;
+    margin-bottom: 16px;
+    text-align: center;
+    color: #fff;
+  }
+
+  /* Alert success / erreur */
+  .alert {
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .alert-success {
+    background: #151433;
+    border: 1px solid #2b2a59;
+    color: #fff;
+  }
+  .alert-danger {
+    background: #2c1b1b;
+    border: 1px solid #4a2b2b;
+    color: #fff;
+  }
+
+  /* Bouton transfert */
+  .btn-transfert {
+    display: inline-block;
+    background-color: #198754;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 180px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-transfert:hover:not([disabled]) {
+    background-color: #12a05a;
+  }
+  .btn-transfert[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Progress bar */
+  #progressWrapper { 
+    margin: 10px auto 0;
+    max-width: 420px;
+    width: 100%;
+  }
+  #progressWrapper .progress-track {
+    background-color: #0f1730;
+    border-radius: 6px;
+    height: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#198754,#12a05a);
+    color: #fff;
+    text-align: center;
+    font-size: 0.85rem;
+    line-height: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  /* Filtre select */
+  .form-label { 
+    color: #fff; 
+    font-weight: 600; 
+    margin-right: 8px; 
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .form-select {
+    background: #151433;
+    border: 1px solid #2b2a59;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    min-width: 150px;
+    cursor: pointer;
+  }
+
+  /* Container filtre pour centrer */
+  form[method="GET"] {
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  /* === Cartes Mes Participations === */
+  .cartes-participations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding-top: 12px;
+  }
+
+  .carte-participation {
+    background: #1f1b45;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .carte-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .carte-jeu {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #fecd1a;
+  }
+  .carte-date {
+    font-size: 0.9rem;
+    color: #a3a9d1;
+  }
+
+  .badge {
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 14px;
+    width: fit-content;
+    user-select: none;
+  }
+  .bg-success { background: #198754; color: #fff; }
+  .bg-danger { background: #b02a37; color: #fff; }
+  .bg-secondary { background: #6c757d; color: #fff; }
+
+  .carte-content {
+    font-size: 0.95rem;
+    color: #ddd;
+  }
+  .carte-row {
+    margin-bottom: 14px;
+  }
+  .carte-label {
+    font-weight: 600;
+    color: #9aa0c8;
+    margin-bottom: 6px;
+  }
+
+  /* Styles boules numéros */
+  .boules {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .boule {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(145deg, #0052cc, #0041a8);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 3px 8px rgba(255,255,255,0.3),
+      0 4px 8px rgba(0,0,0,0.8);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 38px;
+    text-align: center;
+    user-select: none;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  /* Étoiles en boules dorées avec numéro - forme étoile polygon améliorée */
+  .boule.etoile {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(145deg, #ffd700, #e6c200);
+    clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+    );
+    color: #444;
+    font-size: 1.0rem;
+    font-weight: 900;
+    line-height: 40px;
+    text-align: center;
+    user-select: none;
+    text-shadow:
+      0 0 4px rgba(255, 215, 0, 0.9),
+      0 0 8px rgba(255, 215, 0, 0.7);
+    filter: drop-shadow(0 0 2px rgba(255,215,0,0.9));
+    box-shadow:
+      inset 0 0 8px 2px rgba(255, 255, 255, 0.6),
+      0 0 6px 3px rgba(255, 215, 0, 0.8);
+    transition: filter 0.3s ease, box-shadow 0.3s ease;
+  }
+  .boule.etoile:hover {
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 1));
+    box-shadow:
+      inset 0 0 12px 3px rgba(255, 255, 255, 0.8),
+      0 0 12px 6px rgba(255, 215, 0, 1);
+    cursor: default;
+  }
+
+  /* Bouton voir */
+  .btn-outline-primary {
+    align-self: flex-end;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 2px solid #5b6cff;
+    background: transparent;
+    color: #bfc8ff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+  }
+  .btn-outline-primary:hover {
+    background-color: #5b6cff;
+    color: #fff;
+  }
+
+  @media (max-width: 768px) {
+    .cartes-participations {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+</style>
+
+<div class="mes-participations-wrap" role="main" aria-label="Mes participations">
+  <h2>Mes Participations</h2>
+
+  <% if (messages && messages.success_msg) { %>
+    <div class="alert alert-success" role="alert"><%= messages.success_msg %></div>
+  <% } %>
+  <% if (messages && messages.error_msg) { %>
+    <div class="alert alert-danger" role="alert"><%= messages.error_msg %></div>
+  <% } %>
+
+  <div class="alert alert-success" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+    <div style="font-weight:700; margin-bottom:6px;">
+      Total des gains remportés : 
+      <span style="color:#fecd1a;">
+        <%= (Number(totalGagne) || 0).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €
+      </span>
+    </div>
+
+    <% if (Number(totalGagne) > 0) { %>
+      <form method="POST" action="/jeu/transfert-gains" id="transfertForm" style="width: 100%; max-width: 320px;">
+        <button id="btnTransfert" type="submit" class="btn-transfert">Transférer vers mon solde</button>
+      </form>
+
+      <div id="progressWrapper" style="display:none;">
+        <div class="progress-track">
+          <div id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <form method="GET" action="/jeu/mes-participations">
+    <label for="filtre" class="form-label">Filtrer par statut :</label>
+    <select name="statut" id="filtre" class="form-select" onchange="this.form.submit()">
+      <option value="" <%= !filtreStatut ? 'selected' : '' %>>Tous</option>
+      <option value="En attente" <%= filtreStatut === 'En attente' ? 'selected' : '' %>>En attente</option>
+      <option value="Gagnant" <%= filtreStatut === 'Gagnant' ? 'selected' : '' %>>Gagnant</option>
+      <option value="Perdant" <%= filtreStatut === 'Perdant' ? 'selected' : '' %>>Perdant</option>
+    </select>
+  </form>
+
+  <% if (!participations || participations.length === 0) { %>
+    <p style="margin-top:18px; color:#ddd; text-align:center;">Vous n'avez encore participé à aucun jeu.</p>
+  <% } else { %>
+    <div class="cartes-participations">
+      <% participations.forEach(p => { %>
+        <article class="carte-participation" role="region" aria-label="Participation au jeu <%= p.jeuNom %>">
+          <header class="carte-header">
+            <div class="carte-jeu"><%= p.jeuNom || 'Jeu inconnu' %></div>
+            <time class="carte-date" datetime="<%= new Date(p.dateTirage || p.dateParticipation).toISOString() %>">
+              <%= new Date(p.dateTirage || p.dateParticipation).toLocaleDateString('fr-FR') %>
+            </time>
+          </header>
+
+          <% if (p.statut === 'Gagnant') { %>
+            <div class="badge bg-success">GAGNANT</div>
+          <% } else if (p.statut === 'Perdant') { %>
+            <div class="badge bg-danger">PERDANT</div>
+          <% } else { %>
+            <div class="badge bg-secondary">EN ATTENTE</div>
+          <% } %>
+
+          <section class="carte-content">
+            <div class="carte-row">
+              <div class="carte-label">Numéros :</div>
+              <div class="boules" aria-label="Numéros choisis">
+                <% (p.numerosChoisis || []).forEach(n => { %>
+                  <span class="boule" aria-label="Numéro <%= n %>"><%= n %></span>
+                <% }) %>
+              </div>
+            </div>
+            <div class="carte-row">
+              <div class="carte-label">Étoiles :</div>
+              <div class="boules" aria-label="Étoiles choisies">
+                <% (p.etoilesChoisies || []).forEach(n => { %>
+                  <span class="boule etoile" aria-label="Étoile numéro <%= n %>"><%= n %></span>
+                <% }) %>
+              </div>
+            </div>
+            <div class="carte-row">
+              <span class="carte-label">Mise (€) :</span>
+              <span class="carte-value">
+                <%= (Number(p.prix) || 0).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %>
+              </span>
+            </div>
+            <div class="carte-row">
+              <span class="carte-label">Gain (€) :</span>
+              <span class="carte-value">
+                <% if (p.statut === 'Gagnant' && typeof p.gainAttribue !== 'undefined') { %>
+                  <%= (Number(p.gainAttribue) || 0).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %>
+                <% } else if (p.statut === 'En attente' && typeof p.gainPotentiel !== 'undefined') { %>
+                  <%= (Number(p.gainPotentiel) || 0).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> (potentiel)
+                <% } else { %>
+                  —
+                <% } %>
+              </span>
+            </div>
+          </section>
+
+          <a href="/jeu/<%= p.jeuSlug %>/resultat" class="btn-outline-primary" role="button" aria-label="Voir résultat du jeu <%= p.jeuNom %>">
+            Voir résultat
+          </a>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('transfertForm');
+  if (!form) return;
+  const btn = document.getElementById('btnTransfert');
+  const progressWrapper = document.getElementById('progressWrapper');
+  const progressBar = document.getElementById('progressBar');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Transfert en cours...';
+    progressWrapper.style.display = 'block';
+    let progress = 0;
+    const duration = 30000; // 30 sec
+    const intervalTime = 100;
+    const step = 100 / (duration / intervalTime);
+
+    const interval = setInterval(() => {
+      progress = Math.min(100, progress + step);
+      progressBar.style.width = progress.toFixed(1) + '%';
+      progressBar.textContent = Math.floor(progress) + '%';
+      progressBar.setAttribute('aria-valuenow', Math.floor(progress));
+      if (progress >= 100) {
+        clearInterval(interval);
+        if (!form.dataset.submitted) {
+          form.dataset.submitted = "true";
+          form.submit();
+        }
+      }
+    }, intervalTime);
+  });
+});
+</script>
+
+
+

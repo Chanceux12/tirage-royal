@@ -1,0 +1,20 @@
+<%- include('../layout') %>
+
+<main class="main-container" style="padding: 40px; color: white;">
+  <h1 style="text-align: center;">🎯 Tirages passés</h1>
+
+  <% if (tirages.length === 0) { %>
+    <p style="text-align: center;">Aucun tirage passé trouvé.</p>
+  <% } else { %>
+    <div class="tirages-list">
+      <% tirages.forEach(t => { %>
+        <div style="background-color: #161633; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+          <h2 style="margin: 0; color: #ffc107;"><%= t.jeuNom %></h2>
+          <p>📅 Date du tirage : <%= new Date(t.dateTirage).toLocaleString('fr-FR') %></p>
+          <p>💰 Gain potentiel : <strong><%= t.gain.toLocaleString('fr-FR') %> €</strong></p>
+          <a href="/jeu/<%= t.jeuSlug %>/resultat" class="btn btn-primary">📊 Voir résultats</a>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>

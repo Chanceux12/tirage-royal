@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tirage Royal – Loterie en Ligne</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Loterie en ligne</h1>
+    <div class="texte-animé">
+      <div class="mot">Tentez</div>
+      <div class="mot">Gagnez</div>
+      <div class="mot">Célébrez</div>
+    </div>
+    <p>Jouez chaque jour à nos tirages exclusifs et tentez de remporter le jackpot.</p>
+    <a href="/auth/register" class="btn-orange">Inscription</a>
+    <a href="/jeu/resultats" class="btn-orange">Résultats</a>
+  </div>
+  <div>
+    <img src="/image/Accueil.png" alt="Visuel principal de la loterie en ligne" />
+  </div>
+</section>
+
+<section class="etapes-container">
+  <div class="etapes-gauche">
+    <h2>Comment débuter ?</h2>
+    <p>Suis ces 3 étapes faciles !</p>
+
+    <div class="etape">
+      <img src="/image/icon-jeu.png" alt="Choisissez votre jeu" width="50" />
+      <div>
+        <h3>Choisissez votre jeu</h3>
+        <p>Inscrivez-vous et sélectionnez votre loterie préférée</p>
+      </div>
+    </div>
+
+    <div class="etape">
+      <img src="/image/icon-numeros.png" alt="Sélectionnez vos numéros" width="50" />
+      <div>
+        <h3>Sélectionnez vos numéros</h3>
+        <p>Choisissez vos numéros et validez votre participation</p>
+      </div>
+    </div>
+
+    <div class="etape">
+      <img src="/image/icon-gain.png" alt="Récupérez vos gains" width="50" />
+      <div>
+        <h3>Récupérez vos gains</h3>
+        <p>Vérifiez les résultats et encaissez vos gains en toute sécurité</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="etapes-droite">
+    <img src="/image/big-winn.png" alt="Gagnant Jackpot" />
+  </div>
+</section>
+
+<section class="titre-jeux">
+  <h2>Des Millions à Gagner</h2>
+  <p>Avec nos Loteries</p>
+</section>
+
+<section id="jeux" class="jeux-grid">
+  <% if (jeux && jeux.length > 0) { %>
+    <% jeux.forEach(jeu => { %>
+      <div class="carte-jeu">
+        <div class="image-container">
+          <div class="timer-overlay" data-date="<%= jeu.prochainTirage %>">
+            ⏳ <span class="timer">Chargement...</span>
+          </div>
+          <img src="<%= jeu.image %>" alt="<%= jeu.nom || 'Jeu' %>">
+          <div class="overlay-titre"><%= (jeu.nom || 'Jeu').toUpperCase() %></div>
+        </div>
+        <div class="infos">
+          <p>📅 Tirage :
+            <%= new Date(jeu.prochainTirage).toLocaleString('fr-FR', {
+              dateStyle: 'short',
+              timeStyle: 'short'
+            }) %>
+          </p>
+          <p>🎟️ <%= (jeu.billetsRestants || 0).toLocaleString() %> billets restants</p>
+          <p>📊 Statut : <strong><%= jeu.statut || 'En cours' %></strong></p>
+          <p>💰 Récompense : <span class="gain"><%= (jeu.recompense || 0).toLocaleString() %> €</span></p>
+          <a href="/jeu/<%= jeu.slug %>" class="jouer-btn">Jouer pour <%= jeu.montant %> €</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p style="text-align: center;">Aucun jeu avec tirage à venir pour le moment.</p>
+  <% } %>
+</section>
+
+
+
+<section class="section-comment-jouer fade-slide" id="comment-jouer-home">
+  <div class="container-comment">
+    <div class="bloc-texte-comment">
+      <h2>Comment ça fonctionne ?</h2>
+      <p>
+        Inscription, choix du jeu, validation de vos numéros…  
+        Tirage Royal simplifie la participation à ses tirages pour tous.
+      </p>
+      <a href="/comment-jouer" class="btn-orange">Voir comment jouer</a>
+    </div>
+    <div class="bloc-visuel-comment">
+      <img src="/image/comment-jouer-visuel.png" alt="Illustration étape jeu Tirage Royal" />
+    </div> 
+  </div>
+</section>
+
+<section id="tirages-passes" class="section-tirages-passes">
+  <div class="container">
+    <a href="/jeux/archive" class="tirages-link">
+      <div class="image-wrapper">
+        <img src="/image/tirages-passes.png" alt="Tirages passés - Tous les jeux" />
+        <div class="overlay">
+          <span class="text">Tirages passés<br><small>Voir tous les jeux, y compris archivés</small></span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+ <section class="section-decouverte-jeux" id="decouverte-jeux">
+  <div class="container-decouverte fade-slide">
+    <div class="texte-jeux">
+      <h2>Une collection de jeux pensée pour tous</h2>
+      <p>Jackpots, tirages instantanés, gains garantis… Parcourez nos jeux et tentez votre chance dès aujourd’hui.</p>
+      <a href="/jouer" class="btn-orange">Voir tous les jeux disponibles</a>
+    </div>
+    <div class="visuel-jeux">
+      <img src="/image/jeux-illustration.jpg" alt="Illustration jeux Tirage Royal" />      
+    </div>
+  </div> 
+</section>
+
+
+
+
+<section class="stats-pro-section" id="statsSection">
+  <h2 class="stats-title">Notre communauté en chiffres</h2>
+  <div class="stats-circles">
+    
+    <div class="circle-stat color-blue">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= totalTickets %>">0</div>
+          <p>Tickets joués</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="circle-stat color-green">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= totalGagnants %>">0</div>
+          <p>Gagnants</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="circle-stat color-purple">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= montantTotalGagne %>">0</div>
+          <p>Gains distribués</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+  
+
+  
+
+
+
+<script>
+  function abbreviateNumber(value) {
+    if (value >= 1_000_000_000) return (value / 1_000_000_000).toFixed(1) + "B";
+    if (value >= 1_000_000) return (value / 1_000_000).toFixed(1) + "M";
+    if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
+    return value.toString();
+  }
+
+  function animateCounter(el, target, duration = 2000) {
+    let startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const current = Math.min(Math.floor((progress / duration) * target), target);
+      el.textContent = abbreviateNumber(current);
+      if (progress < duration) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = abbreviateNumber(target);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const section = document.getElementById("statsSection");
+    const counters = section.querySelectorAll(".counter");
+    let hasAnimated = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        hasAnimated = true;
+        counters.forEach(counter => {
+          const target = parseInt(counter.dataset.value);
+          animateCounter(counter, target);
+        });
+      }
+    }, { threshold: 0.0 });
+
+    observer.observe(section);
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    const animatedElements = document.querySelectorAll(".fade-slide");
+    animatedElements.forEach(el => observer.observe(el));
+  });
+</script>
+
+
+<section class="pourquoi-nous">
+  
+  <div class="pourquoi-contenu">
+    <div class="image-pourquoi">
+      <h2>Pourquoi choisir Tirage Royal ?</h2>
+      <img src="/image/pourquoi-nous.png" alt="Pourquoi choisir Tirage Royal" />
+    </div>
+    <div class="texte-pourquoi">
+      
+      <ul>
+        <li>✔️ Plateforme intuitive et rapide</li>
+        <li>✔️ Tirages quotidiens avec résultats en temps réel</li>
+        <li>✔️ Tirages 100% numériques et contrôlés</li>
+        <li>✔️ Gains sécurisés et retraits rapides</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+
+<footer class="footer-site">
+  <!-- Logos au-dessus -->
+  <div class="footer-logos">
+    <div class="footer-logos-block">
+      <img src="/img/conseils.svg" alt="Conseils" class="footer-icon" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/googleplay.svg" alt="Google Play" />
+      <img src="/img/appstore.svg" alt="App Store" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/visa.svg" alt="Visa" />
+      <img src="/img/mastercard.svg" alt="Mastercard" />
+      <img src="/img/paysafecard.svg" alt="Paysafecard" />
+      <img src="/img/paypal.svg" alt="PayPal" />
+    </div>
+  </div>
+
+
+
+
+<section id="avis-clients" class="section-avis">
+  <h2 class="titre-section">Avis de nos clients</h2>
+  <div class="avis-grid">
+    <% avis.forEach(a => { %>
+      <div class="avis-item">
+        <strong><%= a.nom %></strong>
+        <div class="etoiles">
+          <% for (let i = 0; i < a.note; i++) { %>⭐<% } %>
+        </div>
+        <p><%= a.commentaire %></p>
+      </div>
+    <% }) %>
+  </div>
+  <div class="lien-voir-tous">
+    <a href="/avis">Voir tous les témoignages</a>
+  </div>
+</section>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.timer-overlay').forEach(function(timerEl) {
+      const dateTirage = new Date(timerEl.dataset.date).getTime();
+      const timerSpan = timerEl.querySelector('.timer');
+
+      function updateTimer() {
+        const now = new Date().getTime();
+        const diff = dateTirage - now;
+
+        if (diff <= 0) {
+          timerSpan.textContent = "Tirage terminé";
+          timerEl.classList.add("terminé");
+          return;
+        }
+
+        const j = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        timerSpan.textContent = `${j}j ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    });
+  });
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

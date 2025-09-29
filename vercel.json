@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/api/index.js" }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://tirage-royal-Admin:Chanceux@tirage-royal-admin.6xsznqn.mongodb.net/tirage-royal?retryWrites=true&w=majority&tls=true",
+    "SESSION_SECRET": "A1b2C3d4E5f6G7h8SuperSecret",
+    "NODE_ENV": "production"
+  }
+}

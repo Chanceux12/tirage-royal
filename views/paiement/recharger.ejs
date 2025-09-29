@@ -1,0 +1,159 @@
+
+    
+  
+
+    <!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Recharger mon compte</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=ASAHc-xGOK4g-AZnEhWJ8EzU3vgnRR4hKKLvcOkr56CikoJpwLPkNKuRET1nw5W0TMuFMrdukUkB6C8D&currency=EUR"></script>
+  <style>
+    .recharger-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3rem;
+      max-width: 1000px;
+      margin: 4rem auto;
+      padding: 2rem;
+    }
+  .recharger-image {
+  flex: 1;
+  max-width: 450px;   /* largeur fixe du bloc image */
+  height: 500px;      /* hauteur fixe du bloc image */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+    .recharger-image img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;   /* l’image couvre tout le cadre */
+     border-radius: 12px;
+}
+
+    .recharger-form {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      padding: 2rem;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .recharger-form h2 {
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .recharger-form p {
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .recharger-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .recharger-form input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .recharger-form button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .recharger-form button:hover {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    #paypal-button-container {
+      margin-top: 1rem;
+    }
+
+    /* Masquer l’image en mobile/tablette */
+    @media(max-width: 900px) {
+      .recharger-image {
+        display: none;
+      }
+      .recharger-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="recharger-section">
+    <div class="recharger-image">
+      <img src="/image/recharge.png" alt="Paiement sécurisé">
+    </div>
+
+    <div class="recharger-form">
+      <h2>Recharger mon compte</h2>
+
+      <% if (user) { %>
+        <p>Votre solde actuel est : <strong><%= user.solde.toFixed(2) %> €</strong></p>
+      <% } else { %>
+        <p>Connectez-vous pour recharger votre compte.</p>
+      <% } %>
+
+      <!-- Stripe -->
+      <form action="/paiement/stripe" method="POST" id="stripe-form">
+        <label for="amountInput">Montant (€)</label>
+        <input type="number" name="amount" id="amountInput" min="1" step="0.01" required>
+        <button type="submit">Payer avec Stripe</button>
+      </form>
+
+      <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ccc;">
+
+      <!-- PayPal -->
+      <h3>Payer avec PayPal</h3>
+      <form id="paypal-form" action="/paiement/paypal" method="POST">
+        <input type="hidden" name="amount" id="paypalAmount">
+        <div id="paypal-button-container"></div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    paypal.Buttons({
+      onClick: function() {
+        const amountInput = document.getElementById('amountInput');
+        const amount = amountInput ? amountInput.value : '0';
+        if (!amount || parseFloat(amount) <= 0) {
+          alert("Veuillez entrer un montant valide.");
+          return false;
+        }
+        document.getElementById('paypalAmount').value = amount;
+      },
+      createOrder: function(data, actions) {
+        // L’ordre sera créé côté serveur via le formulaire POST
+        document.getElementById('paypal-form').submit();
+      },
+      onApprove: function(data, actions) {
+        // La redirection est gérée par le serveur après paiement
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>

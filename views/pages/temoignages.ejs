@@ -1,0 +1,34 @@
+<section>
+  <h2>Avis de nos clients</h2>
+
+  <form action="/avis/ajouter" method="POST">
+    <input type="text" name="nom" placeholder="Votre nom" required />
+    <textarea name="commentaire" placeholder="Votre avis" required></textarea>
+    <select name="note" required>
+      <option value="">Note</option>
+      <% for (let i = 1; i <= 5; i++) { %>
+        <option value="<%= i %>"><%= i %> ⭐</option>
+      <% } %>
+    </select>
+    <input type="text" name="honeypot" style="display: none" />
+    <button type="submit">Envoyer</button>
+  </form>
+
+  <% if (avis.length > 0) { %>
+    <div class="avis-liste">
+      <% avis.forEach(a => { %>
+        <div class="avis-item">
+          <strong><%= a.nom %></strong><br />
+          <div>
+            <% for (let i = 0; i < a.note; i++) { %>
+              ⭐
+            <% } %>
+          </div>
+          <p><%= a.commentaire %></p>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>Aucun témoignage encore publié.</p>
+  <% } %>
+</section>

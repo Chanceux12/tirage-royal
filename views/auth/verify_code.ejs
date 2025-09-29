@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vérification du code</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+</head>
+<body class="auth-body">
+  <div class="auth-container">
+    <div class="auth-box">
+      <h2 class="auth-title">Vérification du code</h2>
+
+      <% if (message) { %>
+        <div class="alert success"><%= message %></div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+
+      <form action="/auth/verifier-code" method="POST" class="auth-form">
+        <input type="hidden" name="email" value="<%= email %>">
+
+        <div class="form-group">
+          <label for="code">Code à 6 chiffres</label>
+          <input
+            type="text"
+            id="code"
+            name="code"
+            required
+            pattern="\d{6}"
+            title="Veuillez entrer un code à 6 chiffres"
+            placeholder="Entrez le code reçu"
+          >
+        </div>
+
+        <button type="submit" class="btn-primary">Valider le code</button>
+      </form>
+
+      <div class="auth-links">
+        <a href="/auth/login">← Retour</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<h2>Modération des avis</h2>
+
+<table>
+  <tr>
+    <th>Nom</th>
+    <th>Note</th>
+    <th>Commentaire</th>
+    <th>Statut</th>
+    <th>Actions</th>
+  </tr>
+  <% avis.forEach(a => { %>
+    <tr>
+      <td><%= a.nom %></td>
+      <td><%= "⭐".repeat(a.note) %></td>
+      <td><%= a.commentaire %></td>
+      <td><%= a.approuvé ? "✅ Approuvé" : "⏳ En attente" %></td>
+      <td>
+        <% if (!a.approuvé) { %>
+          <form action="/avis/admin/<%= a._id %>/approuver" method="POST" style="display:inline;">
+            <button type="submit">Approuver</button>
+          </form>
+        <% } %>
+        <form action="/avis/admin/<%= a._id %>/supprimer" method="POST" style="display:inline;">
+          <button type="submit">Supprimer</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>

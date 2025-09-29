@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Retirer mes fonds</title>
+  <style>
+
+.retrait-section {
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* 🔹 même hauteur entre image et formulaire */
+  gap: 3rem;
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.retrait-image {
+  flex: 1;
+  max-width: 450px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+}
+
+.retrait-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* 🔹 remplit totalement le bloc */
+  border-radius: 12px;
+}
+
+
+.retrait-form h2 {
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+}
+
+.retrait-form p {
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.retrait-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.retrait-form input,
+.retrait-form select {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.retrait-form button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retrait-form button:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+@media (max-width: 900px) {
+  .retrait-section {
+    flex-direction: column;
+  }
+
+  .retrait-image {
+    display: none;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <section class="retrait-section">
+    <!-- Image pro -->
+    <div class="retrait-image">
+      <img src="/image/retrait.png" alt="Retrait sécurisé">
+    </div>
+
+    <!-- Formulaire -->
+    <div class="retrait-form">
+      <h2>Retirer mes fonds</h2>
+      <p>Sélectionnez une méthode sécurisée pour transférer vos gains.</p>
+      <p><strong>Solde disponible :</strong> <%= user ? user.solde.toFixed(2) : '0.00' %> €</p>
+
+      <form id="retraitForm" action="/paiement/retrait" method="POST">
+        
+        <label for="date">Date de transaction</label>
+        <input type="text" id="date" name="date" readonly value="<%= new Date().toLocaleDateString('fr-FR') %>">
+
+        <label for="method">Méthode de retrait</label>
+        <select name="method" id="method" required>
+          <option value="iban">Virement bancaire</option>
+        </select>
+
+        <label for="currency">Devise de transfert</label>
+        <select name="currency" id="currency" required>
+          <option value="EUR">Euro (EUR)</option>
+          <option value="USD">Dollar (USD)</option>
+          <option value="GBP">Livre Sterling (GBP)</option>
+        </select>
+
+        <label for="amount">Montant du transfert</label>
+        <input type="number" name="amount" id="amount" min="10" step="0.01" placeholder="Ex: 250.00" required>
+
+        <label for="iban">IBAN</label>
+        <input type="text" name="iban" id="iban" placeholder="Ex: FR76 3000 6000 0112 3456 7890 189" required>
+        <div id="ibanError" class="error">IBAN invalide (ex: FR76 suivi de chiffres).</div>
+
+        <label for="bic">Code SWIFT/BIC</label>
+        <input type="text" name="bic" id="bic" placeholder="Ex: AGRIFRPPXXX" required>
+        <div id="bicError" class="error">Le code SWIFT/BIC doit contenir 8 à 11 caractères alphanumériques.</div>
+
+        <label for="benef_name">Nom et prénom du bénéficiaire</label>
+        <input type="text" name="benef_name" id="benef_name" placeholder="Ex: Jean Dupont" required>
+
+        <label for="bank_name">Nom de la banque du bénéficiaire</label>
+        <input type="text" name="bank_name" id="bank_name" placeholder="Ex: BNP Paribas" required>
+
+        <label for="motif">Motif du transfert</label>
+        <input type="text" name="motif" id="motif" placeholder="Ex: Retrait gains" required>
+
+        <button type="submit">Valider le retrait</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const ibanInput = document.getElementById("iban");
+    const bicInput = document.getElementById("bic");
+
+    // Auto-format IBAN (majuscule + espace chaque 4 caractères)
+    ibanInput.addEventListener("input", function() {
+      let value = this.value.replace(/\s+/g, "").toUpperCase();
+      this.value = value.replace(/(.{4})/g, "$1 ").trim();
+    });
+
+    // Auto-format BIC (majuscule)
+    bicInput.addEventListener("input", function() {
+      this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    });
+
+    // Validation en temps réel
+    ibanInput.addEventListener("blur", function() {
+      const iban = this.value.replace(/\s+/g, "");
+      const ibanRegex = /^[A-Z]{2}[0-9]{10,30}$/;
+      document.getElementById("ibanError").style.display = ibanRegex.test(iban) ? "none" : "block";
+    });
+
+    bicInput.addEventListener("blur", function() {
+      const bic = this.value.trim();
+      const bicRegex = /^[A-Z0-9]{8,11}$/;
+      document.getElementById("bicError").style.display = bicRegex.test(bic) ? "none" : "block";
+    });
+
+    // Vérif finale à l'envoi
+    document.getElementById("retraitForm").addEventListener("submit", function(e) {
+      let valid = true;
+
+      const iban = ibanInput.value.replace(/\s+/g, "");
+      const ibanRegex = /^[A-Z]{2}[0-9]{10,30}$/;
+      if (!ibanRegex.test(iban)) {
+        document.getElementById("ibanError").style.display = "block";
+        valid = false;
+      }
+
+      const bic = bicInput.value.trim();
+      const bicRegex = /^[A-Z0-9]{8,11}$/;
+      if (!bicRegex.test(bic)) {
+        document.getElementById("bicError").style.display = "block";
+        valid = false;
+      }
+
+      if (!valid) e.preventDefault();
+    });
+  </script>
+</body>
+</html>

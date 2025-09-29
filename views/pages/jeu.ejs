@@ -1,0 +1,509 @@
+  <!DOCTYPE html>    
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= jeu.nom %> – Tirage Royal</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+
+  <style>
+    /* Boules 3D (sélection) */
+    .boules-container, .etoiles-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+      max-width: 100%;
+    }
+    .boule {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffd94d, #f7b500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      color: #000;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.3),
+                  inset 2px 2px 6px rgba(255,255,255,0.8),
+                  0 4px 8px rgba(0,0,0,0.4);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .boule::before {
+      content: "";
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 50%;
+      z-index: 0;
+    }
+    .boule span { position: relative; z-index: 1; }
+
+    /* Étoiles (sélection) */
+    .boule.etoile {
+      background: radial-gradient(circle at 30% 30%, #ffe082, #ffb300);
+    }
+    .boule.etoile span::before {
+      content: "★ ";
+      color: inherit;
+    }
+
+    .boule:hover { transform: scale(1.05); cursor: pointer; }
+    .boule.selected {
+      box-shadow: 0 0 12px 4px rgba(0, 123, 255, 0.7),
+                  inset -2px -2px 8px rgba(0,0,0,0.3),
+                  inset 2px 2px 6px rgba(255,255,255,0.8);
+    }
+
+    /* ---------- APERÇU "Votre sélection" ---------- */
+    .selection-cadre {
+      display: inline-flex;        /* largeur automatique selon le contenu */
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 15px;          /* espace interne du cadre */
+      border: 2px solid white;     /* cadre blanc */
+      border-radius: 12px;
+      background: transparent;
+      margin: 10px auto;           /* centré */
+    }
+    .selection-cadre .bubble,
+    .selection-cadre .bubble.star {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.3),
+                  inset 2px 2px 6px rgba(255,255,255,0.8),
+                  0 4px 8px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .selection-cadre .bubble { background: #ffd94d; color: #000; }
+    .selection-cadre .bubble.star { background: #ffb300; color: #fff; }
+    .selection-cadre .bubble.star::before {
+      content: "★";
+      color: inherit;
+      margin-right: 2px;
+    }
+
+    /* Compte à rebours */
+    .timer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 5px;
+    }
+    .time-segment { display: flex; flex-direction: column; align-items: center; }
+    .time-circle {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: #ff9800; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: bold;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 600px) {
+      .boules-container {
+        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 50 boules */
+        gap: 8px;
+      }
+      .etoiles-container {
+        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 10 étoiles */
+        gap: 8px;
+      }
+      .boule { width: 45px; height: 45px; font-size: 16px; }
+      .boule::before { width: 28px; height: 28px; }
+      .selection-cadre .bubble,
+      .selection-cadre .bubble.star { width: 45px; height: 45px; font-size: 16px; }
+      .time-circle { width: 50px; height: 50px; font-size: 16px; }
+    }
+    @media (max-width: 420px) {
+      .selection-cadre { gap: 6px; padding: 8px 12px; }
+      .selection-cadre .bubble,
+      .selection-cadre .bubble.star { width: 40px; height: 40px; font-size: 15px; }
+    }
+    @media (max-width: 360px) {
+      .selection-cadre { gap: 6px; padding: 6px 10px; }
+      .selection-cadre .bubble,
+      .selection-cadre .bubble.star { width: 36px; height: 36px; font-size: 14px; }
+    }
+
+    /* Messages flash */
+    .flash-error { background-color: #ffd2d2; color: #990000; padding: 10px; text-align: center; font-weight: bold; margin: 10px auto; }
+    .flash-success { background-color: #d2ffd2; color: #009900; padding: 10px; text-align: center; font-weight: bold; margin: 10px auto; }
+  </style>
+</head>
+<body>
+
+<% if (messages && messages.error_msg?.length) { %>
+  <div class="flash-error"><%= messages.error_msg[0] %></div>
+<% } %>
+
+<% if (messages && messages.success_msg?.length) { %>
+  <div class="flash-success"><%= messages.success_msg[0] %></div>
+<% } %>
+
+<section class="jeu-detail">
+  <h1><%= jeu.nom %></h1>
+
+  <% if (tirage) { %>
+    <div style="padding: 10px; background: #e6ffed; color: #006400; font-weight: bold;">
+      ✅ Tirage trouvé : <%= tirage.dateTirage.toISOString() %>
+    </div>
+  <% } else { %>
+    <div style="padding: 10px; background: #ffe6e6; color: #990000; font-weight: bold;">
+      ⚠️ Aucun tirage trouvé dans le contrôleur !
+    </div>
+  <% } %>
+
+  <div class="jeu-meta">
+    <p><strong>Prix du billet :</strong> <%= (jeu.montant || 0).toFixed(2) %> €</p>
+    <p><strong>Récompense maximale :</strong> <%= (jeu.recompense || 0).toLocaleString('fr-FR') %> €</p>
+
+    <% if (tirage && tirage.dateTirage) { %>
+      <p><strong>Prochain tirage :</strong> <%= new Date(tirage.dateTirage).toLocaleString('fr-FR') %></p>
+    <% } else { %>
+      <p>Aucun tirage planifié pour ce jeu actuellement.</p>
+    <% } %>
+  </div>
+
+  <img src="<%= jeu.image %>" alt="<%= jeu.nom %>" style="max-width: 400px; width:100%; height:auto;">
+</section>
+
+<section class="compte-a-rebours">
+  <h2>Bientôt le tirage</h2>
+  <div class="timer">
+    <div class="time-segment"><div class="time-circle" id="jours">00</div><div class="label">JOURS</div></div>
+    <span>:</span>
+    <div class="time-segment"><div class="time-circle" id="heures">00</div><div class="label">HEURES</div></div>
+    <span>:</span>
+    <div class="time-segment"><div class="time-circle" id="minutes">00</div><div class="label">MINS</div></div>
+    <span>:</span>
+    <div class="time-segment"><div class="time-circle" id="secondes">00</div><div class="label">SECS</div></div>
+  </div>
+</section>
+
+<section class="selection-preview">
+  <h2>Votre sélection</h2>
+  <div class="selection-cadre" id="preview-selection"></div>
+</section>
+
+<section class="tirage-form">
+  <h2>Choisissez vos numéros</h2>
+  <div class="boules-container">
+    <% for(let i = 1; i <= 50; i++) { %>
+      <div class="boule" data-number="<%= i %>"><span><%= i %></span></div>
+    <% } %>
+  </div>
+
+  <h2>Choisissez vos étoiles</h2>
+  <div class="etoiles-container">
+    <% for(let i = 1; i <= 10; i++) { %>
+      <div class="boule etoile" data-etoile="<%= i %>"><span><%= i %></span></div>
+    <% } %>
+  </div>
+
+  <div style="margin-top:20px; text-align:center;">
+    <form id="form-participation" action="/jeu/<%= jeu.slug %>/participer" method="POST">
+      <div id="hidden-fields"></div>
+      <button type="submit" class="cta-btn">✅ Valider ma participation</button>
+    </form>
+  </div>
+</section>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const boules = document.querySelectorAll('.boule[data-number]');
+    const etoiles = document.querySelectorAll('.boule.etoile');
+    const preview = document.getElementById('preview-selection');
+    const maxNumeros = 5;
+    const maxEtoiles = 2;
+
+    let selectionNumeros = [];
+    let selectionEtoiles = [];
+
+    const hiddenFields = document.getElementById('hidden-fields');
+    const form = document.getElementById('form-participation');
+
+    function syncHiddenFields() {
+      const inputsNums = selectionNumeros.map(n => `<input type="hidden" name="numeros" value="${n}">`).join('');
+      const inputsStars = selectionEtoiles.map(e => `<input type="hidden" name="etoiles" value="${e}">`).join('');
+      hiddenFields.innerHTML = inputsNums + inputsStars;
+    }
+
+    function updatePreview() {
+      preview.innerHTML = '';
+      selectionNumeros.forEach(num => {
+        const el = document.createElement('div');
+        el.className = 'bubble';
+        el.textContent = num;
+        preview.appendChild(el);
+      });
+      selectionEtoiles.forEach(etoile => {
+        const el = document.createElement('div');
+        el.className = 'bubble star';
+        el.textContent = etoile;  // ★ ajouté via CSS (blanc)
+        preview.appendChild(el);
+      });
+      localStorage.setItem('selection', JSON.stringify({
+        numeros: selectionNumeros,
+        etoiles: selectionEtoiles
+      }));
+      syncHiddenFields();
+    }
+
+    function restoreSelection() {
+      const saved = JSON.parse(localStorage.getItem('selection'));
+      if (saved) {
+        selectionNumeros = (saved.numeros || []).map(String);
+        selectionEtoiles = (saved.etoiles || []).map(String);
+
+        boules.forEach(b => {
+          if (selectionNumeros.includes(String(b.dataset.number))) {
+            b.classList.add('selected');
+          }
+        });
+        etoiles.forEach(e => {
+          if (selectionEtoiles.includes(String(e.dataset.etoile))) {
+            e.classList.add('selected');
+          }
+        });
+
+        updatePreview();
+      } else {
+        syncHiddenFields();
+      }
+    }
+
+    boules.forEach(boule => {
+      boule.addEventListener('click', function() {
+        const num = String(this.dataset.number);
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectionNumeros = selectionNumeros.filter(n => n !== num);
+        } else {
+          if (selectionNumeros.length < maxNumeros) {
+            this.classList.add('selected');
+            selectionNumeros.push(num);
+          } else {
+            alert(`Vous ne pouvez sélectionner que ${maxNumeros} numéros.`);
+          }
+        }
+        updatePreview();
+      });
+    });
+
+    etoiles.forEach(boule => {
+      boule.addEventListener('click', function() {
+        const etoile = String(this.dataset.etoile);
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectionEtoiles = selectionEtoiles.filter(e => e !== etoile);
+        } else {
+          if (selectionEtoiles.length < maxEtoiles) {
+            this.classList.add('selected');
+            selectionEtoiles.push(etoile);
+          } else {
+            alert(`Vous ne pouvez sélectionner que ${maxEtoiles} étoiles.`);
+          }
+        }
+        updatePreview();
+      });
+    });
+
+    form.addEventListener('submit', function(e) {
+      if (selectionNumeros.length !== maxNumeros || selectionEtoiles.length !== maxEtoiles) {
+        alert(`Veuillez choisir ${maxNumeros} numéros et ${maxEtoiles} étoiles.`);
+        e.preventDefault();
+        return;
+      }
+      syncHiddenFields();
+    });
+
+    restoreSelection();
+  });
+
+  const dateTirage = new Date("<%= tirage ? tirage.dateTirage.toISOString() : jeu.dateTirage %>").getTime();
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = dateTirage - now;
+    if (diff <= 0) {
+      document.querySelector('.compte-a-rebours .timer').innerHTML = "🎉 Tirage en cours !";
+      return;
+    }
+    const jours = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const heures = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secondes = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('jours').textContent = String(jours).padStart(2, '0');
+    document.getElementById('heures').textContent = String(heures).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('secondes').textContent = String(secondes).padStart(2, '0');
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+    </script>
+  </body>
+</html> 
+
+
+<!-- SECTION : COMMENT JOUER PROFESSIONNELLEMENT -->
+<section class="comment-jouer">
+  <div class="container">
+    <h2>Comment participer à nos tirages ?</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Sélectionnez un jeu</h3>
+        <p>Sélectionnez le jeu qui vous attire et vérifiez que son statut est bien actif ou ouvert.</p>
+      </div>
+      <div class="step">
+        <h3>2. Achetez un ticket</h3>
+        <p>Achetez un ticket en quelques clics pour le montant indiqué.</p>
+      </div>
+      <div class="step">
+        <h3>3. Choisissez vos numéros</h3>
+        <p>Choisissez 5 numéros de votre choix et 2 étoiles obligatoires (les étoiles ne comptent pas pour les numéros gagnants).</p>
+      </div>
+      <div class="step">
+        <h3>4. Participez en sécurité</h3>
+        <p>Vérifiez votre solde et participez en toute sécurité, en un seul clic.</p>
+      </div>
+      <div class="step">
+        <h3>5. Rapprochez-vous du jackpot</h3>
+        <p>Chaque ticket vous rapproche du grand lot qui pourrait changer votre vie !</p>
+      </div>
+    </div>
+
+    <div class="results-gains">
+      <div class="results">
+        <h3>Résultats</h3>
+        <p>Consultez les résultats dès leur publication sur votre page <strong>Résultats</strong>, dans la section <strong>Mes participations</strong>, ou directement via vos <strong>emails</strong> et <strong>SMS automatiques</strong> (sous 48h après les tirages).</p>
+      </div>
+      <div class="gains">
+        <h3>Gains</h3>
+        <p>Les fonds gagnés seront transférés par le gagnant lui-même vers son <strong>solde principal</strong>, puis sur son <strong>compte bancaire</strong> en toute sécurité.</p>
+      </div>
+    </div>
+
+    <div class="cta">
+      <p>✨ <strong>Changez votre vie avec nous dès aujourd’hui !</strong> ✨</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION : POURQUOI NOUS CHOISIR -->
+<section class="why-us">
+  <div class="container">
+    <h2>Pourquoi choisir Tirage Royal ?</h2>
+    <div class="advantages">
+      <div class="advantage">
+        <h3>100% Sécurisé</h3>
+        <p>Vos participations et paiements sont protégés par des systèmes certifiés.</p>
+      </div>
+      <div class="advantage">
+        <h3>Transparence totale</h3>
+        <p>Tous les tirages sont publics, vérifiables, et publiés automatiquement.</p>
+      </div>
+      <div class="advantage">
+        <h3>Gains rapides</h3>
+        <p>Les gagnants sont crédités en quelques heures seulement, sans délai caché.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer class="footer-site">
+  <!-- Logos au-dessus -->
+  <div class="footer-logos">
+    <div class="footer-logos-block">
+      <img src="/img/conseils.svg" alt="Conseils" class="footer-icon" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/googleplay.svg" alt="Google Play" />
+      <img src="/img/appstore.svg" alt="App Store" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/visa.svg" alt="Visa" />
+      <img src="/img/mastercard.svg" alt="Mastercard" />
+      <img src="/img/paysafecard.svg" alt="Paysafecard" />
+      <img src="/img/paypal.svg" alt="PayPal" />
+    </div>
+  </div>
+
+  
+
+
+<!-- SECTION : FAQ -->
+<section class="faq">
+  <div class="container">
+    <h2>Questions fréquentes</h2>
+    <div class="faq-item">
+      <h3>Comment participer à un tirage ?</h3>
+      <p>Il suffit de sélectionner un jeu, acheter un billet, et attendre le tirage !</p>
+    </div>
+    <div class="faq-item">
+      <h3>Quand sont publiés les résultats ?</h3>
+      <p>Les résultats sont disponibles juste après le tirage et visibles dans votre espace.</p>
+    </div>
+  </div>
+</section>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // ⏳ Timer
+      document.querySelectorAll('.timer-overlay').forEach(function(timerEl) {
+        const dateTirage = new Date(timerEl.dataset.date).getTime();
+        const timerSpan = timerEl.querySelector('.timer');
+
+        function updateTimer() {
+          const now = new Date().getTime();
+          const diff = dateTirage - now;
+
+          if (diff <= 0) {
+            timerSpan.textContent = "Tirage terminé";
+            timerEl.classList.add("terminé");
+            return;
+          }
+
+          const j = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+          timerSpan.textContent = `${j}j ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+      });
+
+      // ▶◀ Flèches
+      const slider = document.getElementById('jeuxSlider');
+      const leftBtn = document.querySelector('.nav-button.left');
+      const rightBtn = document.querySelector('.nav-button.right');
+
+      function scrollSlider(direction) {
+        const amount = slider.offsetWidth * 0.8;
+        slider.scrollBy({ left: direction * amount, behavior: 'smooth' });
+      }
+
+      leftBtn.addEventListener('click', () => scrollSlider(-1));
+      rightBtn.addEventListener('click', () => scrollSlider(1));
+    });
+  </script>
+
+</body>
+</html>
