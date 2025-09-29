@@ -56,11 +56,12 @@ const registerUser = async (req, res) => {
 
   try {
      
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     let pieceFilename = null;
-if (req.file) {
-  pieceFilename = req.file.path; // ✅ Cloudinary renvoie l'URL du fichier
-}
+    if (req.file) {
+    pieceFilename = req.file.path; // ✅ Cloudinary renvoie l'URL du fichier
+  }
 
 
     const newUser = new User({
