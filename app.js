@@ -15,6 +15,10 @@ const app = express();
 
 const avisRoutes = require('./routes/avis');
 
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // ===================== SÉCURITÉ AVANCÉE =====================
 const helmet = require('helmet');
 const hpp = require('hpp');

@@ -68,7 +68,7 @@ if (req.file) {
       prenom,
       username,
       email,
-      password,
+      password: hashedPassword,
       parrainage: parrainage || null,
       langue,
       devise,
