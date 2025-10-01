@@ -55,8 +55,6 @@ const registerUser = async (req, res) => {
   }
 
   try {
-     
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     let pieceFilename = null;
     if (req.file) {
@@ -69,7 +67,7 @@ const registerUser = async (req, res) => {
       prenom,
       username,
       email,
-      password: hashedPassword,
+      password,
       parrainage: parrainage || null,
       langue,
       devise,
