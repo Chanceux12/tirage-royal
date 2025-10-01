@@ -7,6 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const upload = require('../middlewares/uploadCloudinary');
+const bcrypt = require('bcryptjs');
+
 
 
 const { ensureAuthenticated } = require('../middlewares/auth');
@@ -215,25 +217,26 @@ router.post('/verifier-code', async (req, res) => {
       return res.render('auth/verify_code', {
         email,
         message: null,
+        messageType: null,
         error: "Code invalide ou expiré."
       });
     }
 
     res.render('auth/reset_password', {
-      email: req.body.email,
-      code: req.body.code,
-      message: 'Votre code est valide, veuillez saisir un nouveau mot de passe.',
-      messageType: 'success',
+      email,
+      code,
+      message: "Votre code est valide, veuillez saisir un nouveau mot de passe.",
+      messageType: "success",
+      error: null,
       showForm: true
     });
-
-
 
   } catch (err) {
     console.error(err);
     res.render('auth/verify_code', {
       email,
       message: null,
+      messageType: null,
       error: "Erreur lors de la vérification."
     });
   }
@@ -250,7 +253,10 @@ router.post('/reset-password', async (req, res) => {
       return res.render('auth/reset_password', {
         email,
         code,
-        error: "Code expiré ou invalide."
+        message: null,
+        messageType: null,
+        error: "Code expiré ou invalide.",
+        showForm: true
       });
     }
 
@@ -258,7 +264,10 @@ router.post('/reset-password', async (req, res) => {
       return res.render('auth/reset_password', {
         email,
         code,
-        error: "Les mots de passe ne correspondent pas."
+        message: null,
+        messageType: null,
+        error: "Les mots de passe ne correspondent pas.",
+        showForm: true
       });
     }
 
@@ -274,9 +283,13 @@ router.post('/reset-password', async (req, res) => {
     res.render('auth/reset_password', {
       email,
       code,
-      error: "Erreur lors du changement de mot de passe."
+      message: null,
+      messageType: null,
+      error: "Erreur lors du changement de mot de passe.",
+      showForm: true
     });
   }
 });
+
 
 module.exports = router;
