@@ -2,14 +2,88 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Vérification du code</title>
+  <title>Réinitialiser le mot de passe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+    body.auth-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f7f7f7;
+    }
+
+    .auth-container { width: 100%; max-width: 400px; padding: 20px; }
+
+    .auth-box {
+      background-color: #fff;
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .auth-title {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .alert {
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .alert.success { background-color: #2ecc71; color: #fff; }
+    .alert.error { background-color: #e74c3c; color: #fff; }
+
+    .auth-form .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+    .auth-form label { margin-bottom: 5px; font-weight: 500; color: #555; }
+    .auth-form input {
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+    .auth-form input:focus { border-color: #3498db; outline: none; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-primary:hover { background-color: #217dbb; }
+
+    .auth-links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+    }
+    .auth-links a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    .auth-links a:hover { text-decoration: underline; }
+
+    @media (max-width: 500px) { .auth-box { padding: 25px 15px; } }
+  </style>
 </head>
 <body class="auth-body">
   <div class="auth-container">
     <div class="auth-box">
-      <h2 class="auth-title">Vérification du code</h2>
+      <h2 class="auth-title">Réinitialiser votre mot de passe</h2>
 
       <% if (message) { %>
         <div class="alert success"><%= message %></div>
@@ -19,27 +93,26 @@
         <div class="alert error"><%= error %></div>
       <% } %>
 
-      <form action="/auth/verifier-code" method="POST" class="auth-form">
-        <input type="hidden" name="email" value="<%= email %>">
+      <form action="/auth/reset-password" method="POST" class="auth-form">
+        <% if (email) { %>
+          <input type="hidden" name="email" value="<%= email %>">
+        <% } %>
 
         <div class="form-group">
-          <label for="code">Code à 6 chiffres</label>
-          <input
-            type="text"
-            id="code"
-            name="code"
-            required
-            pattern="\d{6}"
-            title="Veuillez entrer un code à 6 chiffres"
-            placeholder="Entrez le code reçu"
-          >
+          <label for="password">Nouveau mot de passe</label>
+          <input type="password" id="password" name="password" required placeholder="Entrez votre nouveau mot de passe">
         </div>
 
-        <button type="submit" class="btn-primary">Valider le code</button>
+        <div class="form-group">
+          <label for="confirm">Confirmer le mot de passe</label>
+          <input type="password" id="confirm" name="confirm" required placeholder="Confirmez votre mot de passe">
+        </div>
+
+        <button type="submit" class="btn-primary">Mettre à jour le mot de passe</button>
       </form>
 
       <div class="auth-links">
-        <a href="/auth/login">← Retour</a>
+        <a href="/auth/login">← Retour à la connexion</a>
       </div>
     </div>
   </div>
