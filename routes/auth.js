@@ -163,8 +163,9 @@ const transporter = nodemailer.createTransport({
 
 // 1. Formulaire mot de passe oublié
 router.get('/mot-de-passe-oublie', (req, res) => {
-  res.render('auth/forgot', { success: null, error: null });
+  res.render('auth/forgot-password', { success: null, error: null });
 });
+
 
 // 2. Envoi du code
 router.post('/mot-de-passe-oublie', async (req, res) => {
@@ -173,10 +174,10 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.render('auth/forgot', {
-        error: "Aucun compte trouvé avec cet email.",
-        success: null
-      });
+      return res.render('auth/forgot-password', {
+      error: "Aucun compte trouvé avec cet email.",
+      success: null
+     });
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -199,10 +200,11 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.render('auth/forgot', {
+    res.render('auth/forgot-password', {
       error: "Erreur lors de l'envoi du code.",
       success: null
     });
+
   }
 });
 
