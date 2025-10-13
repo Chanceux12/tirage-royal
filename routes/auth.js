@@ -246,13 +246,12 @@ router.post('/verifier-code', async (req, res) => {
 
 // 4. Changement du mot de passe
 router.post('/reset-password', async (req, res) => {
-  let { email, code, password, confirmPassword } = req.body;
-
   try {
-    // Trim pour éviter les espaces invisibles
-    password = password?.trim();
-    confirmPassword = confirmPassword?.trim();
-    email = email?.trim();
+    let { email, code, password, confirmPassword } = req.body;
+
+    email = email.trim().toLowerCase();
+    password = password.trim();
+    confirmPassword = confirmPassword.trim();
 
     const user = await User.findOne({ email });
 
@@ -278,25 +277,27 @@ router.post('/reset-password', async (req, res) => {
       });
     }
 
-    // Hash du mot de passe avec bcrypt
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    // 🧠 Log de debug
+    console.log("🔄 Réinitialisation du mot de passe pour :", email);
+    console.log("Mot de passe brut reçu :", password);
 
-    // Réinitialisation du code
+    // ✅ Re-hachage correct du mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hash généré :", hashedPassword);
+
+    user.password = hashedPassword;
     user.resetCode = null;
     user.resetCodeExpiration = null;
 
     await user.save();
-
-    console.log(`[info] Mot de passe hashé enregistré pour ${email}:`, hashedPassword);
+    console.log("✅ Mot de passe mis à jour avec succès pour :", email);
 
     res.redirect('/auth/login?message=Mot de passe modifié avec succès');
-
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erreur reset-password :", err);
     res.render('auth/reset_password', {
-      email,
-      code,
+      email: req.body.email,
+      code: req.body.code,
       message: null,
       messageType: null,
       error: "Erreur lors du changement de mot de passe.",
@@ -304,7 +305,6 @@ router.post('/reset-password', async (req, res) => {
     });
   }
 });
-
 
 
 module.exports = router;
