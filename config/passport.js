@@ -7,6 +7,10 @@ module.exports = function (passport) {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
       try {
+        // 🔹 Trim pour éviter les espaces invisibles
+        email = email.trim();
+        password = password.trim();
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -14,7 +18,6 @@ module.exports = function (passport) {
           return done(null, false, { message: 'Utilisateur non trouvé' });
         }
 
-        // Vérifie que le compte est approuvé
         if (!user.isApproved) {
           console.log('⚠️ Compte en attente de validation:', email);
           return done(null, false, { message: 'Compte en attente de validation' });
@@ -25,7 +28,8 @@ module.exports = function (passport) {
         console.log('Mot de passe reçu:', password);
         console.log('Hash stocké en base:', user.password);
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        // ✅ Correction appliquée : on trim le mot de passe avant compare
+        const isMatch = await bcrypt.compare(password.trim(), user.password);
         console.log('Résultat bcrypt.compare:', isMatch);
 
         if (!isMatch) {
@@ -35,6 +39,7 @@ module.exports = function (passport) {
         console.log('✅ Connexion réussie pour:', email);
         return done(null, user);
       } catch (err) {
+        console.error('Erreur lors de la connexion:', err);
         return done(err);
       }
     })
