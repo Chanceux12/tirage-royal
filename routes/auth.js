@@ -246,9 +246,14 @@ router.post('/verifier-code', async (req, res) => {
 
 // 4. Changement du mot de passe
 router.post('/reset-password', async (req, res) => {
-  const { email, code, password, confirmPassword } = req.body;
+  let { email, code, password, confirmPassword } = req.body;
 
   try {
+    // Trim pour éviter les espaces invisibles
+    password = password?.trim();
+    confirmPassword = confirmPassword?.trim();
+    email = email?.trim();
+
     const user = await User.findOne({ email });
 
     if (!user || user.resetCode !== code || Date.now() > user.resetCodeExpiration) {
@@ -273,10 +278,17 @@ router.post('/reset-password', async (req, res) => {
       });
     }
 
-    user.password = await bcrypt.hash(password, 10);
+    // Hash du mot de passe avec bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+
+    // Réinitialisation du code
     user.resetCode = null;
     user.resetCodeExpiration = null;
+
     await user.save();
+
+    console.log(`[info] Mot de passe hashé enregistré pour ${email}:`, hashedPassword);
 
     res.redirect('/auth/login?message=Mot de passe modifié avec succès');
 
@@ -292,6 +304,7 @@ router.post('/reset-password', async (req, res) => {
     });
   }
 });
+
 
 
 module.exports = router;
