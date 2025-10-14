@@ -1,73 +1,18 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= title || "Tirage Royal" %></title>
   <style>
-    /* === STYLE GLOBAL === */
+
     body {
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif; /* ton font existant */
       background-color: #080032;
       color: #fff;
-      opacity: 0;
-      transition: opacity 1.2s ease-in-out;
-    }
-    body.loaded {
-      opacity: 1;
     }
 
-    /* === LOADER LUXUEUX ANIMÉ === */
-    #loader {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at center, #06002e, #010010);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      overflow: hidden;
-      transition: opacity 1s ease, visibility 1s ease;
-    }
-    .gold-ring {
-      width: 120px;
-      height: 120px;
-      border: 3px solid rgba(255, 215, 0, 0.5);
-      border-top-color: gold;
-      border-radius: 50%;
-      animation: rotateRing 1.8s linear infinite;
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
-                  inset 0 0 20px rgba(255, 215, 0, 0.4);
-    }
-    .glow {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent 70%);
-      animation: rotateGlow 3s linear infinite;
-      filter: blur(8px);
-    }
-    .loader-text {
-      margin-top: 30px;
-      font-size: 1.6em;
-      color: gold;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 3px;
-      text-shadow: 0 0 15px gold;
-      animation: fadePulse 1.8s ease-in-out infinite;
-    }
-    @keyframes rotateRing { from {transform: rotate(0);} to {transform: rotate(360deg);} }
-    @keyframes rotateGlow { from {transform: rotate(0);} to {transform: rotate(360deg);} }
-    @keyframes fadePulse {
-      0%,100% { opacity: 1; transform: scale(1);}
-      50% { opacity: 0.6; transform: scale(1.05);}
-    }
-    body.loaded #loader { opacity: 0; visibility: hidden; }
-
-    /* === NAVBAR === */
     header.navbar {
       background: linear-gradient(90deg, #0e0038, #20006a);
       padding: 12px 20px;
@@ -76,6 +21,7 @@
       top: 0;
       z-index: 1000;
     }
+
     .navbar-container {
       max-width: 1300px;
       margin: 0 auto;
@@ -84,6 +30,8 @@
       justify-content: space-between;
       flex-wrap: wrap;
     }
+
+    /* Logo */
     .navbar-left .logo {
       font-size: 1.7em;
       font-weight: 700;
@@ -94,8 +42,13 @@
       gap: 6px;
     }
     .navbar-left .logo:hover { color: #ffdd4a; }
+
+    /* Menu desktop */
     nav.navbar-menu {
-      display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
     }
     nav.navbar-menu a {
       font-weight: 500;
@@ -106,6 +59,7 @@
     }
     nav.navbar-menu a:hover { background: rgba(255,255,255,0.15); }
 
+    /* Dropdown Paiements et Jeux */
     .dropdown-container { position: relative; display: inline-block; }
     .dropdown-btn {
       background: none;
@@ -118,6 +72,7 @@
       transition: background 0.3s;
     }
     .dropdown-btn:hover { background: rgba(255,255,255,0.15); }
+
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -137,54 +92,297 @@
       transition: background 0.3s;
     }
     .dropdown-menu a:hover { background: rgba(255,255,255,0.15); }
+
     .dropdown-container:hover .dropdown-menu { display: block; }
 
+    /* Zone droite */
     .navbar-right {
-      display: flex; align-items: center; gap: 16px;
-      flex-wrap: wrap; min-width: 220px; justify-content: flex-end;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      min-width: 220px;
+      justify-content: flex-end;
     }
     .navbar-right a {
-      font-weight: 500; padding: 6px 14px; border-radius: 6px;
-      transition: background-color 0.3s; text-decoration: none; white-space: nowrap;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+      text-decoration: none;
     }
     .navbar-right a:hover { background: rgba(255,255,255,0.15); }
-    .btn-orange { background-color: #f97316; padding: 8px 16px; border-radius: 8px; font-weight: 700; text-decoration: none; transition: background-color 0.3s; }
+
+    .btn-orange {
+      background-color: #f97316;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
     .btn-orange:hover { background-color: #ff8c3f; }
-    .user-info { display: flex; flex-direction: column; text-align: right; line-height: 1.2; min-width: 150px; font-weight: 600; font-size: 0.95em; color: #fecd1a; }
+
+    /* User info */
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      line-height: 1.2;
+      min-width: 150px;
+      font-weight: 600;
+      font-size: 0.95em;
+      color: #fecd1a;
+    }
     .user-info .username { font-weight: 700; margin-bottom: 2px; color: white; }
     .user-info .solde { font-weight: 600; font-size: 0.9em; color: #fecd1a; }
 
-    /* === FOOTER === */
-    .footer-columns { display: flex; justify-content: space-between; gap: 2rem; }
-    .footer-col { flex: 1; }
-    .footer-col h4 { margin-bottom: 0.5rem; }
-    .footer-col ul { list-style: none; padding: 0; margin: 0; }
-    .footer-col ul li { margin-bottom: 0.4rem; }
-    .footer-col ul li a { text-decoration: none; color: #fff; transition: 0.3s; }
-    .footer-col ul li a:hover { color: #10b981; }
-    .footer-accordeon { display: none; }
-    .acc-btn { background: none; border: none; color: #fff; font-weight: bold; cursor: pointer; width: 100%; text-align: left; padding: 0.5rem 0; }
-    .acc-content { display: none; list-style: none; padding: 0; margin: 0; }
-    .acc-content li { padding: 0.4rem 0; }
-    @media(max-width:900px){
-      .footer-columns { display: none; }
-      .footer-accordeon { display: block; }
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 26px;
+      height: 22px;
+      cursor: pointer;
+      margin-left: 10px;
     }
+    .hamburger span {
+      width: 100%;
+      height: 3px;
+      background-color: white;
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* Menu mobile */
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background-color: #0e0038;
+      border-radius: 0 0 8px 8px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .mobile-menu.open { max-height: 600px; }
+    .mobile-menu .section { border-bottom: 1px solid #444; padding: 12px 20px; }
+    .mobile-menu a {
+      display: block;
+      padding: 10px 0;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .mobile-menu a:hover { background: rgba(255,255,255,0.15); }
+    .mobile-menu .user-info { margin-bottom: 12px; font-weight: 600; color: #fecd1a; }
+
+    @media (max-width: 768px){
+      nav.navbar-menu, .navbar-right { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: block; }
+      .user-info { text-align: left; min-width: auto; }
+    }
+
+    /* -------------------------
+       LOADER LUXUEUX (AJOUT)
+       100% CSS - animation dorée fluide
+       ------------------------- */
+
+    /* Fond légèrement bleuté, laisse deviner la page derrière */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 0, 50, 0.78); /* bleu nuit transparent */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 99999;
+      backdrop-filter: blur(5px);
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+
+    /* conteneur du cercle et des effets */
+    .loader-wrap {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* anneau principal doré (créé en CSS) */
+    .gold-ring {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg,
+        rgba(255,215,0,0.95) 0deg 25deg,
+        rgba(255,200,60,0.85) 25deg 45deg,
+        rgba(255,215,0,0.6) 45deg 90deg,
+        rgba(255,200,50,0.4) 90deg 220deg,
+        rgba(255,215,0,0.9) 220deg 360deg);
+      filter: drop-shadow(0 0 18px rgba(255,200,60,0.35));
+      mask: radial-gradient(circle, transparent 60px, black 61px);
+      -webkit-mask: radial-gradient(circle, transparent 60px, black 61px);
+      box-shadow: inset 0 0 18px rgba(255,240,180,0.15);
+      animation: ringSkew 2.2s linear infinite;
+      transform-origin: center;
+    }
+
+    /* bande lumineuse qui parcourt l'anneau pour effet fluide */
+    .gold-ring::after {
+      content: "";
+      position: absolute;
+      width: 30%;
+      height: 30%;
+      top: -5%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,220,0.95), rgba(255,220,120,0.7) 40%, transparent 60%);
+      filter: blur(6px);
+      animation: shine 2.2s linear infinite;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
+
+    /* halo global */
+    .ring-halo {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.06), transparent 40%);
+      filter: blur(22px);
+      pointer-events: none;
+      animation: haloPulse 3.6s ease-in-out infinite;
+    }
+
+    /* petit éclat ponctuel (bas gauche) */
+    .spark {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff9d6 0%, rgba(255,220,120,0.95) 40%, rgba(255,200,60,0.7) 60%, transparent 70%);
+      filter: blur(1px);
+      box-shadow: 0 0 18px rgba(255,220,120,0.9);
+      left: 22%;
+      top: 68%;
+      transform: translate(-50%, -50%);
+      animation: sparkMove 2.2s linear infinite;
+    }
+
+    /* texte "TIRAGE ROYAL" stylé */
+    .loader-text {
+      margin-top: 18px;
+      font-size: 1.4rem;
+      color: #f7d46a;
+      letter-spacing: 4px;
+      font-weight: 700;
+      font-family: "Segoe UI", "Cinzel", serif;
+      text-shadow: 0 0 12px rgba(255,215,0,0.55);
+      animation: textPulse 1.8s ease-in-out infinite;
+    }
+
+    /* petites responsive */
+    @media (max-width:480px) {
+      .loader-wrap { width: 120px; height: 120px; }
+      .gold-ring { width: 100px; height: 100px; }
+      .ring-halo { width: 160px; height: 160px; filter: blur(16px); }
+      .loader-text { font-size: 1.05rem; letter-spacing: 3px; }
+    }
+
+    /* animations */
+    @keyframes ringSkew {
+      0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 18px rgba(255,200,60,0.35)); }
+      50% { transform: rotate(180deg) scale(0.995); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes shine {
+      0% { transform: rotate(0deg) translateX(-50%) translateY(-2%) ; opacity: 1; }
+      50% { transform: rotate(180deg) translateX(-50%) translateY(4%); opacity: 0.65; }
+      100% { transform: rotate(360deg) translateX(-50%) translateY(-2%); opacity: 1; }
+    }
+
+    @keyframes haloPulse {
+      0% { transform: scale(0.98); opacity: 0.9; }
+      50% { transform: scale(1.02); opacity: 0.7; }
+      100% { transform: scale(0.98); opacity: 0.9; }
+    }
+
+    @keyframes sparkMove {
+      0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: translate(-30%, -60%) scale(0.95) rotate(20deg); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes textPulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.04); opacity: 0.65; }
+    }
+
+    /* masquer le loader quand body a la classe loaded */
+    body.loaded #loader {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* effet d'apparition du contenu principal (fade-in) */
+    main {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    body.loaded main {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* -------------------------
+       FIN LOADER
+       ------------------------- */
+
   </style>
 </head>
 <body>
-  <!-- Loader -->
-  <div id="loader">
-    <div class="gold-ring"></div>
-    <div class="glow"></div>
+
+  <!-- LOADER INSÉRÉ ICI (NE PAS SUPPRIMER) -->
+  <div id="loader" aria-hidden="false" role="status">
+    <div class="loader-wrap" aria-hidden="true">
+      <div class="ring-halo" aria-hidden="true"></div>
+      <div class="gold-ring" aria-hidden="true"></div>
+      <div class="spark" aria-hidden="true"></div>
+    </div>
     <div class="loader-text">TIRAGE ROYAL</div>
   </div>
+  <!-- FIN LOADER -->
 
   <header class="navbar">
     <div class="navbar-container">
-      <div class="navbar-left"><a href="/" class="logo">🎲 Tirage Royal</a></div>
+      <div class="navbar-left">
+        <a href="/" class="logo">🎲 Tirage Royal</a>
+      </div>
+
+      <!-- Menu Desktop -->
       <nav class="navbar-menu">
         <a href="/">Accueil</a>
+
+        <!-- Dropdown Jeux -->
         <div class="dropdown-container">
           <button class="dropdown-btn">Jeux ▼</button>
           <div class="dropdown-menu">
@@ -193,6 +391,8 @@
             <a href="/jeu/resultats">Résultats</a>
           </div>
         </div>
+
+        <!-- Dropdown Paiements -->
         <div class="dropdown-container">
           <button class="dropdown-btn">Paiements ▼</button>
           <div class="dropdown-menu">
@@ -202,31 +402,88 @@
             <a href="/paiement/mes-recharges">Mes recharges</a>
           </div>
         </div>
+
         <a href="/contact">Contact</a>
-        <% if (user) { %> <a href="/profil">Mon Profil</a> <% } %>
+
+        <% if (user) { %>
+         <a href="/profil">Mon Profil</a>
+        <% } %>
+
       </nav>
 
+      <!-- Zone droite -->
       <div class="navbar-right">
         <% if(user){ %>
           <div class="user-info">
             <div class="username">Bienvenue <%= user.username %></div>
-            <div class="solde">Solde : <%= user.solde.toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+            <div class="solde">Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
           </div>
           <a href="/auth/logout">Déconnexion</a>
         <% } else { %>
           <a href="/auth/login" class="btn-orange">Connexion</a>
         <% } %>
       </div>
+
+      <!-- Hamburger -->
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
     </div>
+
+    <!-- Menu Mobile -->
+<div class="mobile-menu" id="mobile-menu">
+  <% if(user){ %>
+    <div class="section user-info">
+      <div>Bienvenue <%= user.username %></div>
+      <div>Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+    </div>
+    <div class="section">
+      <a href="/">Accueil</a>
+      <a href="/jouer">Jouer</a>
+      <a href="/jeu/mes-participations">Mes tickets</a>
+      <a href="/jeu/resultats">Résultats</a>
+    </div>
+    <div class="section">
+      <a href="/paiement/retrait">Retrait</a>
+      <a href="/paiement/mes-retraits">Mes retraits</a>
+      <a href="/paiement/recharger">Recharger</a>
+      <a href="/paiement/mes-recharges">Mes recharges</a>
+    </div>
+
+    <a href="/contact">Contact</a>
+
+    <% if (user) { %>
+      <a href="/profil">Mon Profil</a>
+    <% } %>
+    <div class="section"><a href="/auth/logout">Déconnexion</a></div>
+  <% } else { %>
+    <!-- INVITÉS (non connectés) -->
+    <div class="section">
+      <a href="/">Accueil</a>
+      <a href="/jouer">Jouer</a>
+      <a href="/jeu/resultats">Résultats</a>
+    </div>
+    
+
+    <div class="section"><a href="/auth/login" class="btn-orange">Connexion</a></div>
+  <% } %>
+</div>
+
   </header>
 
-  <main><%- body %></main>
-
-  
-          
-  
+  <main>
+  <%- body %>
+</main>
 
 
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+  </script>
 
 
 
@@ -387,7 +644,32 @@
   }
 </style>
 
+<!-- SCRIPT: supprimer loader après chargement + fallback -->
+<script>
+  // navigation hamburger (déjà présent)
+  // (conserver l'existant)
+  // On ajoute la logique de fermeture du loader quand la page est complètement chargée
+  window.addEventListener('load', () => {
+    // ajoute la classe pour transition fade-out et fade-in du main
+    document.body.classList.add('loaded');
+
+    // retirer complètement l'élément loader du DOM après la transition
+    setTimeout(() => {
+      const l = document.getElementById('loader');
+      if (l && l.parentNode) l.parentNode.removeChild(l);
+    }, 1000); // délai légèrement supérieur à la transition CSS
+  });
+
+  // En cas d'erreur ou si 'load' ne se déclenche pas (ex: ressources lentes),
+  // fallback pour enlever loader au bout de 8s
+  setTimeout(() => {
+    if (!document.body.classList.contains('loaded')) {
+      document.body.classList.add('loaded');
+      const l = document.getElementById('loader');
+      if (l && l.parentNode) l.parentNode.removeChild(l);
+    }
+  }, 8000);
+</script>
+
 </body>
 </html>
-
-
