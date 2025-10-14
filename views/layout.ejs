@@ -4,89 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= title || "Tirage Royal" %></title>
-
   <style>
+
     body {
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif; /* ton font existant */
       background-color: #080032;
       color: #fff;
-      overflow-x: hidden;
     }
 
-    /* === LOADER CASINO === */
-    #casino-loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at center, #0e0038 10%, #000 90%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-
-    #casino-loader.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .slot {
-      display: flex;
-      background: linear-gradient(145deg, #1a1a1a, #000);
-      border: 4px solid gold;
-      border-radius: 12px;
-      padding: 10px 25px;
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .digit {
-      font-size: 4rem;
-      font-weight: bold;
-      color: gold;
-      width: 60px;
-      text-align: center;
-      animation: spin 1s infinite linear;
-    }
-
-    @keyframes spin {
-      0% { transform: translateY(0); }
-      25% { transform: translateY(-10px); }
-      50% { transform: translateY(10px); }
-      75% { transform: translateY(-5px); }
-      100% { transform: translateY(0); }
-    }
-
-    .jeton {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background: radial-gradient(circle, gold 40%, #2e2e2e 80%);
-      border-radius: 50%;
-      border: 2px solid #f5d142;
-      box-shadow: 0 0 10px rgba(255,215,0,0.5);
-      animation: fall 2.5s linear infinite;
-      opacity: 0.8;
-    }
-
-    @keyframes fall {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-    }
-
-    .loading-text {
-      font-size: 1.5rem;
-      color: gold;
-      letter-spacing: 3px;
-    }
-
-    /* === NAVBAR === */
     header.navbar {
       background: linear-gradient(90deg, #0e0038, #20006a);
       padding: 12px 20px;
@@ -105,6 +31,7 @@
       flex-wrap: wrap;
     }
 
+    /* Logo */
     .navbar-left .logo {
       font-size: 1.7em;
       font-weight: 700;
@@ -116,6 +43,7 @@
     }
     .navbar-left .logo:hover { color: #ffdd4a; }
 
+    /* Menu desktop */
     nav.navbar-menu {
       display: flex;
       gap: 20px;
@@ -131,62 +59,349 @@
     }
     nav.navbar-menu a:hover { background: rgba(255,255,255,0.15); }
 
-    /* Footer simplifié */
-    footer {
-      text-align: center;
-      font-size: 0.9em;
-      padding: 30px 0;
+    /* Dropdown Paiements et Jeux */
+    .dropdown-container { position: relative; display: inline-block; }
+    .dropdown-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    .dropdown-btn:hover { background: rgba(255,255,255,0.15); }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
       background: #0e0038;
-      color: #ccc;
+      min-width: 180px;
+      border-radius: 6px;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 14px;
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .dropdown-menu a:hover { background: rgba(255,255,255,0.15); }
+
+    .dropdown-container:hover .dropdown-menu { display: block; }
+
+    /* Zone droite */
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      min-width: 220px;
+      justify-content: flex-end;
+    }
+    .navbar-right a {
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .navbar-right a:hover { background: rgba(255,255,255,0.15); }
+
+    .btn-orange {
+      background-color: #f97316;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .btn-orange:hover { background-color: #ff8c3f; }
+
+    /* User info */
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      line-height: 1.2;
+      min-width: 150px;
+      font-weight: 600;
+      font-size: 0.95em;
+      color: #fecd1a;
+    }
+    .user-info .username { font-weight: 700; margin-bottom: 2px; color: white; }
+    .user-info .solde { font-weight: 600; font-size: 0.9em; color: #fecd1a; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 26px;
+      height: 22px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .hamburger span {
+      width: 100%;
+      height: 3px;
+      background-color: white;
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* Menu mobile */
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background-color: #0e0038;
+      border-radius: 0 0 8px 8px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .mobile-menu.open { max-height: 600px; }
+    .mobile-menu .section { border-bottom: 1px solid #444; padding: 12px 20px; }
+    .mobile-menu a {
+      display: block;
+      padding: 10px 0;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .mobile-menu a:hover { background: rgba(255,255,255,0.15); }
+    .mobile-menu .user-info { margin-bottom: 12px; font-weight: 600; color: #fecd1a; }
+
+    @media (max-width: 768px){
+      nav.navbar-menu, .navbar-right { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: block; }
+      .user-info { text-align: left; min-width: auto; }
     }
   </style>
 </head>
-
 <body>
-  <!-- === LOADER CASINO === -->
-  <div id="casino-loader">
-    <div class="slot">
-      <div class="digit">9</div>
-      <div class="digit">7</div>
-      <div class="digit">6</div>
-    </div>
-    <div class="loading-text">CHARGEMENT...</div>
-  </div>
-
-  <!-- === JETONS ANIMÉS === -->
-  <script>
-    for(let i = 0; i < 20; i++) {
-      const jeton = document.createElement("div");
-      jeton.classList.add("jeton");
-      jeton.style.left = Math.random() * 100 + "vw";
-      jeton.style.animationDuration = (2 + Math.random() * 2) + "s";
-      jeton.style.animationDelay = Math.random() + "s";
-      document.getElementById("casino-loader").appendChild(jeton);
-    }
-  </script>
-
   <header class="navbar">
     <div class="navbar-container">
       <div class="navbar-left">
         <a href="/" class="logo">🎲 Tirage Royal</a>
       </div>
 
+      <!-- Menu Desktop -->
       <nav class="navbar-menu">
         <a href="/">Accueil</a>
-        <a href="/jouer">Jouer</a>
-        <a href="/jeu/resultats">Résultats</a>
+
+        <!-- Dropdown Jeux -->
+        <div class="dropdown-container">
+          <button class="dropdown-btn">Jeux ▼</button>
+          <div class="dropdown-menu">
+            <a href="/jouer">Jouer</a>
+            <a href="/jeu/mes-participations">Mes tickets</a>
+            <a href="/jeu/resultats">Résultats</a>
+          </div>
+        </div>
+
+        <!-- Dropdown Paiements -->
+        <div class="dropdown-container">
+          <button class="dropdown-btn">Paiements ▼</button>
+          <div class="dropdown-menu">
+            <a href="/paiement/retrait">Retrait</a>
+            <a href="/paiement/mes-retraits">Mes retraits</a>
+            <a href="/paiement/recharger">Recharger</a>
+            <a href="/paiement/mes-recharges">Mes recharges</a>
+          </div>
+        </div>
+
         <a href="/contact">Contact</a>
+
+        <% if (user) { %>
+         <a href="/profil">Mon Profil</a>
+        <% } %>
+
       </nav>
+
+      <!-- Zone droite -->
+      <div class="navbar-right">
+        <% if(user){ %>
+          <div class="user-info">
+            <div class="username">Bienvenue <%= user.username %></div>
+            <div class="solde">Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+          </div>
+          <a href="/auth/logout">Déconnexion</a>
+        <% } else { %>
+          <a href="/auth/login" class="btn-orange">Connexion</a>
+        <% } %>
+      </div>
+
+      <!-- Hamburger -->
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
     </div>
+
+    <!-- Menu Mobile -->
+<div class="mobile-menu" id="mobile-menu">
+  <% if(user){ %>
+    <div class="section user-info">
+      <div>Bienvenue <%= user.username %></div>
+      <div>Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+    </div>
+    <div class="section">
+      <a href="/">Accueil</a>
+      <a href="/jouer">Jouer</a>
+      <a href="/jeu/mes-participations">Mes tickets</a>
+      <a href="/jeu/resultats">Résultats</a>
+    </div>
+    <div class="section">
+      <a href="/paiement/retrait">Retrait</a>
+      <a href="/paiement/mes-retraits">Mes retraits</a>
+      <a href="/paiement/recharger">Recharger</a>
+      <a href="/paiement/mes-recharges">Mes recharges</a>
+    </div>
+
+    <a href="/contact">Contact</a>
+
+    <% if (user) { %>
+      <a href="/profil">Mon Profil</a>
+    <% } %>
+    <div class="section"><a href="/auth/logout">Déconnexion</a></div>
+  <% } else { %>
+    <!-- INVITÉS (non connectés) -->
+    <div class="section">
+      <a href="/">Accueil</a>
+      <a href="/jouer">Jouer</a>
+      <a href="/jeu/resultats">Résultats</a>
+    </div>
+    
+
+    <div class="section"><a href="/auth/login" class="btn-orange">Connexion</a></div>
+  <% } %>
+</div>
+
   </header>
 
   <main>
+  <%- body %>
+</main>
+
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+  </script>
+
+
+
+
+
+
+
+
+
+
+<style>
+    /* === STYLE DU LOADER === */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(10, 20, 50, 0.8); /* Fond bleuté transparent */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #loader img {
+      width: 180px;
+      height: auto;
+      animation: rotation 3s linear infinite;
+    }
+
+    #loader h2 {
+      color: gold;
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      margin-top: 20px;
+      letter-spacing: 3px;
+    }
+
+    @keyframes rotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Loader caché après chargement */
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* === CONTENU PRINCIPAL === */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      background-color: #01081c;
+      color: #fff;
+    }
+
+    main {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    main.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- === LOADER === -->
+  <div id="loader">
+    <img src="/images/loader.png" alt="Chargement...">
+    <h2>CHARGEMENT...</h2>
+  </div>
+
+  <!-- === CONTENU PRINCIPAL === -->
+  <main id="content">
     <%- body %>
   </main>
 
-  
+  <script>
+    // Lorsque la page est chargée
+    window.addEventListener("load", () => {
+      const loader = document.getElementById("loader");
+      const content = document.getElementById("content");
 
-
+      setTimeout(() => {
+        loader.classList.add("hidden");
+        content.classList.add("visible");
+      }, 1000); // délai de 1 seconde pour un effet fluide
+    });
+  </script>
 
 
 
@@ -337,37 +552,7 @@
   }
 </style>
 
-
-
-
-
-
-
-
-
-
-
-
-
-  <script>
-    const loader = document.getElementById('casino-loader');
-
-    // Masquer le loader après chargement initial
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        loader.classList.add("hidden");
-      }, 800);
-    });
-
-    // Montrer le loader à chaque clic sur un lien interne
-    document.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", e => {
-        const href = link.getAttribute("href");
-        if (href && !href.startsWith("#") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
-          loader.classList.remove("hidden");
-        }
-      });
-    });
-  </script>
 </body>
 </html>
+
+
