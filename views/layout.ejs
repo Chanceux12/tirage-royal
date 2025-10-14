@@ -245,6 +245,31 @@
         font-size: 1.2rem;
       }
     }
+        
+    .logo-img {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
+.logo-text {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #fecd1a;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .logo-img {
+    height: 34px;
+  }
+  .logo-text {
+    font-size: 1.3em;
+  }
+}
+
+
+
   </style>
 </head>
 
@@ -258,7 +283,10 @@
   <header class="navbar">
     <div class="navbar-container">
       <div class="navbar-left">
-        <a href="/" class="logo">🎲 Tirage Royal</a>
+        <a href="/" class="logo">
+  <img src="/image/logo-tirage.png" alt="Tirage Royal" class="logo-img" />
+       </a>
+
       </div>
 
       <!-- Menu Desktop -->
@@ -367,20 +395,6 @@
       mobileMenu.classList.toggle('open');
     });
   </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
