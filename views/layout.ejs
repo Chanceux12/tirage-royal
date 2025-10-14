@@ -314,6 +314,104 @@
 
 
 
+
+
+
+<!-- Effet de chargement style casino -->
+<div id="loader">
+  <div class="coins">
+    <div class="coin"></div>
+    <div class="coin"></div>
+    <div class="coin"></div>
+  </div>
+  <div class="numbers">
+    <span>7</span><span>7</span><span>7</span>
+  </div>
+  <p class="loading-text">Chargement...</p>
+</div>
+
+<style>
+  /* === Loader Casino === */
+  #loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #0e0038, #080032);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .coins {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .coin {
+    width: 40px; height: 40px;
+    background: gold;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255,215,0,0.8);
+    animation: dropCoin 1.2s ease-in-out infinite;
+  }
+
+  .coin:nth-child(2) { animation-delay: 0.3s; }
+  .coin:nth-child(3) { animation-delay: 0.6s; }
+
+  @keyframes dropCoin {
+    0% { transform: translateY(-60px) rotate(0deg); opacity: 0; }
+    50% { transform: translateY(20px) rotate(360deg); opacity: 1; }
+    100% { transform: translateY(80px) rotate(720deg); opacity: 0; }
+  }
+
+  .numbers {
+    display: flex;
+    gap: 10px;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fecd1a;
+    margin-top: 20px;
+    text-shadow: 0 0 10px #fecd1a;
+    animation: spinNumbers 1.5s infinite;
+  }
+
+  @keyframes spinNumbers {
+    0%, 100% { transform: rotateX(0deg); }
+    50% { transform: rotateX(360deg); }
+  }
+
+  .loading-text {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    color: white;
+    opacity: 0.9;
+    letter-spacing: 1px;
+  }
+
+  /* Masque après chargement */
+  body.loaded #loader {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+</style>
+
+<script>
+  // Simulation du temps de chargement
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.body.classList.add("loaded");
+    }, 1000); // durée du chargement (en ms)
+  });
+</script>
+
+
+
 <footer>
   <!-- Version Bureau/Tablette : Colonnes -->
   <div class="footer-columns">
