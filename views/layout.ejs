@@ -247,26 +247,29 @@
     }
         
     .logo-img {
-  height: 50px;
+  height: 60px; /* hauteur plus grande pour ordinateur */
   width: auto;
   display: block;
 }
 
-.logo-text {
-  font-size: 1.6em;
-  font-weight: 700;
-  color: #fecd1a;
-  letter-spacing: 0.5px;
+@media (max-width: 1024px) {
+  .logo-img {
+    height: 50px; /* tablette */
+  }
 }
 
 @media (max-width: 768px) {
   .logo-img {
-    height: 40px;
-  }
-  .logo-text {
-    font-size: 1.3em;
+    height: 45px; /* mobile */
   }
 }
+
+@media (max-width: 480px) {
+  .logo-img {
+    height: 40px; /* petit mobile */
+  }
+}
+
 
 
 
@@ -284,8 +287,9 @@
     <div class="navbar-container">
       <div class="navbar-left">
         <a href="/" class="logo">
-  <img src="/image/logo-tirage.png" alt="Tirage Royal" class="logo-img" />
-       </a>
+          <img src="/images/logo-tirage.png" alt="Tirage Royal" class="logo-img" />
+        </a>
+
 
       </div>
 
