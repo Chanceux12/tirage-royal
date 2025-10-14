@@ -5,14 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><%= title || "Tirage Royal" %></title>
   <style>
-
+    /* === STYLE GLOBAL === */
     body {
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif; /* ton font existant */
+      font-family: "Segoe UI", Arial, sans-serif;
       background-color: #080032;
       color: #fff;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    body.loaded {
+      opacity: 1;
     }
 
+    /* === LOADER LUXUEUX ANIMÉ === */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #06002e, #010010);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      overflow: hidden;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+    .gold-ring {
+      width: 120px;
+      height: 120px;
+      border: 3px solid rgba(255, 215, 0, 0.5);
+      border-top-color: gold;
+      border-radius: 50%;
+      animation: rotateRing 1.8s linear infinite;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
+                  inset 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+    .glow {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent 70%);
+      animation: rotateGlow 3s linear infinite;
+      filter: blur(8px);
+    }
+    .loader-text {
+      margin-top: 30px;
+      font-size: 1.6em;
+      color: gold;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 3px;
+      text-shadow: 0 0 15px gold;
+      animation: fadePulse 1.8s ease-in-out infinite;
+    }
+    @keyframes rotateRing { from {transform: rotate(0);} to {transform: rotate(360deg);} }
+    @keyframes rotateGlow { from {transform: rotate(0);} to {transform: rotate(360deg);} }
+    @keyframes fadePulse {
+      0%,100% { opacity: 1; transform: scale(1);}
+      50% { opacity: 0.6; transform: scale(1.05);}
+    }
+    body.loaded #loader { opacity: 0; visibility: hidden; }
+
+    /* === NAVBAR === */
     header.navbar {
       background: linear-gradient(90deg, #0e0038, #20006a);
       padding: 12px 20px;
@@ -21,7 +76,6 @@
       top: 0;
       z-index: 1000;
     }
-
     .navbar-container {
       max-width: 1300px;
       margin: 0 auto;
@@ -30,8 +84,6 @@
       justify-content: space-between;
       flex-wrap: wrap;
     }
-
-    /* Logo */
     .navbar-left .logo {
       font-size: 1.7em;
       font-weight: 700;
@@ -42,13 +94,8 @@
       gap: 6px;
     }
     .navbar-left .logo:hover { color: #ffdd4a; }
-
-    /* Menu desktop */
     nav.navbar-menu {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
+      display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
     }
     nav.navbar-menu a {
       font-weight: 500;
@@ -59,7 +106,6 @@
     }
     nav.navbar-menu a:hover { background: rgba(255,255,255,0.15); }
 
-    /* Dropdown Paiements et Jeux */
     .dropdown-container { position: relative; display: inline-block; }
     .dropdown-btn {
       background: none;
@@ -72,7 +118,6 @@
       transition: background 0.3s;
     }
     .dropdown-btn:hover { background: rgba(255,255,255,0.15); }
-
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -92,120 +137,54 @@
       transition: background 0.3s;
     }
     .dropdown-menu a:hover { background: rgba(255,255,255,0.15); }
-
     .dropdown-container:hover .dropdown-menu { display: block; }
 
-    /* Zone droite */
     .navbar-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      min-width: 220px;
-      justify-content: flex-end;
+      display: flex; align-items: center; gap: 16px;
+      flex-wrap: wrap; min-width: 220px; justify-content: flex-end;
     }
     .navbar-right a {
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 6px;
-      transition: background-color 0.3s;
-      white-space: nowrap;
-      text-decoration: none;
+      font-weight: 500; padding: 6px 14px; border-radius: 6px;
+      transition: background-color 0.3s; text-decoration: none; white-space: nowrap;
     }
     .navbar-right a:hover { background: rgba(255,255,255,0.15); }
-
-    .btn-orange {
-      background-color: #f97316;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: background-color 0.3s;
-    }
+    .btn-orange { background-color: #f97316; padding: 8px 16px; border-radius: 8px; font-weight: 700; text-decoration: none; transition: background-color 0.3s; }
     .btn-orange:hover { background-color: #ff8c3f; }
-
-    /* User info */
-    .user-info {
-      display: flex;
-      flex-direction: column;
-      text-align: right;
-      line-height: 1.2;
-      min-width: 150px;
-      font-weight: 600;
-      font-size: 0.95em;
-      color: #fecd1a;
-    }
+    .user-info { display: flex; flex-direction: column; text-align: right; line-height: 1.2; min-width: 150px; font-weight: 600; font-size: 0.95em; color: #fecd1a; }
     .user-info .username { font-weight: 700; margin-bottom: 2px; color: white; }
     .user-info .solde { font-weight: 600; font-size: 0.9em; color: #fecd1a; }
 
-    /* Hamburger */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      justify-content: space-around;
-      width: 26px;
-      height: 22px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-    .hamburger span {
-      width: 100%;
-      height: 3px;
-      background-color: white;
-      border-radius: 2px;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
-
-    /* Menu mobile */
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 56px;
-      left: 0;
-      right: 0;
-      background-color: #0e0038;
-      border-radius: 0 0 8px 8px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      z-index: 999;
-    }
-    .mobile-menu.open { max-height: 600px; }
-    .mobile-menu .section { border-bottom: 1px solid #444; padding: 12px 20px; }
-    .mobile-menu a {
-      display: block;
-      padding: 10px 0;
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .mobile-menu a:hover { background: rgba(255,255,255,0.15); }
-    .mobile-menu .user-info { margin-bottom: 12px; font-weight: 600; color: #fecd1a; }
-
-    @media (max-width: 768px){
-      nav.navbar-menu, .navbar-right { display: none; }
-      .hamburger { display: flex; }
-      .mobile-menu { display: block; }
-      .user-info { text-align: left; min-width: auto; }
+    /* === FOOTER === */
+    .footer-columns { display: flex; justify-content: space-between; gap: 2rem; }
+    .footer-col { flex: 1; }
+    .footer-col h4 { margin-bottom: 0.5rem; }
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col ul li { margin-bottom: 0.4rem; }
+    .footer-col ul li a { text-decoration: none; color: #fff; transition: 0.3s; }
+    .footer-col ul li a:hover { color: #10b981; }
+    .footer-accordeon { display: none; }
+    .acc-btn { background: none; border: none; color: #fff; font-weight: bold; cursor: pointer; width: 100%; text-align: left; padding: 0.5rem 0; }
+    .acc-content { display: none; list-style: none; padding: 0; margin: 0; }
+    .acc-content li { padding: 0.4rem 0; }
+    @media(max-width:900px){
+      .footer-columns { display: none; }
+      .footer-accordeon { display: block; }
     }
   </style>
 </head>
 <body>
+  <!-- Loader -->
+  <div id="loader">
+    <div class="gold-ring"></div>
+    <div class="glow"></div>
+    <div class="loader-text">TIRAGE ROYAL</div>
+  </div>
+
   <header class="navbar">
     <div class="navbar-container">
-      <div class="navbar-left">
-        <a href="/" class="logo">🎲 Tirage Royal</a>
-      </div>
-
-      <!-- Menu Desktop -->
+      <div class="navbar-left"><a href="/" class="logo">🎲 Tirage Royal</a></div>
       <nav class="navbar-menu">
         <a href="/">Accueil</a>
-
-        <!-- Dropdown Jeux -->
         <div class="dropdown-container">
           <button class="dropdown-btn">Jeux ▼</button>
           <div class="dropdown-menu">
@@ -214,8 +193,6 @@
             <a href="/jeu/resultats">Résultats</a>
           </div>
         </div>
-
-        <!-- Dropdown Paiements -->
         <div class="dropdown-container">
           <button class="dropdown-btn">Paiements ▼</button>
           <div class="dropdown-menu">
@@ -225,88 +202,29 @@
             <a href="/paiement/mes-recharges">Mes recharges</a>
           </div>
         </div>
-
         <a href="/contact">Contact</a>
-
-        <% if (user) { %>
-         <a href="/profil">Mon Profil</a>
-        <% } %>
-
+        <% if (user) { %> <a href="/profil">Mon Profil</a> <% } %>
       </nav>
 
-      <!-- Zone droite -->
       <div class="navbar-right">
         <% if(user){ %>
           <div class="user-info">
             <div class="username">Bienvenue <%= user.username %></div>
-            <div class="solde">Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+            <div class="solde">Solde : <%= user.solde.toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
           </div>
           <a href="/auth/logout">Déconnexion</a>
         <% } else { %>
           <a href="/auth/login" class="btn-orange">Connexion</a>
         <% } %>
       </div>
-
-      <!-- Hamburger -->
-      <div class="hamburger" id="hamburger">
-        <span></span><span></span><span></span>
-      </div>
     </div>
-
-    <!-- Menu Mobile -->
-<div class="mobile-menu" id="mobile-menu">
-  <% if(user){ %>
-    <div class="section user-info">
-      <div>Bienvenue <%= user.username %></div>
-      <div>Solde : <%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
-    </div>
-    <div class="section">
-      <a href="/">Accueil</a>
-      <a href="/jouer">Jouer</a>
-      <a href="/jeu/mes-participations">Mes tickets</a>
-      <a href="/jeu/resultats">Résultats</a>
-    </div>
-    <div class="section">
-      <a href="/paiement/retrait">Retrait</a>
-      <a href="/paiement/mes-retraits">Mes retraits</a>
-      <a href="/paiement/recharger">Recharger</a>
-      <a href="/paiement/mes-recharges">Mes recharges</a>
-    </div>
-
-    <a href="/contact">Contact</a>
-
-    <% if (user) { %>
-      <a href="/profil">Mon Profil</a>
-    <% } %>
-    <div class="section"><a href="/auth/logout">Déconnexion</a></div>
-  <% } else { %>
-    <!-- INVITÉS (non connectés) -->
-    <div class="section">
-      <a href="/">Accueil</a>
-      <a href="/jouer">Jouer</a>
-      <a href="/jeu/resultats">Résultats</a>
-    </div>
-    
-
-    <div class="section"><a href="/auth/login" class="btn-orange">Connexion</a></div>
-  <% } %>
-</div>
-
   </header>
 
-  <main>
-  <%- body %>
-</main>
+  <main><%- body %></main>
 
-
-  <script>
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-    });
-  </script>
+  
+          
+  
 
 
 
@@ -317,91 +235,8 @@
 
 
 
-<style>
-    /* === STYLE DU LOADER === */
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: rgba(10, 20, 50, 0.8); /* Fond bleuté transparent */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 9999;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
-    }
 
-    #loader img {
-      width: 180px;
-      height: auto;
-      animation: rotation 3s linear infinite;
-    }
 
-    #loader h2 {
-      color: gold;
-      font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
-      margin-top: 20px;
-      letter-spacing: 3px;
-    }
-
-    @keyframes rotation {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Loader caché après chargement */
-    #loader.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    /* === CONTENU PRINCIPAL === */
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      overflow-x: hidden;
-      background-color: #01081c;
-      color: #fff;
-    }
-
-    main {
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    main.visible {
-      opacity: 1;
-    }
-  </style>
-</head>
-<body>
-  <!-- === LOADER === -->
-  <div id="loader">
-    <img src="/images/loader.png" alt="Chargement...">
-    <h2>CHARGEMENT...</h2>
-  </div>
-
-  <!-- === CONTENU PRINCIPAL === -->
-  <main id="content">
-    <%- body %>
-  </main>
-
-  <script>
-    // Lorsque la page est chargée
-    window.addEventListener("load", () => {
-      const loader = document.getElementById("loader");
-      const content = document.getElementById("content");
-
-      setTimeout(() => {
-        loader.classList.add("hidden");
-        content.classList.add("visible");
-      }, 1000); // délai de 1 seconde pour un effet fluide
-    });
-  </script>
 
 
 
