@@ -311,28 +311,24 @@
 <section id="avis-clients" class="section-avis">
   <h2 class="titre-section text-center mb-4">Avis de nos clients</h2>
 
+  <section id="avis-clients" class="section-avis">
+  <h2 class="titre-section">Avis de nos clients</h2>
   <div class="avis-grid">
-    <% if (avis && avis.length > 0) { %>
-      <% avis.forEach(a => { %>
-        <div class="avis-item shadow-sm p-3 rounded">
-          <div class="avis-header d-flex justify-content-between align-items-center mb-2">
-            <strong><%= a.nom %></strong>
-            <div class="etoiles">
-              <% for (let i = 0; i < a.note; i++) { %>⭐<% } %>
-            </div>
-          </div>
-          <p class="avis-commentaire"><%= a.commentaire %></p>
+    <% avis.forEach(a => { %>
+      <div class="avis-item">
+        <strong><%= a.nom %></strong>
+        <div class="etoiles">
+          <% for (let i = 0; i < a.note; i++) { %>⭐<% } %>
         </div>
-      <% }) %>
-    <% } else { %>
-      <p class="text-center">Aucun avis pour le moment.</p>
-    <% } %>
+        <p><%= a.commentaire %></p>
+      </div>
+    <% }) %>
   </div>
-
-  <div class="text-center mt-3">
-    <a href="/avis" class="btn btn-outline-primary">Voir tous les témoignages</a>
+  <div class="lien-voir-tous">
+    <a href="/avis">Voir tous les témoignages</a>
   </div>
 </section>
+
 
 
 
