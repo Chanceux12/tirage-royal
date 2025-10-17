@@ -3,9 +3,10 @@ const router = express.Router();
 const User = require('../models/User');
 const Retrait = require('../models/Retrait');
 const { ensureAuthenticated } = require('../middlewares/auth');
+const { isAdmin } = require('../middlewares/authMiddleware');
 
 // ✅ Route pour afficher la page des utilisateurs à approuver
-router.get('/approvals', ensureAuthenticated, async (req, res) => {
+router.get('/approvals', ensureAuthenticated,isAdmin, async (req, res) => {
   const users = await User.find({});
   res.render('admin/approvals', {
     users,
@@ -15,14 +16,14 @@ router.get('/approvals', ensureAuthenticated, async (req, res) => {
 });
 
 // ✅ Route pour approuver un utilisateur
-router.post('/approve/:id', ensureAuthenticated, async (req, res) => {
+router.post('/approve/:id', ensureAuthenticated,isAdmin, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { isApproved: true });
   req.flash('success', 'Utilisateur approuvé avec succès.');
   res.redirect('/admin/approvals');
 });
 
 // ✅ Route pour créditer un utilisateur
-router.post('/crediter/:id', ensureAuthenticated, async (req, res) => {
+router.post('/crediter/:id', ensureAuthenticated,isAdmin, async (req, res) => {
   const userId = req.params.id;
   const montant = parseFloat(req.body.montant);
 
@@ -52,7 +53,7 @@ router.post('/crediter/:id', ensureAuthenticated, async (req, res) => {
 
 
 // Liste des retraits en attente
-router.get('/retraits', ensureAuthenticated, async (req, res) => {
+router.get('/retraits', ensureAuthenticated,isAdmin, async (req, res) => {
   try {
     const statutFilter = req.query.statut || ''; // valeur par défaut
     const query = statutFilter ? { statut: statutFilter } : {};
@@ -73,7 +74,7 @@ router.get('/retraits', ensureAuthenticated, async (req, res) => {
 
 
 // Valider un retrait
-router.post('/retraits/valider/:id', ensureAuthenticated, async (req, res) => {
+router.post('/retraits/valider/:id', ensureAuthenticated,isAdmin, async (req, res) => {
   try {
     const retrait = await Retrait.findById(req.params.id).populate('user');
     if (!retrait) return res.redirect('/admin/retraits');
@@ -104,7 +105,7 @@ router.post('/retraits/valider/:id', ensureAuthenticated, async (req, res) => {
 });
 
 // Refuser un retrait
-router.post('/retraits/refuser/:id', ensureAuthenticated, async (req, res) => {
+router.post('/retraits/refuser/:id', ensureAuthenticated,isAdmin, async (req, res) => {
   try {
     await Retrait.findByIdAndUpdate(req.params.id, { statut: 'échoué' });
     req.flash('success', 'Retrait refusé avec succès.');
