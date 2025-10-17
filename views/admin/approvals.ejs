@@ -42,16 +42,17 @@
 
                 <!-- ✅ Colonne pièce d’identité -->
                 <td class="text-center">
-                  <% if (user.pieceIdentite) { %>
-                    <a href="/uploads/piecesIdentite/<%= user.pieceIdentite %>" target="_blank">
-                      <img src="/uploads/piecesIdentite/<%= user.pieceIdentite %>" 
-                           alt="Pièce d'identité" 
-                           style="width: 80px; height: auto; border-radius: 5px; border: 1px solid #ccc;">
-                    </a>
-                  <% } else { %>
-                    ❌ Non fournie
-                  <% } %>
-                </td>
+  <% if (user.pieceIdentite) { %>
+    <a href="<%= user.pieceIdentite %>" target="_blank">
+      <img src="<%= user.pieceIdentite %>" 
+           alt="Pièce d'identité" 
+           style="width: 80px; height: auto; border-radius: 5px; border: 1px solid #ccc;">
+    </a>
+  <% } else { %>
+    ❌ Non fournie
+  <% } %>
+</td>
+
 
                 <!-- ✅ Statut -->
                 <td class="text-center">
