@@ -50,6 +50,8 @@ exports.fondation = (req, res) => {
   res.render('pages/fondation', { title: 'Fondation', user: req.user || null });
 };
 
+
+
 exports.contact = (req, res) => { 
   res.render("pages/contact", { 
     title: "Contact",
@@ -63,7 +65,6 @@ exports.contact = (req, res) => {
 exports.envoyerContact = async (req, res) => {
   const { nom, email, objet, message } = req.body || {};
 
-  // 🔒 Vérification des champs
   if (!nom || !email || !objet || !message) {
     return res.render("pages/contact", {
       title: "Contact",
@@ -78,15 +79,17 @@ exports.envoyerContact = async (req, res) => {
     let transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_PORT == 465,
+      secure: true,
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
-      }
+      },
+      tls: { rejectUnauthorized: false }
     });
 
     await transporter.sendMail({
-      from: `"${nom}" <${email}>`,
+      from: `"${nom}" <${process.env.EMAIL_USER}>`,
+      replyTo: email,
       to: process.env.EMAIL_USER,
       subject: objet,
       html: `
@@ -100,7 +103,7 @@ exports.envoyerContact = async (req, res) => {
     res.render("pages/contact", {
       title: "Contact",
       user: req.user || null,
-      message: "Votre message a été envoyé avec succès.",
+      message: "✅ Votre message a été envoyé avec succès.",
       messageType: "success",
       formData: { nom:'', email:'', objet:'', message:'' }
     });
@@ -110,12 +113,13 @@ exports.envoyerContact = async (req, res) => {
     res.render("pages/contact", {
       title: "Contact",
       user: req.user || null,
-      message: "Une erreur est survenue, votre message n'a pas pu être envoyé.",
+      message: "❌ Une erreur est survenue, votre message n'a pas pu être envoyé.",
       messageType: "error",
       formData: { nom, email, objet, message }
     });
   }
 };
+
 
 exports.conditions = (req, res) => {
   res.render('pages/conditions', {
