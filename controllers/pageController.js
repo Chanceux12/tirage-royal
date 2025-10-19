@@ -88,17 +88,18 @@ exports.envoyerContact = async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: `"${nom}" <${process.env.EMAIL_USER}>`,
-      replyTo: email,
-      to: process.env.EMAIL_USER,
-      subject: objet,
-      html: `
-        <p><strong>Nom :</strong> ${nom}</p>
-        <p><strong>Email :</strong> ${email}</p>
-        <p><strong>Objet :</strong> ${objet}</p>
-        <p><strong>Message :</strong><br>${message}</p>
-      `
-    });
+  from: `"Tirage Royal" <${process.env.EMAIL_USER}>`, // Toujours ton email officiel
+  replyTo: email,                                     // L'adresse de la personne qui a rempli le formulaire
+  to: process.env.EMAIL_USER,                         // Tu reçois le message ici
+  subject: objet,
+  html: `
+    <p><strong>Nom :</strong> ${nom}</p>
+    <p><strong>Email :</strong> ${email}</p>
+    <p><strong>Objet :</strong> ${objet}</p>
+    <p><strong>Message :</strong><br>${message}</p>
+  `
+});
+
 
     res.render("pages/contact", {
       title: "Contact",
