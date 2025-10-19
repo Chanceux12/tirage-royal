@@ -154,12 +154,18 @@ router.get('/logout', (req, res, next) => {
 // ---------------------
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: true, // true pour le port 465
   auth: {
-    user: 'tirageroyal033@gmail.com',
-    pass: 'yzmz ylbi nqvh prvn'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
+
 
 // 1. Formulaire mot de passe oublié
 router.get('/mot-de-passe-oublie', (req, res) => {
