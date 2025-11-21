@@ -1,0 +1,329 @@
+<% if (user) { %>
+<section class="wallet-section">
+  <div class="wallet-card">
+    <div class="wallet-left">
+      <!-- SVG portefeuille pro -->
+      <div class="wallet-svg-wrap" aria-hidden="true">
+        <svg width="84" height="56" viewBox="0 0 84 56" xmlns="http://www.w3.org/2000/svg">
+          <!-- Body -->
+          <rect x="2" y="10" rx="6" ry="6" width="80" height="34" fill="#1a0f3b"/>
+          <!-- Flap / enveloppe -->
+          <path d="M2 14 L42 34 L82 14 L42 2 Z" fill="#3c1f72"/>
+          <!-- Inner pocket -->
+          <rect x="8" y="18" rx="4" ry="4" width="68" height="18" fill="#2a0f55"/>
+          <!-- Highlight subtle -->
+          <path d="M8 18 Q42 30 76 18" fill="none" stroke="#45297f" stroke-width="1" opacity="0.5"/>
+          <!-- Coin / badge -->
+          <circle cx="64" cy="28" r="7" fill="#FFD166"/>
+          <text x="64" y="31" font-family="Segoe UI, Arial" font-size="9" font-weight="700" text-anchor="middle" fill="#1a0b3b">€</text>
+        </svg>
+      </div>
+
+      <!-- Infos utilisateur et solde -->
+      <div class="wallet-info">
+        <div class="welcome">Bienvenue <strong><%= user.username %></strong></div>
+        <div class="balance">Solde disponible</div>
+        <div class="amount"><%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+      </div>
+    </div>
+
+    <div class="wallet-actions">
+      <a href="/paiement/recharger" class="btn btn-deposit" title="Déposer">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3v12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M19 10l-7-7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="3" y="14" width="18" height="6" rx="2" fill="none" stroke="#fff" stroke-width="1.2"/>
+        </svg>
+        Dépôt
+      </a>
+
+      <a href="/paiement/retrait" class="btn btn-withdraw" title="Retirer">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21V9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M5 14l7 7 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="3" y="3" width="18" height="6" rx="2" fill="none" stroke="#fff" stroke-width="1.2"/>
+        </svg>
+        Retrait
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* === Wallet pro === */
+.wallet-section { width: 100%; padding: 18px 16px; box-sizing: border-box; }
+.wallet-card {
+  max-width: 1100px;
+  margin: 8px auto 24px;
+  background: linear-gradient(180deg, rgba(26,15,59,0.95) 0%, rgba(60,31,114,0.95) 100%);
+  border-radius: 14px;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  box-shadow: 0 12px 32px rgba(3,3,20,0.65);
+  border: 1px solid rgba(255,255,255,0.03);
+  flex-wrap: wrap;
+}
+
+.wallet-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.wallet-svg-wrap { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 4px; }
+
+.wallet-info { display: flex; flex-direction: column; min-width: 0; }
+.wallet-info .welcome { color: #e8e8f8; font-size: 1rem; margin-bottom: 4px; }
+.wallet-info .balance { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .6px; }
+.wallet-info .amount { color: #FFD166; font-weight: 800; font-size: 1.55rem; text-shadow: 0 4px 18px rgba(255,198,60,0.12); }
+
+.wallet-actions { display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(3,6,40,0.45);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.btn .icon { display: inline-block; vertical-align: middle; }
+
+/* Couleurs des boutons */
+.btn-deposit { background: linear-gradient(180deg, #2ecc71 0%, #28a745 100%); }
+.btn-deposit:hover { filter: brightness(0.95); transform: translateY(-2px); transition: .18s ease; }
+
+.btn-withdraw { background: linear-gradient(180deg, #ff6b6b 0%, #dc3545 100%); }
+.btn-withdraw:hover { filter: brightness(0.95); transform: translateY(-2px); transition: .18s ease; }
+
+/* Responsive */
+@media (max-width: 880px) {
+  .wallet-card { padding: 12px; }
+  .wallet-actions { width: 100%; justify-content: space-between; margin-top: 8px; }
+  .wallet-info .amount { font-size: 1.35rem; }
+}
+
+@media (max-width: 520px) {
+  .wallet-card { padding: 10px; gap: 12px; }
+  .wallet-left { gap: 10px; }
+  .wallet-svg-wrap svg { width: 68px; height: 44px; }
+  .wallet-info .welcome { font-size: 0.95rem; }
+  .btn { padding: 9px 12px; font-size: 0.9rem; }
+}
+</style>
+
+
+
+
+
+<section class="retraits-section">
+  <h2>Mes retraits</h2>
+
+  <!-- === CARDS (mobile) === -->
+  <% if (retraits && retraits.length > 0) { %>
+    <% retraits.forEach(function(r) { 
+         let statusClass = '';
+         if(r.statut === 'réussi') statusClass = 'status-reussi';
+         else if(r.statut === 'en attente') statusClass = 'status-en_attente';
+         else if(r.statut === 'échoué') statusClass = 'status-echoue';
+         else statusClass = 'status-en_attente';
+    %>
+      <div class="retrait-card <%= statusClass %>">
+        <div class="retrait-header"><%= r.date %></div>
+        <div class="retrait-amount">
+          - <%= r.amount.toFixed(2) %> <%= r.currency %>
+        </div>
+        <div class="retrait-bank"><%= r.bank_name %> | <%= r.benef_name %></div>
+        <div class="retrait-status">
+          <span class="badge"><%= r.statut %></span>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div style="text-align:center; padding:20px; color:#a3a3a3;">
+      Vous n'avez encore effectué aucun retrait.
+    </div>
+  <% } %>
+
+  <!-- === TABLEAU (desktop) === -->
+  <div class="table-wrapper">
+    <% if (retraits && retraits.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Devise</th>
+            <th>Banque</th>
+            <th>Bénéficiaire</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% retraits.forEach(function(r) { 
+               let statusClass = '';
+               if(r.statut === 'réussi') statusClass = 'status-reussi';
+               else if(r.statut === 'en attente') statusClass = 'status-en_attente';
+               else if(r.statut === 'échoué') statusClass = 'status-echoue';
+               else statusClass = 'status-en_attente';
+          %>
+            <tr>
+              <td><%= r.date %></td>
+              <td class="amount-cell"><%= r.amount.toFixed(2) %></td>
+              <td><%= r.currency %></td>
+              <td><%= r.bank_name %></td>
+              <td><%= r.benef_name %></td>
+              <td class="status-cell">
+                <div class="<%= statusClass %>">
+                  <span class="badge"><%= r.statut %></span>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+
+  <!-- === BOUTONS === -->
+  <div class="buttons">
+    <a href="/paiement/retrait" class="btn-nouveau">Nouvelle demande de retrait</a>
+    <a href="/paiement/mes-retraits" class="btn-historique">Voir l'historique</a>
+  </div>
+</section>
+
+<style>
+/* ---------- Global ---------- */
+.retraits-section {
+  padding: 20px;
+  font-family: "Inter", system-ui;
+  max-width: 920px;
+  margin: 18px auto;
+  color: #f5f5f5;
+  background: #1a0f3bf2;
+  border-radius: 12px;
+}
+
+/* Titre */
+.retraits-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+/* ---------- Cards mobile ---------- */
+.retrait-card {
+  background: rgba(37, 17, 79, 0.55);
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 6px solid transparent;
+  backdrop-filter: blur(4px);
+}
+
+.retrait-header { color: #cbd5e1; font-size: 13px; }
+.retrait-amount { font-size: 18px; font-weight: 700; text-align: right; }
+.retrait-bank { color: #a3a3a3; font-size: 14px; }
+.retrait-status .badge {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+/* Statuts */
+.status-reussi { border-left-color: #4ade80; }
+.status-reussi .badge { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+
+.status-echoue { border-left-color: #f87171; }
+.status-echoue .badge { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+
+.status-en_attente { border-left-color: #facc15; }
+.status-en_attente .badge { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+
+/* ---------- Desktop tableau ---------- */
+.table-wrapper { display: none; margin-top: 14px; }
+
+@media (min-width: 700px) {
+  .retrait-card { display: none; }
+
+  .table-wrapper { display: block; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(37, 17, 79, 0.55);
+    color: #f5f5f5;
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+  }
+
+  thead th {
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.05);
+    color: #cbd5e1;
+    font-weight: 700;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-size: 15px;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody td.amount-cell { text-align: right; font-weight: 700; }
+  tbody td.status-cell { text-align: right; }
+}
+
+/* ---------- Boutons ---------- */
+.buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.buttons a {
+  display: inline-block;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.btn-nouveau { background: #2563eb; color: #fff; }
+.btn-nouveau:hover { background: #1e4bb8; }
+
+.btn-historique { background: #6b7280; color: #fff; }
+.btn-historique:hover { background: #4b5563; }
+
+/* ---------- Responsive ---------- */
+@media(max-width:768px){
+  table, th, td { font-size: 0.85rem; padding: 0.6rem; }
+  .buttons { flex-direction: column; }
+}
+
+@media(max-width:480px){
+  table, th, td { font-size: 0.8rem; padding: 0.5rem; }
+}
+</style>
+
+<% } %>

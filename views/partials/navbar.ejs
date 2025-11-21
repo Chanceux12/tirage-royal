@@ -1,0 +1,13 @@
+<nav style="background:#0b3d91; padding:10px;"> 
+  <ul style="list-style:none; margin:0; padding:0; display:flex; gap:20px;">
+    <li><a href="/" style="color:#fff; text-decoration:none;">Accueil</a></li>
+    <% if (user) { %>
+      <li><a href="/dashboard" style="color:#fff; text-decoration:none;">Mon compte (Solde: <%= user.solde.toFixed(2) %> €)</a></li>
+      <li><a href="/recharge" style="color:#fff; text-decoration:none;">Recharger mon compte</a></li>  <!-- Le lien que tu veux ajouter -->
+      <li><a href="/logout" style="color:#fff; text-decoration:none;">Déconnexion</a></li>
+    <% } else { %>
+      <li><a href="/login" style="color:#fff; text-decoration:none;">Connexion</a></li>
+      <li><a href="/register" style="color:#fff; text-decoration:none;">Inscription</a></li>
+    <% } %>
+  </ul>
+</nav>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <link rel="stylesheet" href="/styles/global.css">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barre d'en-tête</title>
+  <style>
+    /* RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d0d2b;
+    }
+
+    header {
+      width: 100%;
+      background: linear-gradient(90deg, #3a0ca3, #7209b7);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      display: flex;
+      gap: 25px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffd700;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      margin: 4px 0;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 30px;
+        background: #1e1e3f;
+        flex-direction: column;
+        width: 200px;
+        padding: 15px;
+        border-radius: 5px;
+      }
+
+      nav.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">MonProjet</div>
+    <div class="menu-toggle" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <% if (user) { %>
+      <div class="user-solde">
+    💰 Solde : <strong><%= user.solde.toFixed(2) %> €</strong>
+      </div>
+    <% } %>
+
+    <% if (user) { %>
+      <a href="/user/dashboard">🎫 Mon compte</a>
+    <% } %>
+
+    <nav id="navbar">
+      <a href="/">Accueil</a>
+      <a href="/login">Connexion</a>
+      <a href="/register">Inscription</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const navbar = document.getElementById("navbar");
+      navbar.classList.toggle("active");
+    }
+  </script>
+</body>
+</html>

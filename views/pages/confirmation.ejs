@@ -1,0 +1,138 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Confirmation – <%= jeu.nom %></title>
+  <link rel="stylesheet" href="/styles/style.css" />
+</head>
+<body>
+
+  <main class="confirmation-page">
+    <h1 class="confirmation-title">🎉 Participation confirmée !</h1>
+    <p>Merci d’avoir participé au jeu <strong><%= jeu.nom %></strong>.</p>
+
+    <div class="jeu-meta">
+      <p><strong>Date du tirage :</strong> <%= jeu.dateTirage %></p>
+      <p><strong>Récompense maximale :</strong> <%= jeu.recompense.toLocaleString() %> €</p>
+    </div>
+
+    <section class="selection-preview">
+      <h2>Votre sélection</h2>
+      <div class="selection-cadre">
+        <% numeros.forEach(num => { %>
+          <div class="bubble animated"><%= num %></div>
+        <% }) %>
+        <% etoiles.forEach(star => { %>
+          <div class="bubble star animated">
+            <span class="star-icon">⭐</span><span class="star-number"><%= star %></span>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <div class="confirmation-actions">
+      <a href="/" class="cta-btn">🏠 Retour à l’accueil</a>
+      <a href="/jouer" class="cta-btn secondary">🎮 Jouer à un autre jeu</a>
+    </div>
+  </main>
+
+  
+
+  <style>
+    .confirmation-page {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .confirmation-title {
+      font-size: 2rem;
+      animation: bounceIn 1s ease;
+    }
+
+    .selection-cadre {
+      border: 3px solid white;
+      border-radius: 12px;
+      padding: 10px;
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      margin: 20px auto;
+    }
+
+    .bubble {
+      width: 50px;
+      height: 50px;
+      background: #ff6600;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 20px;
+      box-shadow: 0 0 8px rgba(255, 102, 0, 0.8);
+    }
+
+    .bubble.star {
+      background: #ff9900;
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px rgba(255, 153, 0, 0.9);
+    }
+
+    .animated {
+      animation: zoomPop 0.5s ease-in-out;
+    }
+
+    .cta-btn {
+      padding: 10px 20px;
+      background: #1d6efc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin: 10px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+
+    .cta-btn:hover {
+      background: #0e4cd2;
+    }
+
+    .cta-btn.secondary {
+      background: #444;
+    }
+
+    @keyframes zoomPop {
+      0% { transform: scale(0.4); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      .bubble {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+
+      .selection-cadre {
+        padding: 8px;
+        gap: 8px;
+      }
+    }
+  </style>
+</body>
+</html>

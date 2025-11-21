@@ -1,0 +1,15 @@
+<h1>Validation des comptes utilisateurs</h1>
+<table>
+  <tr><th>Email</th><th>Action</th></tr>
+  <% utilisateurs.forEach(u => { %>
+    <tr>
+      <td><%= u.email %></td>
+      <td>
+        <form method="POST" action="/admin/valider/<%= u._id %>">
+          <button>Valider</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+

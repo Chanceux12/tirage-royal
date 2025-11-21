@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jouer – Tirage Royal</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+</head>
+<body>
+
+  <section class="hero-section">
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <h1>Jouez. Gagnez. Répétez.</h1>
+      <p>Participez à nos tirages et remportez des récompenses chaque jour. Simple, rapide, sécurisé.</p>
+      <a href="#jeuxSlider" class="cta-btn">Découvrir les jeux</a>
+    </div>
+  </div>
+</section>
+
+  <h1 style="text-align: center; margin-top: 40px;">Nos jeux disponibles</h1>
+
+  <div class="slider-container">
+    <button class="nav-button left">◀</button>
+
+    <div class="slider" id="jeuxSlider">
+      <% if (jeux && jeux.length > 0) { %>
+        <% jeux.forEach(jeu => { %>
+          <div class="carte-jeu">
+            <div class="image-container">
+              <div class="timer-overlay" data-date="<%= jeu.prochainTirage || jeu.dateTirage %>">
+                ⏳ <span class="timer">Chargement...</span>
+              </div>
+              <img src="<%= jeu.image %>" alt="<%= jeu.nom %>" />
+              <div class="overlay-titre"><%= jeu.nom.toUpperCase() %></div>
+            </div>
+
+            <div class="infos">
+              <p>📅 Tirage :
+                <%= new Date(jeu.prochainTirage || jeu.dateTirage).toLocaleString('fr-FR', {
+                  dateStyle: 'short', timeStyle: 'short'
+                }) %>
+              </p>
+              <p>🎟️ <%= jeu.billetsRestants.toLocaleString() %> billets restants</p>
+              <p>📊 Statut : <strong><%= jeu.statut %></strong></p>
+              <p>💰 Récompense : <span class="gain"><%= (jeu.recompense || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') %> €</span></p>
+              <a href="/jeu/<%= jeu.slug %>" class="jouer-btn">Jouer pour <%= jeu.montant %> €</a>
+            </div>
+          </div> 
+        <% }) %>
+      <% } %>
+    </div>
+
+    <button class="nav-button right">▶</button>
+  </div>
+
+
+  <!-- SECTION : COMMENT JOUER PROFESSIONNELLEMENT -->
+<section class="comment-jouer">
+  <div class="container">
+    <h2>Comment participer à nos tirages ?</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Sélectionnez un jeu</h3>
+        <p>Sélectionnez le jeu qui vous attire et vérifiez que son statut est bien actif ou ouvert.</p>
+      </div>
+      <div class="step">
+        <h3>2. Achetez un ticket</h3>
+        <p>Achetez un ticket en quelques clics pour le montant indiqué.</p>
+      </div>
+      <div class="step">
+        <h3>3. Choisissez vos numéros</h3>
+        <p>Choisissez 5 numéros de votre choix et 2 étoiles obligatoires (les étoiles ne comptent pas pour les numéros gagnants).</p>
+      </div>
+      <div class="step">
+        <h3>4. Participez en sécurité</h3>
+        <p>Vérifiez votre solde et participez en toute sécurité, en un seul clic.</p>
+      </div>
+      <div class="step">
+        <h3>5. Rapprochez-vous du jackpot</h3>
+        <p>Chaque ticket vous rapproche du grand lot qui pourrait changer votre vie !</p>
+      </div>
+    </div>
+
+    <div class="results-gains">
+      <div class="results">
+        <h3>Résultats</h3>
+        <p>Consultez les résultats dès leur publication sur votre page <strong>Résultats</strong>, dans la section <strong>Mes participations</strong>, ou directement via vos <strong>emails</strong> et <strong>SMS automatiques</strong> (sous 48h après les tirages).</p>
+      </div>
+      <div class="gains">
+        <h3>Gains</h3>
+        <p>Les fonds gagnés seront transférés par le gagnant lui-même vers son <strong>solde principal</strong>, puis sur son <strong>compte bancaire</strong> en toute sécurité.</p>
+      </div>
+    </div>
+
+    <div class="cta">
+      <p>✨ <strong>Changez votre vie avec nous dès aujourd’hui !</strong> ✨</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION : POURQUOI NOUS CHOISIR -->
+<section class="why-us">
+  <div class="container">
+    <h2>Pourquoi choisir Tirage Royal ?</h2>
+    <div class="advantages">
+      <div class="advantage">
+        <h3>100% Sécurisé</h3>
+        <p>Vos participations et paiements sont protégés par des systèmes certifiés.</p>
+      </div>
+      <div class="advantage">
+        <h3>Transparence totale</h3>
+        <p>Tous les tirages sont publics, vérifiables, et publiés automatiquement.</p>
+      </div>
+      <div class="advantage">
+        <h3>Gains rapides</h3>
+        <p>Les gagnants sont crédités en quelques heures seulement, sans délai caché.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- COMPTEUR CERCLE ANIMÉ -->
+<section class="live-counter-cercle">
+  <div class="counter-container">
+    <div class="counter-block">
+      <svg class="circle" width="120" height="120">
+        <circle cx="60" cy="60" r="54" stroke="#444" stroke-width="10" fill="none" />
+        <circle cx="60" cy="60" r="54" stroke="#f9dc5c" stroke-width="10" fill="none" stroke-dasharray="339.292" stroke-dashoffset="339.292" />
+      </svg>
+      <div class="counter-value" id="joueurs-en-ligne">0</div>
+      <div class="counter-label">Joueurs en ligne</div>
+    </div>
+
+    <div class="counter-block">
+      <svg class="circle" width="120" height="120">
+        <circle cx="60" cy="60" r="54" stroke="#444" stroke-width="10" fill="none" />
+        <circle cx="60" cy="60" r="54" stroke="#58e1c1" stroke-width="10" fill="none" stroke-dasharray="339.292" stroke-dashoffset="339.292" />
+      </svg>
+      <div class="counter-value" id="billets-restants">0</div>
+      <div class="counter-label">Billets restants</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION : SUIVEZ-NOUS -->
+<section class="reseaux-sociaux">
+  <div class="container">
+    <h2>📲 Suivez-nous sur les réseaux</h2>
+    <div class="icones-reseaux">
+      <a href="https://facebook.com" target="_blank"><img src="/img/facebook.svg" alt="Facebook"></a>
+      <a href="https://instagram.com" target="_blank"><img src="/img/instagram.svg" alt="Instagram"></a>
+      <a href="https://twitter.com" target="_blank"><img src="/img/twitter.svg" alt="Twitter"></a>
+      <a href="https://tiktok.com" target="_blank"><img src="/img/tiktok.svg" alt="TikTok"></a>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPT D'ANIMATION POUR COMPTEUR -->
+<script>
+  function formatNombre(n) {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+    return n.toString();
+  }
+
+  function animerCompteurAvecCercle(id, cible, duration, cercleSvg) {
+    const el = document.getElementById(id);
+    let valeur = 0;
+    const increment = cible / (duration / 10);
+    const cercle = cercleSvg.querySelector('circle:nth-child(2)');
+    const longueur = 2 * Math.PI * 54;
+
+    cercle.classList.remove('pulse');
+
+    const interval = setInterval(() => {
+      valeur += increment;
+      if (valeur >= cible) {
+        valeur = cible;
+        clearInterval(interval);
+        cercle.classList.add('pulse');
+      }
+      el.textContent = formatNombre(Math.floor(valeur));
+
+      const progress = valeur / cible;
+      cercle.setAttribute('stroke-dashoffset', longueur * (1 - progress));
+    }, 10);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const cercle1 = document.querySelectorAll('.circle')[0];
+    const cercle2 = document.querySelectorAll('.circle')[1];
+    animerCompteurAvecCercle("joueurs-en-ligne", 20654755454, 1500, cercle1);
+    animerCompteurAvecCercle("billets-restants", 523545464, 1000, cercle2);
+  });
+</script>
+
+
+<footer class="footer-site">
+  <!-- Logos au-dessus -->
+  <div class="footer-logos">
+    <div class="footer-logos-block">
+      <img src="/img/conseils.svg" alt="Conseils" class="footer-icon" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/googleplay.svg" alt="Google Play" />
+      <img src="/img/appstore.svg" alt="App Store" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/visa.svg" alt="Visa" />
+      <img src="/img/mastercard.svg" alt="Mastercard" />
+      <img src="/img/paysafecard.svg" alt="Paysafecard" />
+      <img src="/img/paypal.svg" alt="PayPal" />
+    </div>
+  </div>
+
+
+  
+
+
+  
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // ⏳ Timer
+      document.querySelectorAll('.timer-overlay').forEach(function(timerEl) {
+        const dateTirage = new Date(timerEl.dataset.date).getTime();
+        const timerSpan = timerEl.querySelector('.timer');
+
+        function updateTimer() {
+          const now = new Date().getTime();
+          const diff = dateTirage - now;
+
+          if (diff <= 0) {
+            timerSpan.textContent = "Tirage terminé";
+            timerEl.classList.add("terminé");
+            return;
+          }
+
+          const j = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+          timerSpan.textContent = `${j}j ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+      });
+
+      // ▶◀ Flèches
+      const slider = document.getElementById('jeuxSlider');
+      const leftBtn = document.querySelector('.nav-button.left');
+      const rightBtn = document.querySelector('.nav-button.right');
+
+      function scrollSlider(direction) {
+        const amount = slider.offsetWidth * 0.8;
+        slider.scrollBy({ left: direction * amount, behavior: 'smooth' });
+      }
+
+      leftBtn.addEventListener('click', () => scrollSlider(-1));
+      rightBtn.addEventListener('click', () => scrollSlider(1));
+    });
+  </script>
+
+</body>
+</html>

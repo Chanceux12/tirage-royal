@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord Admin - Tirage Royal</title>
+  <link rel="stylesheet" href="/styles/style.css"> <!-- Assure-toi que ce chemin est correct -->
+</head>
+<body>
+  <header>
+    <h1>🎛️ Tableau de bord Administrateur</h1>
+    <nav>
+      <a href="/">🏠 Accueil</a>
+      <a href="/logout">🚪 Déconnexion</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>📋 Comptes en attente de validation</h2>
+
+    <% if (utilisateurs.length === 0) { %>
+      <p>✅ Tous les comptes ont été validés.</p>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>📧 Email</th>
+            <th>🔘 Valider</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% utilisateurs.forEach(user => { %>
+            <tr>
+              <td><%= user.email %></td>
+              <td>
+                <form action="/admin/valider/<%= user._id %>" method="POST">
+                  <button type="submit">✅ Valider</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </main>
+
+  <footer>
+    <p>&copy; <%= new Date().getFullYear() %> Tirage Royal - Administration</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>  
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion à Tirage Royal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles/auth.css">
+  <style>
+    .error {
+      color: red;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      color: green;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .forgot-link {
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+
+    .forgot-link a {
+      color: #3498db;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    .toast-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      font-size: 0.95rem;
+    }
+
+    .toast-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-error {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .toast-success {
+      background-color: #2ecc71;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ TOAST MESSAGES -->
+  <% if (query?.message === 'waitApproval') { %>
+    <div class="toast-message toast-success show">
+      ✅ Compte créé avec succès ! Veuillez attendre l'approbation de l'administrateur.
+    </div>
+  <% } else if (message && message.length > 0) { %>
+    <div class="toast-message toast-error show"><%= message %></div>
+  <% } %>
+
+  <div class="container">
+    <div class="left-panel">
+      <!-- Illustration ou visuel ici (optionnel sur desktop) -->
+    </div>
+
+    <div class="right-panel">
+      <h2>Connexion à votre compte</h2>
+
+      <% if (errors?.email || errors?.password) { %>
+        <div class="error">Veuillez corriger les erreurs ci-dessous.</div>
+      <% } %>
+
+      <form action="/auth/login" method="POST" novalidate>
+        <div class="form-group">
+          <label for="email">Adresse Email</label>
+          <input type="email" name="email" id="email" required placeholder="Entrez votre e-mail" value="<%= data?.email || '' %>" autocomplete="email">
+          <% if (errors?.email) { %><div class="error"><%= errors.email %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" name="password" id="password" required placeholder="Entrez votre mot de passe" autocomplete="current-password">
+          <% if (errors?.password) { %><div class="error"><%= errors.password %></div><% } %>
+        </div>
+
+        <% if (errors?.password) { %>
+  <div class="forgot-link">
+    <a href="/auth/mot-de-passe-oublie">Mot de passe oublié ?</a>
+  </div>
+<% } %>
+
+        <button type="submit" class="btn-submit">Se connecter</button>
+
+        <p class="register-link">
+          Pas encore de compte ? <a href="/auth/register">Créez-en un gratuitement</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ Script pour faire disparaître les toasts -->
+  <script>
+    setTimeout(() => {
+      const toast = document.querySelector('.toast-message');
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        setTimeout(() => toast.remove(), 500);
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

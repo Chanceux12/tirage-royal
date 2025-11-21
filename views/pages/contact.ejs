@@ -1,0 +1,123 @@
+<main class="contact-page" style="font-family:'Poppins',sans-serif; color:#1C1C1C; line-height:1.7;">
+
+  <!-- HEADER HERO -->
+  <section class="contact-header" style="background:#080032; color:#fff; padding:6rem 1rem; text-align:center; border-radius:16px; margin-bottom:4rem;">
+    <h1 style="font-size:3rem; font-weight:700; margin-bottom:1rem;">📩 Contactez <span style="color:#FF7A00;">Tirage Royal</span></h1>
+    <p style="max-width:750px; margin:0 auto; font-size:1.2rem; opacity:0.85;">
+      Vous avez une question ou une suggestion ? Notre équipe est là pour vous répondre rapidement. Remplissez le formulaire ci-dessous.
+    </p>
+  </section>
+
+  <!-- FORMULAIRE PROFESSIONNEL -->
+  <section class="contact-form-wrap" style="max-width:720px; margin:0 auto 4rem auto; padding:0 1rem;">
+
+    <!-- MESSAGE SUCCÈS / ERREUR -->
+    <% if (message) { %>
+      <div class="<%= messageType === 'success' ? 'message-success' : 'message-error' %>">
+        <%= message %>
+      </div>
+    <% } %>
+
+    <div style="background:#fff; padding:3rem; border-radius:16px; box-shadow:0 12px 35px rgba(0,0,0,0.15); transition:transform 0.3s ease;">
+      <form action="/contact" method="POST" style="display:flex; flex-direction:column; gap:2rem;">
+        <label style="display:flex; flex-direction:column; font-weight:500;">Nom complet
+          <input type="text" name="nom" placeholder="Votre nom complet" required 
+                 value="<%- formData ? formData.nom : '' %>"
+                 style="padding:1rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:12px; font-size:1rem; transition:all 0.3s;">
+        </label>
+
+        <label style="display:flex; flex-direction:column; font-weight:500;">E-mail
+          <input type="email" name="email" placeholder="Votre adresse email" required 
+                 value="<%- formData ? formData.email : '' %>"
+                 style="padding:1rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:12px; font-size:1rem; transition:all 0.3s;">
+        </label>
+
+        <label style="display:flex; flex-direction:column; font-weight:500;">Objet
+          <input type="text" name="objet" placeholder="Objet du message" required 
+                 value="<%- formData ? formData.objet : '' %>"
+                 style="padding:1rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:12px; font-size:1rem; transition:all 0.3s;">
+        </label>
+
+        <label style="display:flex; flex-direction:column; font-weight:500;">Message
+          <textarea name="message" rows="6" placeholder="Votre message" required 
+                    style="padding:1rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:12px; font-size:1rem; resize:none; transition:all 0.3s;"><%- formData ? formData.message : '' %></textarea>
+        </label>
+
+        <button type="submit" 
+          style="padding:1.2rem; background:#FF7A00; color:#fff; font-weight:700; border:none; border-radius:12px; cursor:pointer; font-size:1.1rem; transition:all 0.3s;">
+          ✉️ Envoyer
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- INFOS DE CONTACT -->
+  <section class="contact-info" style="max-width:720px; margin:0 auto 4rem auto; padding:0 1rem;">
+    <div style="background:#fff; padding:3rem; border-radius:16px; box-shadow:0 12px 35px rgba(0,0,0,0.15);">
+      <h2 style="font-size:2rem; color:#FF7A00; margin-bottom:1.5rem;">📞 Nos coordonnées</h2>
+      <ul style="list-style:none; padding:0; font-size:1.05rem; line-height:2;">
+        <li>📧 <strong>Email :</strong> <a href="mailto:contact@tirage-royal.com" style="color:#FF7A00; text-decoration:none;">contact@tirage-royal.com</a></li>
+        <li>📱 <strong>Téléphone :</strong> +33 7 74 13 70 61</li>
+        <li>🏢 <strong>Adresse :</strong> 5 Rue de la Paix, 75002 Paris, France</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- GOOGLE MAPS -->
+  <section class="contact-map" style="max-width:720px; margin:0 auto 5rem auto; padding:0 1rem;">
+    <iframe 
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.623560881963!2d2.329428315674307!3d48.86863707928715!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e1fa0b5a8c9%3A0x5d5c7b3a1d6d2c0f!2s5%20Rue%20de%20la%20Paix%2C%2075002%20Paris%2C%20France!5e0!3m2!1sfr!2sfr!4v1694880000000!5m2!1sfr!2sfr" 
+      width="100%" 
+      height="400" 
+      style="border:0; border-radius:16px; box-shadow:0 12px 35px rgba(0,0,0,0.1);" 
+      allowfullscreen="" 
+      loading="lazy">
+    </iframe>
+  </section>
+
+  <!-- RESPONSIVE + Styles messages -->
+  <style>
+    @media (max-width: 768px) {
+      .contact-header h1 { font-size:2.2rem; }
+      .contact-header p { font-size:1rem; }
+      .contact-form-wrap, .contact-info, .contact-map { padding:1.5rem; }
+    }
+
+    input:focus, textarea:focus {
+      border-color:#FF7A00;
+      box-shadow:0 0 15px rgba(255,122,0,0.25);
+      outline:none;
+    }
+
+    button:hover {
+      background:#e66a00;
+      transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(255,122,0,0.3);
+    }
+
+    .contact-form-wrap div:hover {
+      transform:translateY(-3px);
+      box-shadow:0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    /* Messages succès / erreur */
+    .message-success {
+      background: #d4edda;
+      color: #155724;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .message-error {
+      background: #f8d7da;
+      color: #721c24;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+  </style>
+
+</main>

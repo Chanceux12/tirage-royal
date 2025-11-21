@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      /* On ne touche pas au background, on garde celui de ta page */
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      /* Fond transparent pour garder le background de la page */
+      background-color: rgba(255, 255, 255, 0.05); 
+      backdrop-filter: blur(5px);
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #fff;
+      border-bottom: 2px solid rgba(255,255,255,0.3);
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      transition: background 0.3s;
+      color: #fff;
+      background-color: rgba(0,0,0,0.2); /* léger fond semi-transparent */
+    }
+
+    ul li:hover {
+      background-color: rgba(0,0,0,0.3);
+    }
+
+    ul li strong {
+      min-width: 120px;
+    }
+
+    a.logout-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    a.logout-btn:hover {
+      background-color: #fff;
+      color: #000;
+    }
+
+    @media (max-width: 600px) {
+      ul li {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      ul li strong {
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenue <%= user.prenom %> <%= user.nom %></h1>
+
+    <h2>Mes informations</h2>
+    <ul>
+      <li><strong>Nom :</strong> <span><%= user.nom %></span></li>
+      <li><strong>Prénom :</strong> <span><%= user.prenom %></span></li>
+      <li><strong>Email :</strong> <span><%= user.email %></span></li>
+    </ul>
+
+    <a class="logout-btn" href="/auth/logout">Se déconnecter</a>
+  </div>
+</body>
+</html>

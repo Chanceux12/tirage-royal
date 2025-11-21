@@ -1,0 +1,197 @@
+<!DOCTYPE html>  
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Crée un compte gratuit</title>
+  <link rel="stylesheet" href="/styles/auth.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .error {
+      color: red;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="left-panel"></div>
+
+    <div class="right-panel">
+      <h2>Crée un compte gratuit</h2>
+
+      <form action="/auth/register" method="POST" enctype="multipart/form-data">
+
+        <div class="row">
+          <div class="form-group">
+            <label for="nom">Nom</label>
+            <input type="text" name="nom" id="nom" required placeholder="Entrez votre nom" value="<%= data?.nom || '' %>">
+            <% if (errors?.nom) { %><div class="error"><%= errors.nom %></div><% } %>
+          </div>
+
+          <div class="form-group">
+            <label for="prenom">Prénom</label>
+            <input type="text" name="prenom" id="prenom" required placeholder="Entrez votre prénom" value="<%= data?.prenom || '' %>">
+            <% if (errors?.prenom) { %><div class="error"><%= errors.prenom %></div><% } %>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input type="text" name="username" id="username" required placeholder="Choisissez un nom d'utilisateur" value="<%= data?.username || '' %>">
+          <% if (errors?.username) { %><div class="error"><%= errors.username %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Adresse Email *</label>
+          <input type="email" name="email" id="email" required placeholder="Entrez votre adresse e-mail" value="<%= data?.email || '' %>">
+          <% if (errors?.email) { %><div class="error"><%= errors.email %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="parrainage">Code de parrainage (optionnel)</label>
+          <input type="text" name="parrainage" id="parrainage" placeholder="Ex: CODE123" value="<%= data?.parrainage || '' %>">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe *</label>
+          <input type="password" name="password" id="password" minlength="8" required placeholder="8 caractères minimum">
+          <% if (errors?.password) { %><div class="error"><%= errors.password %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmez votre mot de passe *</label>
+          <input type="password" name="confirmPassword" id="confirmPassword" minlength="8" required placeholder="Répétez votre mot de passe">
+          <% if (errors?.confirmPassword) { %><div class="error"><%= errors.confirmPassword %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="langue">Langue préférée</label>
+          <select name="langue" id="langue" required>
+            <option value="">-- Choisissez une langue --</option>
+            <option value="fr" <%= data?.langue === 'fr' ? 'selected' : '' %>>Français</option>
+            <option value="en" <%= data?.langue === 'en' ? 'selected' : '' %>>English</option>
+            <option value="es" <%= data?.langue === 'es' ? 'selected' : '' %>>Español</option>
+            <option value="de" <%= data?.langue === 'de' ? 'selected' : '' %>>Deutsch</option>
+            <option value="it" <%= data?.langue === 'it' ? 'selected' : '' %>>Italiano</option>
+            <option value="ar" <%= data?.langue === 'ar' ? 'selected' : '' %>>العربية</option>
+          </select>
+          <% if (errors?.langue) { %><div class="error"><%= errors.langue %></div><% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="devise">Devise préférée</label>
+          <select name="devise" id="devise" required>
+            <option value="">-- Choisissez une devise --</option>
+            <option value="EUR" <%= data?.devise === 'EUR' ? 'selected' : '' %>>Euro (€)</option>
+            <option value="USD" <%= data?.devise === 'USD' ? 'selected' : '' %>>Dollar ($)</option>
+            <option value="GBP" <%= data?.devise === 'GBP' ? 'selected' : '' %>>Livre (£)</option>
+            <option value="CAD" <%= data?.devise === 'CAD' ? 'selected' : '' %>>Dollar canadien (C$)</option>
+          </select>
+          <% if (errors?.devise) { %><div class="error"><%= errors.devise %></div><% } %>
+        </div>
+   
+        <div class="form-group">
+          <label for="pieceIdentite">Photo de pièce d'identité *</label>
+          <input type="file" name="pieceIdentite" id="pieceIdentite" accept="image/*" required>
+          <% if (errors?.pieceIdentite) { %>
+            <div class="error"><%= errors.pieceIdentite %></div>
+          <% } %>
+        </div>
+        
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="terms" name="terms" <%= data?.terms ? 'checked' : '' %>>
+          <label for="terms" class="checkbox-label">
+            J’ai lu et accepté les
+            <li><a href="/conditions">Conditions d'Utilisation</a></li> et la
+            <li><a href="/politique-confidentialite">Politique de confidentialité</a></li>
+          </label>
+          <% if (errors?.terms) { %><div class="error"><%= errors.terms %></div><% } %>
+        </div>
+
+        <button type="submit" class="btn-submit">S'enregistrer</button>
+
+        <p class="login-link">Vous avez un compte ? <a href="/auth/login">Cliquez ici</a> pour y accéder.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        validateField(input);
+      });
+      input.addEventListener('blur', () => {
+        validateField(input);
+      });
+    });
+
+    function validateField(input) {
+      const errorDivId = input.name + '-error';
+      let errorDiv = document.getElementById(errorDivId);
+
+      if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.id = errorDivId;
+        errorDiv.className = 'error';
+        input.insertAdjacentElement('afterend', errorDiv);
+      }
+
+      let errorMsg = '';
+
+      if (input.type === 'checkbox') {
+        if (!input.checked) {
+          errorMsg = 'Vous devez accepter les conditions';
+        }
+      } else if (input.name === 'email') {
+        if (!input.value.trim()) {
+          errorMsg = 'L\'email est requis';
+        } else if (!/\S+@\S+\.\S+/.test(input.value)) {
+          errorMsg = 'Format d\'email invalide';
+        }
+      } else if (input.name === 'password') {
+        if (input.value.length < 8) {
+          errorMsg = 'Mot de passe trop court (min. 8 caractères)';
+        }
+      } else if (input.name === 'confirmPassword') {
+        const pass = form.querySelector('input[name="password"]').value;
+        if (input.value !== pass) {
+          errorMsg = 'Les mots de passe ne correspondent pas';
+        }
+      } else if (!input.value.trim()) {
+        const label = document.querySelector('label[for="' + input.id + '"]');
+        errorMsg = `Le champ "${label ? label.innerText : input.name}" est requis`;
+      }
+
+      if (errorMsg) {
+        errorDiv.textContent = errorMsg;
+      } else {
+        errorDiv.textContent = '';
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      let formIsValid = true;
+      inputs.forEach(input => {
+        validateField(input);
+        const errorDiv = document.getElementById(input.name + '-error');
+        if (errorDiv && errorDiv.textContent) {
+          formIsValid = false;
+        }
+      });
+
+      if (!formIsValid) {
+        e.preventDefault();
+        alert('Veuillez corriger les erreurs dans le formulaire');
+      }
+    });
+  </script>
+
+</body>
+</html>

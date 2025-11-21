@@ -1,0 +1,101 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mon compte – Tirage Royal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    td, th {
+      padding: 10px;
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/navbar', { user: user }) %>
+  <h1>Bienvenue <%= user.username %></h1>
+  <p>Solde actuel : <strong><%= user.solde.toFixed(2) %> €</strong></p>
+
+  <!-- 🔘 Bouton pour modifier le profil -->
+  <a href="/profil/modifier" class="btn">📝 Modifier mes informations</a>
+
+  <!-- 💳 Historique des recharges -->
+  <h2>Historique des recharges</h2>
+  <% if (transactions.length > 0) { %>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Montant (€)</th>
+        <th>Moyen</th>
+        <th>Statut</th>
+      </tr>
+      <% transactions.forEach(t => { %>
+        <tr>
+          <td><%= t.createdAt.toLocaleDateString('fr-FR') %></td>
+          <td><%= t.amount.toFixed(2) %></td>
+          <td><%= t.description %></td>
+          <td><%= t.status %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } else { %>
+    <p>Aucune recharge effectuée pour le moment.</p>
+  <% } %>
+
+  <!-- 🎫 Historique des participations -->
+  <h2>🎮 Historique des participations</h2>
+  <% if (participations.length > 0) { %>
+    <table>
+      <tr>
+        <th>Jeu</th>
+        <th>Numéros</th>
+        <th>Étoiles</th>
+        <th>Date</th>
+        <th>Statut</th>
+        <th>Gain (€)</th>
+      </tr>
+      <% participations.forEach(p => { %>
+        <tr onclick="window.location.href='/ticket/<%= p._id %>'" style="cursor: pointer;">
+          <td><%= p.jeu %></td> 
+          <td><%= p.numeros.join(', ') %></td>
+          <td><%= p.etoiles.join(', ') %></td>
+          <td><%= p.dateParticipation.toLocaleDateString('fr-FR') %></td>
+          <td><%= p.statut %></td>
+          <td><%= p.gain && p.gain > 0 ? p.gain.toFixed(2) : '0.00' %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } else { %>
+    <p>Aucune participation enregistrée.</p>
+  <% } %>
+</body>
+</html>

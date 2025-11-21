@@ -1,0 +1,206 @@
+<section class="temoignages-section">
+  <h2>Avis de nos clients</h2>
+
+  <!-- Formulaire d'ajout d'avis avec photo -->
+  <form class="avis-form" action="/avis/ajouter" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <input type="text" name="nom" placeholder="Votre nom" required />
+    </div>
+    <div class="form-group">
+      <textarea name="commentaire" placeholder="Votre avis" required></textarea>
+    </div>
+    <div class="form-group">
+      <select name="note" required>
+        <option value="">Note</option>
+        <% for (let i = 1; i <= 5; i++) { %>
+          <option value="<%= i %>"><%= i %> ⭐</option>
+        <% } %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="file-label">
+        Ajouter une photo
+        <input type="file" name="photo" accept="image/*" />
+      </label>
+    </div>
+    <input type="text" name="honeypot" style="display: none" />
+    <button type="submit" class="btn-submit">Envoyer</button>
+  </form>
+
+  <!-- Affichage des avis -->
+  <% if (avis.length > 0) { %>
+    <div class="avis-liste">
+      <% avis.forEach(a => { %>
+        <div class="avis-item">
+          <% if (a.photo) { %>
+            <img src="<%= a.photo %>" alt="Photo de <%= a.nom %>" class="avis-photo">
+          <% } %>
+          <div class="avis-content">
+            <strong class="avis-nom"><%= a.nom %></strong>
+            <small class="avis-date">
+              <%= new Date(a.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) %>
+            </small>
+            <div class="avis-note">
+              <% for (let i = 0; i < a.note; i++) { %>⭐<% } %>
+            </div>
+            <p class="avis-commentaire"><%= a.commentaire %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %> 
+    <p class="aucun-avis">Aucun témoignage encore publié.</p>
+  <% } %>
+</section>
+
+<style>
+/* ===== Section ===== */
+.temoignages-section {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 0 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.temoignages-section h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #222;
+}
+
+/* ===== Formulaire ===== */
+.avis-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 40px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.avis-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.avis-form input[type="text"],
+.avis-form textarea,
+.avis-form select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.avis-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.file-label {
+  display: inline-block;
+  padding: 10px 15px;
+  background: #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.file-label input[type="file"] {
+  display: none;
+}
+
+.btn-submit {
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  background: #0056b3;
+}
+
+/* ===== Liste des avis ===== */
+.avis-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.avis-item {
+  display: flex;
+  gap: 15px;
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  align-items: flex-start;
+}
+
+.avis-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #007bff;
+}
+
+.avis-content {
+  flex: 1;
+}
+
+.avis-nom {
+  font-size: 1.1rem;
+  color: #007bff;
+}
+
+.avis-note {
+  color: #f5b50a;
+  margin: 5px 0;
+}
+
+.avis-commentaire {
+  color: #333;
+  line-height: 1.5;
+}
+
+/* ===== Message aucun avis ===== */
+.aucun-avis {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+.avis-date {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+
+/* ===== Responsive ===== */
+@media screen and (max-width: 600px) {
+  .avis-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .avis-photo {
+    margin-bottom: 10px;
+  }
+}
+</style>

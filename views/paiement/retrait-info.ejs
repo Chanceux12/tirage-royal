@@ -1,0 +1,217 @@
+<style> 
+    body {
+      font-family: Arial, sans-serif;
+      background: #080032;
+      color: #fff;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    section {
+      max-width: 700px;
+      margin: 3rem auto;
+      padding: 2rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    p {
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      margin: 0.5rem;
+      font-weight: bold;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    /* VANTEX button base (inline styles add premium look) */
+    .btn-vantex {
+      /* fallback */
+      background: linear-gradient(90deg, #ffcc33, #e6a800);
+      color: #000;
+    }
+
+    .btn-email {
+      background: #ea4335; /* Gmail red */
+      color: #fff;
+      animation: pulse 2s infinite;
+    }
+
+    .btn-whatsapp {
+      background: #25d366; /* WhatsApp green */
+      color: #fff;
+      animation: pulse 2s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    .icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .icon-success { color: #34d399; }
+    .icon-fail { color: #f87171; }
+    .icon-pending { color: #fbbf24; animation: spin 2s linear infinite; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes bounce {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(8px); }
+      100% { transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding: 1rem;
+      }
+    }
+</style>
+
+<section>
+    <% if (retrait.statut === 'réussi') { %>
+      <div class="icon icon-success">✅</div>
+      <h2>Transfert réussi</h2>
+    <% } else if (retrait.statut === 'échoué') { %>
+      <div class="icon icon-fail">❌</div>
+      <h2>Retrait échoué</h2>
+    <% } else { %>
+      <div class="icon icon-pending">⏳</div>
+      <h2>Transfert en attente</h2>
+    <% } %>
+
+    <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>
+
+    <% if (retrait.statut === 'en_attente') { %>
+      <p>Votre demande de retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> est en attente car vous ne disposez pas d’un compte bancaire partenaire lié à notre entreprise.</p>
+
+      <p>Nous vous invitons à créer votre compte bancaire partenaire afin de permettre le transfert sécurisé de vos fonds.</p>
+
+      <!-- ⭐ CADRE PREMIUM VANTEX -->
+      <div style="
+        background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.15);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(255,184,0,0.15);
+      ">
+
+        <!-- Icône banque -->
+        <div style="font-size: 2.5rem; color: #ffb800; margin-bottom: 0.3rem;">
+          🏦
+        </div>
+
+        <!-- Texte -->
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.4rem; color: #fff;">
+          Cliquez ici pour créer votre compte bancaire partenaire
+        </div>
+
+        <!-- Flèche animée -->
+        <div style="font-size: 2rem; color: #ffb800; animation: bounce 1.3s infinite; margin-bottom: 1rem;">
+          ⬇️
+        </div>
+
+        <!-- Bouton VANTEX PREMIUM -->
+        <a href="/paiement/vantex" class="button btn-vantex" style="
+          padding: 1rem 1.5rem;
+          border-radius: 8px;
+          font-size: 1.1rem;
+          box-shadow: 0 0 12px rgba(255,184,0,0.35);
+          transition: transform .3s, box-shadow .3s;
+        "
+        onmouseover="this.style.transform='scale(1.07)'; this.style.boxShadow='0 0 18px rgba(255,184,0,0.6)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 12px rgba(255,184,0,0.35)'">
+          ✔ Ouvrir un compte VANTEX
+        </a>
+
+      </div>
+
+    <% } else if (retrait.statut === 'réussi') { %>
+      <p>Votre retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> a été validé et sera prochainement transféré sur votre compte bancaire partenaire.</p>
+
+    <% } else if (retrait.statut === 'échoué') { %>
+      <p>Votre demande de retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> n’a pas pu être finalisée car votre solde est insuffisant.</p>
+      <p>Veuillez vérifier votre solde avant de soumettre une nouvelle demande.</p>
+    <% } %>
+
+    <hr>
+
+    <p><strong>Montant :</strong> <%= retrait.amount.toFixed(2) %> <%= retrait.currency %></p>
+    <p><strong>Date :</strong> <%= retrait.date %></p>
+    <p><strong>Banque :</strong> <%= retrait.bank_name %></p>
+    <p><strong>Bénéficiaire :</strong> <%= retrait.benef_name %></p>
+    <p><strong>IBAN :</strong> <%= retrait.iban %></p>
+    <p><strong>BIC :</strong> <%= retrait.bic %></p>
+    <p><strong>Motif :</strong> <%= retrait.motif %></p>
+
+    <hr>
+    <p>Pour toute assistance, contactez notre support.</p>
+
+    <!-- CONTACT (EMAIL + WHATSAPP) : remis en bas, comme demandé -->
+    <div style="margin-top: 1rem;">
+      <a href="mailto:contact@tirage-royal.com?subject=Retrait%20-%20Assistance" class="button btn-email" style="vertical-align:middle;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:18px; height:18px; margin-right:6px; fill: #fff;">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 
+            1.1.9 2 2 2h16c1.1 0 2-.9 
+            2-2V6c0-1.1-.9-2-2-2zm0 
+            4-8 5-8-5V6l8 
+            5 8-5v2z"/>
+        </svg>
+        Contacter par Email
+      </a>
+
+      <a href="https://wa.me/+33774137061" target="_blank" class="button btn-whatsapp" style="vertical-align:middle;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="width:18px; height:18px; margin-right:6px; fill: #fff;">
+          <path d="M16 .5C7.6.5.5 7.6.5 16c0 
+            2.8.7 5.5 2.1 7.9L.6 31.4l7.6-2c2.3 
+            1.3 4.9 2 7.8 2 8.4 0 15.5-7.1 
+            15.5-15.5S24.4.5 16 
+            .5zm0 28.1c-2.5 0-4.9-.7-6.9-2.1l-.5-.3-4.5 
+            1.2 1.2-4.4-.3-.5c-1.3-2-2-4.4-2-6.9 
+            0-7 5.9-12.9 12.9-12.9s12.9 5.9 
+            12.9 12.9-5.9 12.9-12.9 
+            12.9zm7.1-9.7c-.4-.2-2.1-1-2.5-1.2s-.6-.2-.9.2-1 
+            1.2-1.2 1.4c-.2.2-.5.3-1 
+            .1s-2-.7-3.8-2.4c-1.4-1.4-2.4-3-2.6-3.5s0-.8.2-1.1c.2-.2.5-.6.7-.9.2-.3.3-.5.5-.9.2-.3.1-.6 
+            0-.8-.1-.2-.9-2.2-1.2-3-.3-.7-.6-.6-.9-.6h-.8c-.3 
+            0-.8.1-1.2.5s-1.6 
+            1.5-1.6 3.6 1.6 4.2 
+            1.8 4.5 3.2 4.9 7.7 6.8c4.6 1.8 4.6 
+            1.2 5.5 1.1 1-.1 2.1-.9 
+            2.4-1.7s.3-1.5.2-1.7c-.1-.2-.3-.2-.7-.4z"/>
+        </svg>
+        Contacter par WhatsApp
+      </a>
+    </div>
+
+</section>
+
+

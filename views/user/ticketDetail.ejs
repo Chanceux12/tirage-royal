@@ -1,0 +1,103 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Détail du ticket – Tirage Royal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .loader {
+      font-size: 30px;
+      margin: 40px auto;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .resultats {
+      display: none;
+      margin-top: 40px;
+    }
+    .boule {
+      display: inline-block;
+      margin: 8px;
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 50px;
+    }
+    .etoile {
+      background-color: gold;
+      color: black;
+    }
+    .info-ticket {
+      margin-top: 20px;
+      text-align: left;
+      display: inline-block;
+    }
+    a {
+      display: inline-block;
+      margin-top: 30px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 Tirage en cours...</h1>
+
+  <div class="loader">⚪ ⚪ ⚪ ⚪ ⚪</div>
+
+  <div class="resultats">
+    <h2>🎯 Résultat de votre ticket</h2>
+
+    <div class="info-ticket">
+      <p><strong>Jeu :</strong> <%= ticket.jeu %></p>
+      <p><strong>Date de participation :</strong> <%= ticket.dateParticipation.toLocaleDateString('fr-FR') %></p>
+      <p><strong>Statut :</strong> <%= ticket.statut %></p>
+      <p><strong>Gain :</strong> <%= ticket.gain ? ticket.gain.toFixed(2) + ' €' : '0.00 €' %></p>
+    </div>
+
+    <h3>Vos numéros :</h3>
+    <div>
+      <% ticket.numeros.forEach(num => { %>
+        <div class="boule"><%= num %></div>
+      <% }) %>
+    </div>
+
+    <h3>Vos étoiles :</h3>
+    <div>
+      <% ticket.etoiles.forEach(etoile => { %>
+        <div class="boule etoile"><%= etoile %></div>
+      <% }) %>
+    </div>
+
+    <a href="/dashboard">⬅ Retour au tableau de bord</a>
+    <a href="/ticket/<%= ticket._id %>/pdf" class="btn" style="margin-top: 10px;">📄 Télécharger ce ticket en PDF</a>
+  </div>
+
+  <script>
+    // Attendre 3 secondes avant d'afficher les résultats
+    setTimeout(() => {
+      document.querySelector('.loader').style.display = 'none';
+      document.querySelector('.resultats').style.display = 'block';
+      document.querySelector('h1').textContent = "🎯 Résultat de votre tirage";
+    }, 3000);
+  </script>
+</body>
+</html>

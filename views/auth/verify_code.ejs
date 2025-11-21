@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérification du code</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      
+    }
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .auth-box {
+      padding: 40px 30px;
+      border-radius: 12px;
+      background: transparent;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .auth-title {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #080032;
+    }
+    .auth-form .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .auth-form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #333;
+    }
+    .auth-form input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: #f97316;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-primary:hover {
+      background: #1a0a6b;
+    }
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .alert.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .auth-links {
+      margin-top: 20px;
+    }
+    .auth-links a {
+      color: #080032;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 480px) {
+      .auth-box {
+        padding: 30px 20px;
+      }
+      .auth-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <h2 class="auth-title">Vérification du code</h2>
+
+      <% if (message) { %>
+        <div class="alert success"><%= message %></div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+
+      <form action="/auth/verifier-code" method="POST" class="auth-form">
+        <input type="hidden" name="email" value="<%= email %>">
+
+        <div class="form-group">
+          <label for="code">Code de vérification (6 chiffres)</label>
+          <input type="text" id="code" name="code" required pattern="\d{6}" maxlength="6" placeholder="Entrez le code reçu par e-mail">
+        </div>
+
+        <button type="submit" class="btn-primary">Vérifier le code</button>
+      </form>
+
+      <div class="auth-links">
+        <a href="/auth/login">← Retour à la connexion</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

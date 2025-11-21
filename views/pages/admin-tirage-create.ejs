@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+  <h1 class="mb-4">📅 Planifier un Tirage</h1>
+
+  <% if (success && success.length > 0) { %>
+    <div class="alert alert-success"><%= success[0] %></div>
+  <% } %>
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-danger"><%= error[0] %></div>
+  <% } %>
+
+  <form action="/admin/tirage/create" method="POST">
+    <div class="form-group mb-3">
+      <label for="jeu">🎮 Jeu</label>
+      <select class="form-control" id="jeu" name="jeu" required>
+       <% jeux.forEach(j => { %>
+        <option value="<%= j._id %>"><%= j.nom %></option>
+       <% }) %>
+      </select>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="numerosGagnants">🔢 Numéros gagnants (ex: 5,12,23,34,42)</label>
+      <input type="text" class="form-control" id="numerosGagnants" name="numerosGagnants" placeholder="Ex: 5,12,23,34,42" required>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="dateTirage">🕒 Date du tirage</label>
+      <input type="datetime-local" class="form-control" id="dateTirage" name="dateTirage" required>
+    </div>
+
+    <div class="form-group mb-4">
+      <label for="gain">💰 Montant du gain (€)</label>
+      <input type="number" class="form-control" id="gain" name="gain" placeholder="Ex: 100" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">✅ Planifier le tirage</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

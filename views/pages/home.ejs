@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tirage Royal – Loterie en Ligne</title>
+  <link rel="stylesheet" href="/styles/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  
+
+</head>
+<body>
+
+
+ <% if (user) { %>
+<section class="wallet-section">
+  <div class="wallet-card">
+    <div class="wallet-left">
+      <!-- SVG portefeuille pro -->
+      <div class="wallet-svg-wrap" aria-hidden="true">
+        <svg width="84" height="56" viewBox="0 0 84 56" xmlns="http://www.w3.org/2000/svg">
+          <!-- Body -->
+          <rect x="2" y="10" rx="6" ry="6" width="80" height="34" fill="#1a0f3b"/>
+          <!-- Flap / enveloppe -->
+          <path d="M2 14 L42 34 L82 14 L42 2 Z" fill="#3c1f72"/>
+          <!-- Inner pocket -->
+          <rect x="8" y="18" rx="4" ry="4" width="68" height="18" fill="#2a0f55"/>
+          <!-- Highlight subtle -->
+          <path d="M8 18 Q42 30 76 18" fill="none" stroke="#45297f" stroke-width="1" opacity="0.5"/>
+          <!-- Coin / badge -->
+          <circle cx="64" cy="28" r="7" fill="#FFD166"/>
+          <text x="64" y="31" font-family="Segoe UI, Arial" font-size="9" font-weight="700" text-anchor="middle" fill="#1a0b3b">€</text>
+        </svg>
+      </div>
+
+      <!-- Infos utilisateur et solde -->
+      <div class="wallet-info">
+        <div class="welcome">Bienvenue <strong><%= user.username %></strong></div>
+        <div class="balance">Solde disponible</div>
+        <div class="amount"><%= user.solde.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) %> €</div>
+      </div>
+    </div>
+
+    <div class="wallet-actions">
+      <a href="/paiement/recharger" class="btn btn-deposit" title="Déposer">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3v12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M19 10l-7-7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="3" y="14" width="18" height="6" rx="2" fill="none" stroke="#fff" stroke-width="1.2"/>
+        </svg>
+        Dépôt
+      </a>
+
+      <a href="/paiement/retrait" class="btn btn-withdraw" title="Retirer">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21V9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M5 14l7 7 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="3" y="3" width="18" height="6" rx="2" fill="none" stroke="#fff" stroke-width="1.2"/>
+        </svg>
+        Retrait
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* === Wallet pro === */
+.wallet-section { width: 100%; padding: 18px 16px; box-sizing: border-box; }
+.wallet-card {
+  max-width: 1100px;
+  margin: 8px auto 24px;
+  background: linear-gradient(180deg, rgba(26,15,59,0.95) 0%, rgba(60,31,114,0.95) 100%);
+  border-radius: 14px;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  box-shadow: 0 12px 32px rgba(3,3,20,0.65);
+  border: 1px solid rgba(255,255,255,0.03);
+  flex-wrap: wrap;
+}
+
+.wallet-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.wallet-svg-wrap { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 4px; }
+
+.wallet-info { display: flex; flex-direction: column; min-width: 0; }
+.wallet-info .welcome { color: #e8e8f8; font-size: 1rem; margin-bottom: 4px; }
+.wallet-info .balance { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .6px; }
+.wallet-info .amount { color: #FFD166; font-weight: 800; font-size: 1.55rem; text-shadow: 0 4px 18px rgba(255,198,60,0.12); }
+
+.wallet-actions { display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(3,6,40,0.45);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.btn .icon { display: inline-block; vertical-align: middle; }
+
+/* Couleurs des boutons */
+.btn-deposit { background: linear-gradient(180deg, #2ecc71 0%, #28a745 100%); }
+.btn-deposit:hover { filter: brightness(0.95); transform: translateY(-2px); transition: .18s ease; }
+
+.btn-withdraw { background: linear-gradient(180deg, #ff6b6b 0%, #dc3545 100%); }
+.btn-withdraw:hover { filter: brightness(0.95); transform: translateY(-2px); transition: .18s ease; }
+
+/* Responsive */
+@media (max-width: 880px) {
+  .wallet-card { padding: 12px; }
+  .wallet-actions { width: 100%; justify-content: space-between; margin-top: 8px; }
+  .wallet-info .amount { font-size: 1.35rem; }
+}
+
+@media (max-width: 520px) {
+  .wallet-card { padding: 10px; gap: 12px; }
+  .wallet-left { gap: 10px; }
+  .wallet-svg-wrap svg { width: 68px; height: 44px; }
+  .wallet-info .welcome { font-size: 0.95rem; }
+  .btn { padding: 9px 12px; font-size: 0.9rem; }
+}
+</style>
+<% } %>
+
+
+
+
+
+
+
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Loterie en ligne</h1>
+    <div class="texte-animé">
+      <div class="mot">Tentez</div>
+      <div class="mot">Gagnez</div>
+      <div class="mot">Célébrez</div>
+    </div>
+    <p>Jouez chaque jour à nos tirages exclusifs et tentez de remporter le jackpot.</p>
+    <a href="/auth/register" class="btn-orange">Inscription</a>
+    <a href="/jeu/resultats" class="btn-orange">Résultats</a>
+  </div>
+  <div>
+    <img src="/image/Accueil.png" alt="Visuel principal de la loterie en ligne" />
+  </div>
+</section>
+
+<section class="etapes-container">
+  <div class="etapes-gauche">
+    <h2>Comment débuter ?</h2>
+    <p>Suis ces 3 étapes faciles !</p>
+
+    <div class="etape">
+      <img src="/image/icon-jeu.png" alt="Choisissez votre jeu" width="50" />
+      <div>
+        <h3>Choisissez votre jeu</h3>
+        <p>Inscrivez-vous et sélectionnez votre loterie préférée</p>
+      </div>
+    </div>
+
+    <div class="etape">
+      <img src="/image/icon-numeros.png" alt="Sélectionnez vos numéros" width="50" />
+      <div>
+        <h3>Sélectionnez vos numéros</h3>
+        <p>Choisissez vos numéros et validez votre participation</p>
+      </div>
+    </div>
+
+    <div class="etape">
+      <img src="/image/icon-gain.png" alt="Récupérez vos gains" width="50" />
+      <div>
+        <h3>Récupérez vos gains</h3>
+        <p>Vérifiez les résultats et encaissez vos gains en toute sécurité</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="etapes-droite">
+    <img src="/image/big-winn.png" alt="Gagnant Jackpot" />
+  </div>
+</section>
+
+  <section class="slot-scene">
+  <div class="slot-container">
+    <!-- Image principale -->
+    <img src="/image/slot-transparent.png" alt="Machine à sous" class="slot-machine">
+
+    <!-- 7 pièces -->
+    <img src="/image/df1ac97d-add6-4d22-9da1-c22752254608.png" class="coin" style="--i:1; top:10%; left:20%;">
+    <img src="/image/df1ac97d-add6-4d22-9da1-c22752254610.png" class="coin" style="--i:3; top:60%; left:10%;">
+    <img src="/image/df1ac97d-add6-4d22-9da1-c22752254612.png" class="coin" style="--i:5; top:50%; left:50%;">
+    <img src="/image/df1ac97d-add6-4d22-9da1-c22752254615.png" class="coin" style="--i:7; top:15%; left:60%;">
+  </div>
+  </section>
+
+
+<style>
+.slot-scene {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  padding: 0;            /* ✅ aucun espace haut/bas */
+  margin: 0;             /* ✅ pas de marge externe */
+  background: transparent;
+  overflow: hidden;
+}
+
+
+.slot-container {
+  position: relative;
+  width: 800px;
+  height: auto;
+}
+
+.slot-machine {
+  width: 100%;
+  height: auto;
+  display: block;
+  z-index: 2;
+  position: relative;
+}
+
+/* === Pièces réalistes === */
+.coin {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  animation: coinRotate 6s linear infinite;
+  animation-delay: calc(var(--i) * 0.3s);
+  transform-origin: center center;
+  z-index: 3;
+}
+
+/* Animation réaliste : légère rotation + bascule lente */
+@keyframes coinRotate {
+  0% { transform: rotateY(0deg) rotateZ(0deg) translateY(0px); }
+  50% { transform: rotateY(180deg) rotateZ(10deg) translateY(-5px); }
+  100% { transform: rotateY(360deg) rotateZ(0deg) translateY(0px); }
+}
+</style>
+
+<section class="titre-jeux">
+  <h2>Des Millions à Gagner</h2>
+  <p>Avec nos Loteries</p>
+</section>
+
+
+<section id="jeux" class="jeux-grid">
+  <% if (jeux && jeux.length > 0) { %>
+    <% jeux.forEach(jeu => { %>
+      <div class="carte-jeu">
+        <div class="image-container">
+          <div class="timer-overlay" data-date="<%= jeu.prochainTirage %>">
+            ⏳ <span class="timer">Chargement...</span>
+          </div>
+          <img src="<%= jeu.image %>" alt="<%= jeu.nom || 'Jeu' %>">
+          <div class="overlay-titre"><%= (jeu.nom || 'Jeu').toUpperCase() %></div>
+        </div>
+        <div class="infos">
+          <p>📅 Tirage :
+            <%= new Date(jeu.prochainTirage).toLocaleString('fr-FR', {
+              dateStyle: 'short',
+              timeStyle: 'short'
+            }) %>
+          </p>
+          <p>🎟️ <%= (jeu.billetsRestants || 0).toLocaleString() %> billets restants</p>
+          <p>📊 Statut : <strong><%= jeu.statut || 'En cours' %></strong></p>
+           <div> <span class="label-recompense">Récompense</div>
+          <p> <span class="gain"><%= (jeu.recompense || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') %> €</span></p> 
+          <a href="/jeu/<%= jeu.slug %>" class="jouer-btn">Jouer pour <%= jeu.montant %> €</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p style="text-align: center;">Aucun jeu avec tirage à venir pour le moment.</p>
+  <% } %>
+</section>     
+
+<!-- ===================== SECTION : Tickets Gagnants ===================== -->
+<section class="gagnants-section my-12 px-4">
+
+  <style>
+
+     .result-header {
+  text-align: center;
+  margin: 40px 0 30px;
+}
+
+.result-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff; /* blanc */
+  margin-bottom: 10px;
+}
+
+.result-header p {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.8);
+}
+
+
+    .gagnants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .ticket-card {
+      background: #161633;
+      color: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(6,6,20,0.6);
+      display: flex;
+      flex-direction: column;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .ticket-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 46px rgba(6,6,20,0.75);
+    }
+
+    .ticket-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px 0;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .ticket-image img {
+      width: 80%;          /* occupe 80% de la largeur du conteneur */
+      max-width: 300px;    /* limite maximale sur desktop */
+      height: auto;        /* garde les proportions */
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      background: rgba(255,255,255,0.03);
+      transition: transform 0.2s ease;
+    }
+
+    .ticket-image img:hover {
+      transform: scale(1.05);  /* effet léger au survol */
+    }
+
+
+    .ticket-body {
+      padding: 16px 18px 22px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ticket-winners {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #ffffff;
+      background: rgba(255,255,255,0.06);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .jeu-nom {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .ticket-date {
+      color: #cfcff0;
+      font-size: 0.9rem;
+    }
+
+    .ticket-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0;
+      flex-wrap: nowrap;
+    }
+
+    .ball-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #ffffff, #d8d8d8 60%, #bfbfbf);
+      border: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #161633;
+      font-size: 1rem;
+      box-shadow: inset 0 -3px 8px rgba(0,0,0,0.08), 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .ball-star {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #fff7c2, #ff3300 60%, #ff3300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #161633;
+      font-size: 0.95rem;
+      box-shadow: 0 8px 20px rgba(255,200,20,0.12), inset 0 -3px 6px rgba(0,0,0,0.06);
+      text-shadow: 0 2px 6px rgba(255,215,80,0.45);
+    }
+
+    .label-recompense {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.9);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Gain */
+     .gain-bar {
+       margin-top: 8px;
+       padding: 8px 12px;
+       border-radius: 10px;
+       background: rgba(255,215,0,0.08);
+       display: inline-block;
+     }
+     .gain-amount {
+       font-size: 3rem;
+       font-weight: 1000;
+       color: #FFD700;
+       text-shadow: 0 4px 10px rgba(255,200,20,0.6);
+       display: inline-block;
+       position: relative;
+       animation: pulsePrix 2s infinite ease-in-out;
+     }
+
+     .gain-label {
+       display: block;
+       font-size: 0.78rem;
+       color: rgba(255,255,255,0.8);
+       margin-top: 4px;
+     }
+
+        /* Animation pulse */
+     @keyframes pulsePrix {
+       0%, 100% { transform: scale(1); }
+       50% { transform: scale(1.08); }
+     }
+
+
+    
+         /* Mobile */
+    @media (max-width: 600px) {
+      .ticket-image img {
+      width: 90%;       /* presque toute la largeur sur mobile */
+      max-width: 180px; /* limite pour petits écrans */
+      height: auto;
+     }
+    }
+    @media (max-width:600px) {
+      .ball-num, .ball-star { width:36px; height:36px; font-size:0.9rem; }      
+      .gain-amount { font-size:2.3rem; }
+    }
+  </style>
+
+    <div class="result-header">
+       <h1>Les derniers résultats</h1>
+       <p>Découvrez les tirages récents et les numéros gagnants de nos jeux.</p>
+    </div>
+
+  <div class="gagnants-grid" role="list">
+    <% ticketsGagnants.forEach(ticket => { %>
+      <article class="ticket-card" role="listitem">
+        <!-- IMAGE DU TICKET -->
+        <div class="ticket-image">
+          <img 
+            src="<%= (ticket.jeu?.image && ticket.jeu.image.trim() !== '') 
+                    ? ticket.jeu.image 
+                    : (ticket.imageTicket && ticket.imageTicket.trim() !== '') 
+                      ? ticket.imageTicket 
+                      : '/images/default-ticket.png' %>" 
+            alt="Image du jeu">
+        </div>
+
+        <div class="ticket-body">
+          <!-- NOMBRE DE GAGNANTS -->
+          <div class="ticket-winners">
+            <%= gagnantsParTirage[ (ticket.jeu && ticket.jeu._id ? ticket.jeu._id.toString() : 'nogame') + '_' + moment(ticket.dateTirage).format('YYYY-MM-DD') ] || 0 %> GAGNANT(S)
+          </div>
+
+          <!-- NOM DU JEU -->
+          <div class="jeu-nom"><%= ticket.jeu?.nom || 'Jeu inconnu' %></div>
+
+          <!-- DATE DU TIRAGE (FR) -->
+          <div class="ticket-date">
+            <%= moment(ticket.dateTirage).locale('fr').format('ddd DD/MM/YYYY') %>
+          </div>
+
+        <!-- NUMÉROS + ÉTOILES -->
+          <div class="ticket-line">
+            <% (ticket.numerosChoisis || []).forEach(num => { %>
+              <div class="ball-num"><%= num %></div>
+            <% }) %>
+            <% (ticket.etoilesChoisies || []).forEach(etoile => { %>
+              <div class="ball-star">⭐<%= etoile %></div>
+            <% }) %>
+          </div>
+           
+          <!-- RÉCOMPENSE -->
+          <div class="label-recompense">Récompense</div>
+
+          <div class="gain-bar">
+            <span class="gain-amount">
+              <%= (ticket["gainAttribué"] || ticket.gainPotentiel || 0).toLocaleString('fr-FR') %> €
+            </span>           
+          </div>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+
+  <% if (!ticketsGagnants || ticketsGagnants.length === 0) { %>
+    <p class="text-center text-gray-300 mt-6">Aucun ticket gagnant pour le moment.</p>
+  <% } %>
+</section>
+
+<section id="tirages-passes" class="section-tirages-passes">
+  <div class="container">
+    <a href="/jeux/archive" class="tirages-link">
+      <div class="image-wrapper">
+        <img src="/image/tirages-passes.png" alt="Tirages passés - Tous les jeux" />
+        <div class="overlay">
+          <span class="text">Tirages passés<br><small>Voir tous les jeux, y compris archivés</small></span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+ <section class="section-decouverte-jeux" id="decouverte-jeux">
+  <div class="container-decouverte fade-slide">
+    <div class="texte-jeux">
+      <h2>Une collection de jeux pensée pour tous</h2>
+      <p>Jackpots, tirages instantanés, gains garantis… Parcourez nos jeux et tentez votre chance dès aujourd’hui.</p>
+      <a href="/jouer" class="btn-orange">Voir tous les jeux disponibles</a>
+    </div>
+    <div class="visuel-jeux">
+      <img src="/image/jeux-illustration.jpg" alt="Illustration jeux Tirage Royal" />      
+    </div>
+  </div> 
+</section>
+
+
+<section class="stats-pro-section" id="statsSection">
+  <h2 class="stats-title">Notre communauté en chiffres</h2>
+  <div class="stats-circles">
+    
+    <div class="circle-stat color-blue">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= totalTickets %>">0</div>
+          <p>Tickets joués</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="circle-stat color-green">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= totalGagnants %>">0</div>
+          <p>Gagnants</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="circle-stat color-purple">
+      <div class="circle-container">
+        <div class="circle rotating-circle"></div>
+        <div class="stat-content">
+          <div class="counter" data-value="<%= montantTotalGagne %>">0</div>
+          <p>Gains distribués</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+<script>
+  function abbreviateNumber(value) {
+    if (value >= 1_000_000_000) return (value / 1_000_000_000).toFixed(1) + "B";
+    if (value >= 1_000_000) return (value / 1_000_000).toFixed(1) + "M";
+    if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
+    return value.toString();
+  }
+
+  function animateCounter(el, target, duration = 2000) {
+    let startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const current = Math.min(Math.floor((progress / duration) * target), target);
+      el.textContent = abbreviateNumber(current);
+      if (progress < duration) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = abbreviateNumber(target);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const section = document.getElementById("statsSection");
+    const counters = section.querySelectorAll(".counter");
+    let hasAnimated = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        hasAnimated = true;
+        counters.forEach(counter => {
+          const target = parseInt(counter.dataset.value);
+          animateCounter(counter, target);
+        });
+      }
+    }, { threshold: 0.0 });
+
+    observer.observe(section);
+  });
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    const animatedElements = document.querySelectorAll(".fade-slide");
+    animatedElements.forEach(el => observer.observe(el));
+  });
+</script>
+
+
+<section class="pourquoi-nous">
+  
+  <div class="pourquoi-contenu">
+    <div class="image-pourquoi">
+      <h2>Pourquoi choisir Tirage Royal ?</h2>
+      <img src="/image/pourquoi-nous.png" alt="Pourquoi choisir Tirage Royal" />
+    </div>
+    <div class="texte-pourquoi">
+      
+      <ul>
+        <li>✔️ Plateforme intuitive et rapide</li>
+        <li>✔️ Tirages quotidiens avec résultats en temps réel</li>
+        <li>✔️ Tirages 100% numériques et contrôlés</li>
+        <li>✔️ Gains sécurisés et retraits rapides</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+
+<footer class="footer-site">
+  <!-- Logos au-dessus -->
+  <div class="footer-logos">
+    <div class="footer-logos-block">
+      <img src="/img/conseils.svg" alt="Conseils" class="footer-icon" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/googleplay.svg" alt="Google Play" />
+      <img src="/img/appstore.svg" alt="App Store" />
+    </div>
+    <div class="footer-logos-block">
+      <img src="/img/visa.svg" alt="Visa" />
+      <img src="/img/mastercard.svg" alt="Mastercard" />
+      <img src="/img/paysafecard.svg" alt="Paysafecard" />
+      <img src="/img/paypal.svg" alt="PayPal" />
+    </div>
+  </div>
+
+
+<section id="avis-clients" class="section-avis">
+  <h2 class="titre-section">Avis de nos clients</h2>
+
+  <div class="avis-container">
+    <% avis.forEach(a => { %>
+      <div class="avis-card">
+        <div class="avis-header">
+          <img src="<%= a.photo || '/images/default-user.png' %>" alt="Photo client" class="photo-client">
+          <div class="avis-info">
+            <strong class="nom-client"><%= a.nom %></strong>
+            <span class="date-avis"><%= new Date(a.date).toLocaleDateString('fr-FR') %></span>
+          </div>
+        </div>
+
+        <div class="etoiles">
+          <% for (let i = 0; i < a.note; i++) { %>⭐<% } %>
+        </div>
+
+        <p class="commentaire"><%= a.commentaire %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="lien-voir-tous">
+    <a href="/avis" class="btn-orange">Voir tous les témoignages</a>   
+  </div>
+</section>
+
+<style>
+/* --- Section globale --- */
+
+.titre-section {
+  font-size: 2em;
+  color: #c7a200;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* --- Conteneur des avis --- */
+.avis-container {
+  display: flex;
+  gap: 25px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 15px;
+  justify-content: flex-start;
+  scrollbar-width: thin;
+  scrollbar-color: #c7a200 #f0e7c5;
+}
+
+.avis-container::-webkit-scrollbar {
+  height: 8px;
+}
+.avis-container::-webkit-scrollbar-thumb {
+  background-color: #c7a200;
+  border-radius: 10px;
+}
+
+/* --- Carte d'avis individuelle --- */
+.avis-card {
+  flex: 0 0 220px;
+  border: 1px solid #fffdfa;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  scroll-snap-align: start;
+  text-align: left;
+  transition: transform 0.3s ease;
+}  
+
+.avis-card:hover {
+  transform: translateY(-5px);
+}
+
+/* --- En-tête (photo + nom + date) --- */
+.avis-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.photo-client {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #c7a200;
+}
+
+.avis-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nom-client {
+  font-size: 1.1em;
+  color: #fffdfa;
+}
+
+.date-avis {
+  font-size: 0.9em;
+  color: #999;
+}
+
+/* --- Étoiles --- */
+.etoiles {
+  color: #f6b800;
+  margin: 5px 0;
+  font-size: 1.2em;
+}
+
+/* --- Commentaire --- */
+.commentaire {
+  color: #fffdfa;
+  font-style: italic;
+  line-height: 1.4;
+  font-size: 0.95em;
+}
+</style>
+
+
+<section class="section-comment-jouer" id="comment-jouer-home">
+  <div class="container-comment">
+    <div class="bloc-texte-comment">
+      <h2>Comment ça fonctionne ?</h2>
+      <p>
+        Inscrivez-vous gratuitement, choisissez votre jeu et validez vos numéros.
+        <br />
+        Avec <strong>Tirage Royal</strong>, participez facilement à nos tirages et tentez de gagner des récompenses exceptionnelles !
+      </p>
+      <a href="/comment-jouer" class="btn-orange">Voir comment jouer</a>
+    </div>
+
+    <div class="bloc-visuel-comment">
+      <img src="/image/comment-jouer-visuel.png" alt="Illustration étape jeu Tirage Royal" />
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section-contact-home" id="contact-home">
+  <div class="container-contact-home">
+    
+    <div class="contact-image">
+      <img src="/image/support-client.png" alt="Assistance Tirage Royal" />
+    </div>
+
+    <div class="contact-text">
+      <h2>Besoin d’aide ?</h2>
+      <p>
+        Notre équipe Tirage Royal est à votre écoute pour répondre à toutes vos questions
+        ou vous fournir plus d’informations sur nos tirages et récompenses.
+      </p>
+      <a href="/contact" class="btn-orange">Contacter notre équipe</a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+
+.section-contact-home {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  margin: 0;
+}
+
+.container-contact-home {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.contact-image img {
+  width: 280px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0;
+  display: block;
+}
+
+.contact-text {
+  flex: 1;
+  padding: 20px;
+  background: #fff8f0;
+  margin: 0;
+}
+
+.contact-text h2 {
+  margin-top: 0;
+  font-size: 24px;
+  color: #222;
+}
+
+.contact-text p {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+
+.btn-orange:hover {
+  background-color: #e67e00;
+}
+
+/* ✅ Responsive mobile */
+@media (max-width: 768px) {
+  .container-contact-home {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-image img {
+    width: 100%;
+    height: 200px;
+    border-radius: 0;
+  }
+
+  .contact-text {
+    padding: 15px;
+    text-align: center;
+  }
+}
+</style>
+
+
+
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.timer-overlay').forEach(function(timerEl) {
+      const dateTirage = new Date(timerEl.dataset.date).getTime();
+      const timerSpan = timerEl.querySelector('.timer');
+
+      function updateTimer() {
+        const now = new Date().getTime();
+        const diff = dateTirage - now;
+
+        if (diff <= 0) {
+          timerSpan.textContent = "Tirage terminé";
+          timerEl.classList.add("terminé");
+          return;
+        }
+
+        const j = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        timerSpan.textContent = `${j}j ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    });
+  });
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

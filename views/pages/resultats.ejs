@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats – Tirage Royal</title>
+  <link rel="stylesheet" href="/styles/style.css">
+  <style>
+    body {
+      background-color: #0e0e2a;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+
+    .result-card {
+      background-color: #161633;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    }
+
+    .result-header {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .result-header img {
+      width: 120px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .result-info { text-align: left; }
+    .result-info h2 { margin: 0 0 8px; text-transform: uppercase; font-size: 1.3em; }
+    .gain { font-size: 1.2em; font-weight: bold; color: limegreen; }
+    .numeros-gagnants { margin-top: 10px; text-align: center; }
+    .numero-boule {
+      display: inline-block; width: 30px; height: 30px; line-height: 30px;
+      margin: 2px; text-align: center; background-color: green; color: white;
+      border-radius: 50%; font-weight: bold; box-shadow: 0 0 5px rgba(0,0,0,0.3); font-size: 0.9em;
+    }
+
+    .table-container { margin-top: 15px; border-radius: 8px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    table th { background-color: #1a1a40; color: white; padding: 10px; text-align: center; }
+    table td { text-align: center; padding: 8px; }
+    table tr { border-top: 1px solid #2a2a4a; }
+    .boule {
+      display: inline-block; width: 28px; height: 28px; line-height: 28px;
+      margin: 2px; text-align: center; background-color: #150053; color: white;
+      border-radius: 50%; font-weight: bold; font-size: 0.85em; box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    .participant-card {
+      display: none; background-color: #1a1a40; border-radius: 10px; padding: 15px;
+      margin-bottom: 15px; box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    }
+    .participant-card h4 { margin: 0 0 10px; font-size: 1em; color: #ffd700; }
+    .status { margin-top: 8px; font-weight: bold; }
+    .status.gagnant { color: limegreen; }
+    .status.perdant { color: red; }
+    .status.attente { color: orange; }
+
+    .hidden { display: none; }
+    .mobile-only { display: none; }
+
+    @media (max-width: 768px) {
+      .result-header { flex-direction: column; align-items: center; text-align: center; }
+      .result-header img { width: 100%; height: auto; border-radius: 8px; }
+      table { display: none; }
+      .participant-card { display: block; }
+      .result-info { text-align: left; }
+      .mobile-only { display: block; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.4em; }
+      .numero-boule, .boule { width: 26px; height: 26px; line-height: 26px; font-size: 0.8em; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="main-container">
+    <h1>📊 Résultats des tirages</h1>
+
+    <% if (resultats.length === 0) { %>
+      <p style="text-align: center;">Aucun résultat n’est encore disponible.</p>
+    <% } else { %>
+      <% resultats.forEach(r => { %>
+        <div class="result-card">
+          <div class="result-header">
+            <img src="<%= r.jeuImage %>" alt="jeu">
+            <div class="result-info">
+              <h2><%= r.jeuNom %></h2>
+              <p>📅 <strong>Date du tirage :</strong> <%= new Date(r.dateTirage).toLocaleString('fr-FR') %></p>
+              <p>💰 <strong>Gain potentiel :</strong>
+                <% if (typeof r.gainTotal === 'number') { %>
+                  <span class="gain"><%= r.gainTotal.toLocaleString('fr-FR') %> €</span>
+                <% } else { %>
+                  <em>Indisponible</em>
+                <% } %>
+              </p>
+              <p>🎟️ <strong>Prix du billet :</strong>
+                <% if (typeof r.prix === 'number') { %>
+                  <%= r.prix.toLocaleString('fr-FR') %> €
+                <% } else { %>
+                  <em>Indisponible</em>
+                <% } %>
+              </p>
+              <% if (r.resultatPublie && r.numerosGagnants) { %>
+                <div class="numeros-gagnants">
+                  🔢 <strong>Numéros gagnants :</strong><br>
+                  <% r.numerosGagnants.forEach(num => { %>
+                    <span class="numero-boule"><%= num %></span>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                🔄 <strong>Résultat en attente</strong>
+              <% } %>
+            </div>
+          </div>
+
+          <% if (r.participantsDerniers10.length > 0) { %>
+            <!-- Tableau PC -->
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Utilisateur</th>
+                    <th>Numéros joués</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% r.participantsDerniers10.forEach((p, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td><%= p.username %></td>
+                      <td>
+                        <% p.numerosJoues.forEach(num => { %>
+                          <span class="boule"><%= num %></span>
+                        <% }) %>
+                      </td>
+                      <td>
+                        <% if (p.statut && p.statut.toLowerCase() === 'gagnant') { %>
+                          <span style="color: limegreen;">🏆 Gagnant</span>
+                        <% } else if (p.statut && p.statut.toLowerCase() === 'perdant') { %>
+                          <span style="color: red;">❌ Perdant</span>
+                        <% } else { %>
+                          <span style="color: orange;">⏳ En attente</span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+
+                  <% r.participantsReste.forEach((p, index) => { %>
+                    <tr class="hidden extra-ticket">
+                      <td><%= index + 11 %></td>
+                      <td><%= p.username %></td>
+                      <td>
+                        <% p.numerosJoues.forEach(num => { %>
+                          <span class="boule"><%= num %></span>
+                        <% }) %>
+                      </td>
+                      <td>
+                        <% if (p.statut && p.statut.toLowerCase() === 'gagnant') { %>
+                          <span style="color: limegreen;">🏆 Gagnant</span>
+                        <% } else if (p.statut && p.statut.toLowerCase() === 'perdant') { %>
+                          <span style="color: red;">❌ Perdant</span>
+                        <% } else { %>
+                          <span style="color: orange;">⏳ En attente</span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+
+                  <% if (r.participantsReste.length > 0) { %>
+                    <tr>
+                      <td colspan="4" style="text-align:center;">
+                        <button class="voir-plus-btn" onclick="this.closest('table').querySelectorAll('.extra-ticket').forEach(el=>el.classList.remove('hidden')); this.style.display='none';">
+                          Voir plus
+                        </button>
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Version mobile -->
+            <% r.participantsDerniers10.forEach((p, index) => { %>
+              <div class="participant-card">
+                <h4>#<%= index + 1 %> 👤 <%= p.username %></h4>
+                <div>
+                  <% p.numerosJoues.forEach(num => { %>
+                    <span class="boule"><%= num %></span>
+                  <% }) %>
+                </div>
+                <div class="status <%= p.statut ? p.statut.toLowerCase() : 'attente' %>">
+                  <% if (p.statut && p.statut.toLowerCase() === 'gagnant') { %>
+                    🏆 Gagnant
+                  <% } else if (p.statut && p.statut.toLowerCase() === 'perdant') { %>
+                    ❌ Perdant
+                  <% } else { %>
+                    ⏳ En attente
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+
+            <% r.participantsReste.forEach((p, index) => { %>
+              <div class="participant-card hidden extra-ticket">
+                <h4>#<%= index + 11 %> 👤 <%= p.username %></h4>
+                <div>
+                  <% p.numerosJoues.forEach(num => { %>
+                    <span class="boule"><%= num %></span>
+                  <% }) %>
+                </div>
+                <div class="status <%= p.statut ? p.statut.toLowerCase() : 'attente' %>">
+                  <% if (p.statut && p.statut.toLowerCase() === 'gagnant') { %>
+                    🏆 Gagnant
+                  <% } else if (p.statut && p.statut.toLowerCase() === 'perdant') { %>
+                    ❌ Perdant
+                  <% } else { %>
+                    ⏳ En attente
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+
+            <% if (r.participantsReste.length > 0) { %>
+              <div class="mobile-only" style="text-align:center; margin:10px 0;">
+                <button class="voir-plus-btn" onclick="this.closest('.result-card').querySelectorAll('.extra-ticket').forEach(el=>el.classList.remove('hidden')); this.style.display='none';">
+                  Voir plus
+                </button>
+              </div>
+            <% } %>
+
+          <% } else { %>
+            <p style="margin-top: 10px;">Aucun participant pour ce tirage.</p>
+          <% } %>
+
+        </div>
+      <% }) %>
+    <% } %>
+  </main>
+
+  <style>
+    .hidden { display: none; }
+  </style>
+
+</body>
+</html>
