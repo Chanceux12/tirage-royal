@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -88,10 +88,12 @@
         .row {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .col {
             flex: 1;
+            min-width: 180px;
         }
 
         /* Button */
@@ -135,15 +137,10 @@
             }
         }
 
-
-        /* ======= PREMIUM FLAGS STYLE ======= */
+        /* Option padding (emoji drapeau + texte) */
         #country option {
-            padding-left: 35px;
-            background-size: 22px;
-            background-position: 8px center;
-            background-repeat: no-repeat;
+            padding-left: 6px;
         }
-
     </style>
 </head>
 <body>
@@ -154,7 +151,7 @@
     </div>
 
     <div class="container">
-        <div class="left-img"></div>
+        <div class="left-img" aria-hidden="true"></div>
 
         <div class="form">
             <h2>Informations personnelles</h2>
@@ -218,14 +215,14 @@
 
                 <div class="row">
                     <div class="col">
-                        <label>Pays *</label>
+                        <label for="country">Pays *</label>
                         <select name="country" id="country" required>
                             <option value="">Chargement...</option>
                         </select>
                     </div>
 
                     <div class="col">
-                        <label>Région / Province *</label>
+                        <label for="region">Région / Province *</label>
                         <select id="region" name="region" required disabled>
                             <option value="">Sélectionnez un pays d'abord</option>
                         </select>
@@ -256,7 +253,7 @@
                     <label>J'accepte les conditions générales</label>
                 </div>
 
-                <button class="btn">Créer mon compte</button>
+                <button class="btn" type="submit">Créer mon compte</button>
 
             </form>
         </div>
@@ -266,88 +263,159 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
     <script>
-        /* === INIT PHONE === */
-        const phoneInput = document.querySelector("#phone");
-        window.intlTelInput(phoneInput, {
-            separateDialCode: true,
-            initialCountry: "fr",
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-        });
+    // Tout s'exécute après chargement du DOM
+    document.addEventListener("DOMContentLoaded", () => {
 
-        /*  ======================================================
-            PREMIUM SYSTEME AUTOMATIQUE PAYS + DRAPEAUX + REGIONS
-            ====================================================== */
+        /* === INIT PHONE (après DOM) === */
+        const phoneInput = document.querySelector("#phone");
+        if (phoneInput) {
+            window.intlTelInput(phoneInput, {
+                separateDialCode: true,
+                initialCountry: "fr",
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+            });
+        }
 
         const countrySelect = document.getElementById("country");
         const regionSelect = document.getElementById("region");
 
-        // Charger tous les pays
+        // Correction : utiliser l'émoji 'flag' (fiable) et nom + stocker cca2 comme value
         async function loadCountries() {
-            const res = await fetch("https://restcountries.com/v3.1/all");
-            const countries = await res.json();
+            try {
+                countrySelect.innerHTML = "<option value=''>Chargement...</option>";
 
-            countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+                const res = await fetch("https://restcountries.com/v3.1/all");
+                if (!res.ok) throw new Error("REST Countries API non disponible");
+                const countries = await res.json();
 
-            countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
+                // Trier par nom
+                countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
 
-            countries.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c.cca2;
-                opt.textContent = c.name.common;
+                countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
 
-                if (c.flags && c.flags.svg) {
-                    opt.style.backgroundImage = `url(${c.flags.svg})`;
-                }
-
-                countrySelect.appendChild(opt);
-            });
-        }
-
-        // Charger automatiquement les régions selon pays
-        async function loadRegions(countryCode) {
-            regionSelect.disabled = true;
-            regionSelect.innerHTML = "<option value=''>Chargement...</option>";
-
-            const url = `https://secure.geonames.org/searchJSON?country=${countryCode}&featureCode=ADM1&maxRows=200&username=demo`;
-
-            const res = await fetch(url);
-            const data = await res.json();
-
-            regionSelect.innerHTML = "<option value=''>Sélectionnez une région</option>";
-
-            if (data.geonames && data.geonames.length > 0) {
-                data.geonames.forEach(region => {
+                countries.forEach(c => {
                     const opt = document.createElement("option");
-                    opt.value = region.name;
-                    opt.textContent = region.name;
-                    regionSelect.appendChild(opt);
+                    // value = code ISO2 (cca2) pour les APIs suivantes
+                    opt.value = c.cca2 || c.ccn3 || c.name.common;
+                    // Afficher emoji drapeau s'il existe, sinon le nom
+                    const flag = c.flag ? `${c.flag} ` : "";
+                    opt.textContent = `${flag}${c.name.common}`;
+                    countrySelect.appendChild(opt);
                 });
-
-                regionSelect.disabled = false;
-            } else {
-                regionSelect.innerHTML = "<option value=''>Aucune région trouvée</option>";
+            } catch (err) {
+                console.error("Erreur loadCountries:", err);
+                countrySelect.innerHTML = "<option value=''>Impossible de charger les pays</option>";
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCountries();
+        // Récupère les subdivisions (ADM1 = régions / états) via GeoNames / countriesnow fallback
+        async function loadRegions(countryCode) {
+            regionSelect.disabled = true;
+            regionSelect.innerHTML = "<option>Chargement...</option>";
 
-            countrySelect.addEventListener("change", () => {
-                if (countrySelect.value !== "") {
-                    loadRegions(countrySelect.value);
+            if (!countryCode) {
+                regionSelect.innerHTML = "<option>Sélectionnez un pays d'abord</option>";
+                return;
+            }
+
+            // 1) Essayer l'API GeoNames (demo). Note: GeoNames attend ISO country code (ex: FR)
+            try {
+                const geoUrl = `https://secure.geonames.org/childrenJSON?geonameId=&username=demo&country=${countryCode}`;
+                // childrenJSON with country param may not work for all; try searchJSON fallback below
+                const geoRes = await fetch(`https://secure.geonames.org/searchJSON?country=${countryCode}&featureCode=ADM1&maxRows=500&username=demo`);
+                if (!geoRes.ok) throw new Error("GeoNames non disponible");
+                const geoData = await geoRes.json();
+
+                // geoData.geonames is an array of regions
+                if (geoData && Array.isArray(geoData.geonames) && geoData.geonames.length > 0) {
+                    regionSelect.innerHTML = "<option value=''>Sélectionnez une région</option>";
+                    geoData.geonames.forEach(r => {
+                        const opt = document.createElement("option");
+                        opt.value = r.adminName1 || r.name || r.toponymName;
+                        opt.textContent = r.adminName1 || r.name || r.toponymName;
+                        regionSelect.appendChild(opt);
+                    });
+                    regionSelect.disabled = false;
+                    return;
                 }
-            });
+            } catch (e) {
+                console.warn("GeoNames unavailable or returned no regions:", e);
+                // fallback to next API
+            }
+
+            // 2) Fallback : countriesnow (une base JSON publiques)
+            try {
+                const res = await fetch("https://countriesnow.space/api/v0.1/countries/states");
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json && json.data) {
+                        const found = json.data.find(c => (c.iso2 && c.iso2.toUpperCase() === countryCode.toUpperCase()) || (c.iso3 && c.iso3.toUpperCase() === countryCode.toUpperCase()) || c.country.toLowerCase() === countryCode.toLowerCase());
+                        if (found && found.states && found.states.length) {
+                            regionSelect.innerHTML = "<option value=''>Sélectionnez une région</option>";
+                            found.states.forEach(s => {
+                                const opt = document.createElement("option");
+                                opt.value = s.name;
+                                opt.textContent = s.name;
+                                regionSelect.appendChild(opt);
+                            });
+                            regionSelect.disabled = false;
+                            return;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("countriesnow fallback failed:", e);
+            }
+
+            // 3) Si aucune API ne retourne de régions → champ texte libre
+            regionSelect.innerHTML = "";
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = "region";
+            input.id = "region";
+            input.placeholder = "Entrez votre région / province";
+            input.required = true;
+
+            // Remplacer le <select> par un <input> dans le DOM (et conserver la même position)
+            regionSelect.parentNode.replaceChild(input, regionSelect);
+        }
+
+        // Initialisation
+        loadCountries();
+
+        // Lorsque l'utilisateur change de pays : charger les régions
+        countrySelect.addEventListener("change", () => {
+            // Si regionSelect a été remplacé par un input lors d'un précédent fallback, on ré-obtient la référence
+            const currentRegion = document.getElementById("region");
+            if (currentRegion && currentRegion.tagName.toLowerCase() === "select") {
+                // keep reference
+            } else if (currentRegion && currentRegion.tagName.toLowerCase() === "input") {
+                // si input présent (fallback), on veut recréer un <select> avant de charger
+                const wrapper = currentRegion.parentNode;
+                const newSelect = document.createElement("select");
+                newSelect.id = "region";
+                newSelect.name = "region";
+                newSelect.required = true;
+                newSelect.disabled = true;
+                newSelect.innerHTML = "<option>Sélectionnez un pays d'abord</option>";
+                wrapper.replaceChild(newSelect, currentRegion);
+            }
+
+            // nouvelle référence après éventuel remplacement
+            const regionRef = document.getElementById("region");
+            // appeler loadRegions avec le code ISO2 sélectionné
+            if (countrySelect.value) {
+                loadRegions(countrySelect.value);
+            } else {
+                if (regionRef) {
+                    regionRef.innerHTML = "<option>Sélectionnez un pays d'abord</option>";
+                    regionRef.disabled = true;
+                }
+            }
         });
+
+    }); // DOMContentLoaded
     </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
