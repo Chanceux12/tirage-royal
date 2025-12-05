@@ -121,16 +121,17 @@ input[type="file"] { background: rgba(255,255,255,0.2); color: #fff; }
                 </div>
             </div>
 
-            <!-- Pays et Région -->
+            <!-- Pays + Région -->
             <div class="flex-row">
                 <div>
                     <label for="country">Pays *</label>
                     <select name="country" id="country" required></select>
                 </div>
-                <div>
+
+                <div id="regionWrapper">
                     <label for="region">Région / Province *</label>
                     <select name="region" id="region" required>
-                        <option value="">Entrez votre région ou province</option>
+                        <option value="">Sélectionnez votre région</option>
                     </select>
                 </div>
             </div>
@@ -173,62 +174,81 @@ input[type="file"] { background: rgba(255,255,255,0.2); color: #fff; }
 <!-- JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 <script>
-// ====== Téléphone avec drapeau et indicatif ======
+// ============ Téléphone international ============
 const phoneInput = document.querySelector("#phone");
-const iti = window.intlTelInput(phoneInput, {
+window.intlTelInput(phoneInput, {
     separateDialCode: true,
     initialCountry: "fr",
     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
 });
 
-// ====== Pays et régions automatiques ======
+// ================== Gestion pays ==================
 const countrySelect = document.getElementById("country");
-const regionSelect = document.getElementById("region");
+const regionWrapper = document.getElementById("regionWrapper");
 
-const mainCountriesRegions = {
+const regions = {
     "FR": ["Île-de-France","Provence-Alpes-Côte d'Azur","Auvergne-Rhône-Alpes","Occitanie","Nouvelle-Aquitaine","Hauts-de-France","Bretagne","Normandie","Grand Est","Centre-Val de Loire","Bourgogne-Franche-Comté","Pays de la Loire","Corse"],
     "CA": ["Alberta","Colombie-Britannique","Manitoba","Nouveau-Brunswick","Terre-Neuve-et-Labrador","Nouvelle-Écosse","Ontario","Île-du-Prince-Édouard","Québec","Saskatchewan","Territoires du Nord-Ouest","Yukon","Nunavut"],
     "US": ["Alabama","Alaska","Arizona","Arkansas","Californie","Caroline du Nord","Caroline du Sud","Colorado","Connecticut","Delaware","Floride","Géorgie","Hawaï","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiane","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","Nouveau-Mexique","New York","Ohio","Oklahoma","Oregon","Pennsylvanie","Rhode Island","Tennessee","Texas","Utah","Vermont","Virginie","Virginie-Occidentale","Washington","Wisconsin","Wyoming"]
 };
 
-// ====== Remplissage des pays via REST Countries ======
-fetch('https://restcountries.com/v3.1/all')
+// Charger automatiquement tous les pays
+fetch("https://restcountries.com/v3.1/all")
 .then(res => res.json())
 .then(data => {
-    data.sort((a,b)=>a.name.common.localeCompare(b.name.common));
-    data.forEach(c=>{
-        const opt=document.createElement("option");
-        opt.value=c.cca2;
-        opt.textContent=c.name.common;
+    data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+    data.forEach(country => {
+        const opt = document.createElement("option");
+        opt.value = country.cca2;
+        opt.textContent = country.name.common;
         countrySelect.appendChild(opt);
     });
 });
 
-// ====== Changement de région selon pays ======
-countrySelect.addEventListener("change",()=>{
+// Changer la région selon le pays
+countrySelect.addEventListener("change", () => {
     const code = countrySelect.value;
-    regionSelect.innerHTML = '';
-    if(mainCountriesRegions[code]){
+
+    regionWrapper.innerHTML = ` 
+        <label for="region">Région / Province *</label>
+    `;
+
+    // Pays avec régions définies
+    if (regions[code]) {
+        const select = document.createElement("select");
+        select.name = "region";
+        select.id = "region";
+        select.required = true;
+
         const defaultOpt = document.createElement("option");
-        defaultOpt.value='';
-        defaultOpt.textContent='Sélectionnez votre région';
-        regionSelect.appendChild(defaultOpt);
-        mainCountriesRegions[code].forEach(r=>{
+        defaultOpt.value = "";
+        defaultOpt.textContent = "Sélectionnez votre région";
+        select.appendChild(defaultOpt);
+
+        regions[code].forEach(r => {
             const opt = document.createElement("option");
-            opt.value=r; opt.textContent=r;
-            regionSelect.appendChild(opt);
+            opt.value = r;
+            opt.textContent = r;
+            select.appendChild(opt);
         });
+
+        regionWrapper.appendChild(select);
     } else {
         // Champ texte libre
         const input = document.createElement("input");
-        input.type="text"; input.name="region"; input.id="region"; input.required=true; input.placeholder="Entrez votre région ou province";
-        regionSelect.parentNode.replaceChild(input, regionSelect);
-        regionSelect = input;
+        input.type = "text";
+        input.name = "region";
+        input.id = "region";
+        input.required = true;
+        input.placeholder = "Entrez votre région";
+        regionWrapper.appendChild(input);
     }
 });
 </script>
+
 </body>
 </html>
+
 
 
 
