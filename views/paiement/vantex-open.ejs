@@ -9,109 +9,138 @@
 
 <style>
 
-/* === FOND GLOBAL === */
+/* === FOND GLOBAL TURQUOISE === */
 body {
     margin: 0;
     font-family: "Inter", Arial, sans-serif;
-    background: linear-gradient(135deg, #0A9999, #087C7C);
+    background: linear-gradient(135deg, #0A9999, #066F6F);
     min-height: 100vh;
-    padding: 20px;
-    color: #fff;
+    padding: 25px;
+    color: #ffffff;
 }
 
-/* === CARD BANCAIRE === */
+/* === CARTE VERRE DEPOLI === */
 .container {
     max-width: 900px;
     margin: 40px auto;
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    color: #1a1a1a;
+    padding: 35px;
+    border-radius: 24px;
+
+    /* effet verre dépoli (glassmorphism) */
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.30);
 }
 
-/* HEADER */
-.form-title {
+/* === TITRE === */
+h1 {
     text-align: center;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+h2 {
+    text-align: center;
+    margin-top: 0;
+    color: #e4fafa;
+    font-weight: 400;
+    font-size: 1.1rem;
+}
+
+/* === LABELS FLOTTANTS === */
+.field {
+    position: relative;
     margin-bottom: 25px;
 }
-.form-title h1 {
-    font-size: 2rem;
-    margin: 0;
-    color: #0A9999;
-    font-weight: 800;
-}
-.form-title p {
-    margin: 4px 0 0;
-    color: #444;
-}
 
-/* === CHAMPS BANQUE PREMIUM === */
-
-.field-container {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: #0A9999;
-}
-
-/* Champ style bancaire */
-input, select {
+.field input,
+.field select {
     width: 100%;
     padding: 14px;
     font-size: 1rem;
-    border-radius: 10px;
-    border: 1.7px solid #cfd8dc;
-    background: #fdfdfd;
-    transition: all 0.2s ease-in-out;
+    background: rgba(255,255,255,0.90);
+    border: 1.6px solid rgba(10,153,153,0.55);
+    border-radius: 12px;
+    color: #1b1b1b;
+
+    transition: all .3s ease;
 }
 
-input:focus, select:focus {
-    border-color: #0A9999;
-    box-shadow: 0 0 6px rgba(10,153,153,0.4);
+.field input:focus,
+.field select:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 8px rgba(255,255,255,0.6);
     outline: none;
 }
 
-/* ROWS */
+/* Label flottant */
+.field label {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    background: transparent;
+    padding: 0 6px;
+    color: #034646;
+    font-weight: 600;
+
+    pointer-events: none;
+    transition: 0.25s ease;
+}
+
+/* Animation flottante */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label,
+.field select:focus + label,
+.field select:not([value=""]) + label {
+    top: -8px;
+    background: rgba(255,255,255,0.7);
+    font-size: 0.78rem;
+    color: #013c3c;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+/* === ROW GRID RESPONSIVE === */
 .row {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
 }
+
 .col {
     flex: 1;
-    min-width: 220px;
+    min-width: 240px;
 }
 
 /* === BOUTON PREMIUM === */
 .btn {
+    margin-top: 20px;
     width: 100%;
-    padding: 15px;
-    background: #0A9999;
-    color: #fff;
+    padding: 16px;
+    background: #ffffff;
+    color: #066F6F;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.25s;
+
+    transition: 0.3s ease;
 }
 
 .btn:hover {
-    background: #066b6b;
+    background: #e1ffff;
 }
 
-/* Responsive */
+/* === MOBILE === */
 @media (max-width: 780px) {
     .container {
         padding: 20px;
-    }
-    .form-title h1 {
-        font-size: 1.7rem;
     }
 }
 
@@ -121,114 +150,90 @@ input:focus, select:focus {
 <body>
 
 <div class="container">
-    <div class="form-title">
-        <h1>Ouvrir un compte VANTEX</h1>
-        <p>Inscription rapide & sécurisée</p>
-    </div>
+
+    <h1>Créer un compte VANTEX</h1>
+    <h2>Inscription sécurisée • Version Premium</h2>
 
     <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
         <div class="row">
-            <div class="col field-container">
-                <label>Civilité *</label>
-                <select name="civility" required>
-                    <option value="">Sélectionner</option>
-                    <option>M.</option>
-                    <option>Mme</option>
-                    <option>Mlle</option>
-                </select>
+            <div class="col field">
+                <input type="text" name="civility" id="civ" placeholder=" " required>
+                <label for="civ">Civilité</label>
             </div>
 
-            <div class="col field-container">
-                <label>Prénom *</label>
-                <input type="text" name="firstname" required>
+            <div class="col field">
+                <input type="text" name="firstname" id="firstname" placeholder=" " required>
+                <label for="firstname">Prénom</label>
             </div>
 
-            <div class="col field-container">
-                <label>Nom *</label>
-                <input type="text" name="lastname" required>
+            <div class="col field">
+                <input type="text" name="lastname" id="lastname" placeholder=" " required>
+                <label for="lastname">Nom</label>
             </div>
         </div>
 
         <div class="row">
-            <div class="col field-container">
-                <label>Email *</label>
-                <input type="email" name="email" required>
+            <div class="col field">
+                <input type="email" name="email" id="email" placeholder=" " required>
+                <label for="email">Email</label>
             </div>
 
-            <div class="col field-container">
-                <label>Téléphone *</label>
-                <input type="tel" id="phone" name="phone" required>
+            <div class="col field">
+                <input type="tel" name="phone" id="phone" placeholder=" " required>
+                <label for="phone">Téléphone</label>
             </div>
         </div>
 
-        <div class="field-container">
-            <label>Profession *</label>
-            <input type="text" name="profession" required>
-        </div>
-
-        <div class="row">
-            <div class="col field-container">
-                <label>Type de pièce *</label>
-                <select name="id_type" required>
-                    <option value="">Sélectionner</option>
-                    <option value="passeport">Passeport</option>
-                    <option value="cni">Carte nationale d'identité</option>
-                </select>
-            </div>
-
-            <div class="col field-container">
-                <label>Numéro de pièce *</label>
-                <input type="text" name="id_number" required>
-            </div>
+        <div class="field">
+            <input type="text" name="profession" id="profession" placeholder=" " required>
+            <label for="profession">Profession</label>
         </div>
 
         <div class="row">
-            <div class="col field-container">
-                <label for="country">Pays *</label>
-                <select id="country" name="country" required>
-                    <option value="">Chargement...</option>
+            <div class="col field">
+                <select name="country" id="country" required>
+                    <option value="" selected></option>
                 </select>
+                <label>Pays</label>
             </div>
 
-            <div class="col field-container">
-                <label for="region">Région / Province *</label>
-                <select id="region" name="region" required disabled>
-                    <option value="">Sélectionnez un pays d'abord</option>
+            <div class="col field">
+                <select name="region" id="region" required disabled>
+                    <option value="" selected></option>
                 </select>
+                <label>Région / Province</label>
             </div>
         </div>
 
         <div class="row">
-            <div class="col field-container">
-                <label>Rue *</label>
-                <input type="text" name="street" required>
+            <div class="col field">
+                <input type="text" name="street" id="street" placeholder=" " required>
+                <label for="street">Rue</label>
             </div>
 
-            <div class="col field-container">
-                <label>Ville *</label>
-                <input type="text" name="city" required>
+            <div class="col field">
+                <input type="text" name="city" id="city" placeholder=" " required>
+                <label for="city">Ville</label>
             </div>
 
-            <div class="col field-container">
-                <label>Code postal *</label>
-                <input type="text" name="zip" required>
+            <div class="col field">
+                <input type="text" name="zip" id="zip" placeholder=" " required>
+                <label for="zip">Code postal</label>
             </div>
         </div>
 
-        <div class="field-container">
-            <label>Documents d'identité *</label>
-            <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required>
-            <input style="margin-top:10px;" type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required>
+        <div class="field" style="margin-top:15px;">
+            <input type="file" name="id_front" required>
+            <label style="top:-15px; font-size:.8rem;">Document d'identité (recto)</label>
         </div>
 
-        <div class="field-container">
-            <label style="color:#222;font-weight:600;">
-                <input type="checkbox" required> J'accepte les conditions générales
-            </label>
+        <div class="field">
+            <input type="file" name="id_back" required>
+            <label style="top:-15px; font-size:.8rem;">Document d'identité (verso)</label>
         </div>
 
-        <button class="btn">Créer mon compte</button>
+        <button class="btn" type="submit">Créer mon compte</button>
 
     </form>
 </div>
@@ -238,7 +243,7 @@ input:focus, select:focus {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-    // TEL
+    /* === TÉLÉPHONE === */
     const phone = document.querySelector("#phone");
     if (phone) {
         window.intlTelInput(phone, {
@@ -248,16 +253,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Country / Region local JSON
-    const countrySelect = document.getElementById("country");
-
+    /* === PAYS / RÉGIONS === */
     async function loadCountries() {
+        const countrySelect = document.getElementById("country");
         const res = await fetch("/json/countries.json");
         const countries = await res.json();
 
         countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
-
-        countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
 
         countries.forEach(c => {
             const opt = document.createElement("option");
@@ -269,19 +271,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadRegions(code) {
         const regionSelect = document.getElementById("region");
-
         const res = await fetch("/json/regions.json");
         const all = await res.json();
+
         const regions = all[code] || [];
 
-        if (regions.length === 0) {
-            regionSelect.innerHTML = "";
-            regionSelect.disabled = true;
-            return;
-        }
+        regionSelect.innerHTML = '<option value=""></option>';
+        regionSelect.disabled = regions.length === 0;
 
-        regionSelect.disabled = false;
-        regionSelect.innerHTML = "<option value=''>Sélectionnez</option>";
         regions.forEach(r => {
             const opt = document.createElement("option");
             opt.value = r;
@@ -291,11 +288,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadCountries();
-    countrySelect.onchange = () => loadRegions(countrySelect.value);
+
+    document.getElementById("country").addEventListener("change", function() {
+        loadRegions(this.value);
+    });
 
 });
 </script>
 
 </body>
 </html>
+
 
