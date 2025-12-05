@@ -281,32 +281,32 @@
 
         // Correction : utiliser l'émoji 'flag' (fiable) et nom + stocker cca2 comme value
         async function loadCountries() {
-            try {
-                countrySelect.innerHTML = "<option value=''>Chargement...</option>";
+    try {
+        countrySelect.innerHTML = "<option value=''>Chargement...</option>";
 
-                const res = await fetch("https://restcountries.com/v3.1/all");
-                if (!res.ok) throw new Error("REST Countries API non disponible");
-                const countries = await res.json();
+        // 👉 Charger le fichier local au lieu de l’API externe
+        const res = await fetch("/json/countries.json");
+        if (!res.ok) throw new Error("Fichier local non trouvé");
 
-                // Trier par nom
-                countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+        const countries = await res.json();
 
-                countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
+        // Trier par ordre alphabétique
+        countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
 
-                countries.forEach(c => {
-                    const opt = document.createElement("option");
-                    // value = code ISO2 (cca2) pour les APIs suivantes
-                    opt.value = c.cca2 || c.ccn3 || c.name.common;
-                    // Afficher emoji drapeau s'il existe, sinon le nom
-                    const flag = c.flag ? `${c.flag} ` : "";
-                    opt.textContent = `${flag}${c.name.common}`;
-                    countrySelect.appendChild(opt);
-                });
-            } catch (err) {
-                console.error("Erreur loadCountries:", err);
-                countrySelect.innerHTML = "<option value=''>Impossible de charger les pays</option>";
-            }
-        }
+        countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
+
+        countries.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.cca2; // code pays
+            opt.textContent = `${c.name.common}`;
+            countrySelect.appendChild(opt);
+        });
+    } catch (err) {
+        console.error("Erreur loadCountries:", err);
+        countrySelect.innerHTML = "<option value=''>Impossible de charger les pays</option>";
+    }
+}
+
 
         // Récupère les subdivisions (ADM1 = régions / états) via GeoNames / countriesnow fallback
         async function loadRegions(countryCode) {
