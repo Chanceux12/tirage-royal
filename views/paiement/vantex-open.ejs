@@ -2,136 +2,118 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Ouvrir un compte VANTEX</title>
+<title>Créer un compte VANTEX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
 
-/* === FOND === */
+/* === THEME FINTECH N26/WISE === */
 body {
     margin: 0;
     font-family: "Inter", sans-serif;
-    background: linear-gradient(135deg, #0A9999, #066F6F);
-    min-height: 100vh;
-    padding: 18px;
+    background: #F5FAFA; 
 }
 
-/* === CARD VERRE DEPOLI MAIS PLUS SOBRE === */
-.container {
-    max-width: 500px;
+/* Container mobile-first */
+.form-wrapper {
+    max-width: 460px;
     margin: auto;
-    padding: 28px 24px;
-    border-radius: 20px;
-
-    background: rgba(255,255,255,0.16);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.20);
-
-    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    padding: 22px;
 }
 
-/* === TITRE === */
+/* TITRE */
 h1 {
-    text-align: center;
-    color: #fff;
-    margin-bottom: 6px;
     font-size: 1.9rem;
-}
-h2 {
+    font-weight: 700;
     text-align: center;
-    color: #e9ffff;
-    font-size: 1rem;
-    margin-bottom: 25px;
+    color: #0A5050;
+    margin-bottom: 6px;
+}
+p.subtitle {
+    text-align: center;
+    color: #327575;
+    margin-bottom: 26px;
 }
 
-/* === CHAMPS PREMIUM — PLUS MINCES === */
-.field {
-    position: relative;
+/* BLOCS */
+.block {
     margin-bottom: 22px;
 }
 
-.field input,
-.field select {
+/* LABEL PRO FIXE (pas flottant) */
+label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #064D4D;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* INPUT FINTECH */
+input, select {
     width: 100%;
-    padding: 12px 12px 12px 12px;
-    font-size: 0.98rem;
-
-    background: rgba(255,255,255,0.92);
-    border: 1.4px solid rgba(8,120,120,0.6);
-    border-radius: 10px;
-    color: #1a1a1a;
-
-    transition: 0.25s ease;
-}
-
-/* Focus */
-.field input:focus,
-.field select:focus {
-    border-color: #fff;
-    box-shadow: 0 0 6px rgba(255,255,255,0.5);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1.6px solid #B8DCDC;
+    background: #fff;
+    font-size: 1rem;
     outline: none;
+    transition: .2s;
 }
 
-/* Labels flottants — version soft */
-.field label {
+input:focus, select:focus {
+    border-color: #0A9999;
+    box-shadow: 0 0 0 3px rgba(10,153,153,0.2);
+}
+
+/* Icônes dans champs */
+.input-icon {
+    position: relative;
+}
+.input-icon i {
     position: absolute;
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    background: transparent;
-    padding: 0 4px;
-    color: #034646;
-    font-size: 0.88rem;
-    pointer-events: none;
-    transition: 0.25s;
+    font-size: 1.1rem;
+    color: #0A9999;
+}
+.input-icon input {
+    padding-left: 40px;
 }
 
-/* Animation */
-.field input:focus + label,
-.field input:not(:placeholder-shown) + label,
-.field select:focus + label,
-.field select:not([value=""]) + label {
-    top: -9px;
-    font-size: 0.72rem;
-    background: rgba(255,255,255,0.75);
-}
-
-/* === ROW COMPACT === */
-.row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.col {
-    flex: 1;
-    min-width: 100%;
-}
-
-/* Desktop uniquement : 2 par ligne */
-@media (min-width: 670px) {
-    .col-half {
-        min-width: calc(50% - 10px);
-    }
-}
-
-/* === BOUTON === */
+/* BOUTON */
 .btn {
     width: 100%;
-    margin-top: 10px;
-    padding: 14px;
-    background: #ffffff;
-    color: #066F6F;
-    border: none;
+    padding: 16px;
     border-radius: 12px;
-    font-size: 1.1rem;
+    border: none;
+    background: #0A9999;
+    color: #fff;
+    font-size: 1.15rem;
     font-weight: 700;
     cursor: pointer;
+    transition: .25s;
+}
+.btn:hover {
+    background: #066F6F;
 }
 
-.btn:hover {
-    background: #d9ffff;
+/* DESKTOP */
+@media (min-width: 900px) {
+    body {
+        background: linear-gradient(135deg, #0A9999 0%, #066F6F 80%);
+    }
+    .form-wrapper {
+        margin-top: 60px;
+        background: #fff;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    h1, p.subtitle { color: #044646; }
 }
 
 </style>
@@ -139,114 +121,125 @@ h2 {
 
 <body>
 
-<div class="container">
+<div class="form-wrapper">
+
     <h1>Créer un compte</h1>
-    <h2>Ouverture rapide & sécurisée</h2>
+    <p class="subtitle">Ouverture moderne et sécurisée</p>
 
-<form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-    <div class="row">
-        <div class="col col-half field">
-            <input type="text" name="civility" placeholder=" " required>
+        <div class="block">
             <label>Civilité</label>
+            <select name="civility" required>
+                <option value="">Choisir</option>
+                <option>Mr</option>
+                <option>Mme</option>
+                <option>Mlle</option>
+            </select>
         </div>
 
-        <div class="col col-half field">
-            <input type="text" name="firstname" placeholder=" " required>
+        <div class="block">
             <label>Prénom</label>
+            <div class="input-icon">
+                <i>👤</i>
+                <input type="text" name="firstname" required>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <input type="text" name="lastname" placeholder=" " required>
-        <label>Nom</label>
-    </div>
+        <div class="block">
+            <label>Nom</label>
+            <div class="input-icon">
+                <i>👤</i>
+                <input type="text" name="lastname" required>
+            </div>
+        </div>
 
-    <div class="field">
-        <input type="email" name="email" placeholder=" " required>
-        <label>Email</label>
-    </div>
+        <div class="block">
+            <label>Email</label>
+            <div class="input-icon">
+                <i>📧</i>
+                <input type="email" name="email" required>
+            </div>
+        </div>
 
-    <!-- CHAMP TELEPHONE PREMIUM -->
-    <div class="field">
-        <input type="tel" id="phone" name="phone" placeholder=" " required>
-        <label>Téléphone</label>
-    </div>
+        <div class="block">
+            <label>Téléphone</label>
+            <input type="tel" id="phone" name="phone" required>
+        </div>
 
-    <div class="field">
-        <input type="text" name="profession" placeholder=" " required>
-        <label>Profession</label>
-    </div>
+        <div class="block">
+            <label>Profession</label>
+            <input type="text" name="profession" required>
+        </div>
 
-    <div class="field">
-        <select id="country" name="country" required>
-            <option value=""></option>
-        </select>
-        <label>Pays</label>
-    </div>
+        <div class="block">
+            <label>Pays</label>
+            <select id="country" name="country" required>
+                <option value=""></option>
+            </select>
+        </div>
 
-    <div class="field">
-        <select id="region" name="region" required disabled>
-            <option value=""></option>
-        </select>
-        <label>Région / Province</label>
-    </div>
+        <div class="block">
+            <label>Région / Province</label>
+            <select id="region" name="region" required disabled>
+                <option value=""></option>
+            </select>
+        </div>
 
-    <div class="field">
-        <input type="text" name="street" placeholder=" " required>
-        <label>Rue</label>
-    </div>
+        <div class="block">
+            <label>Rue</label>
+            <input type="text" name="street" required>
+        </div>
 
-    <div class="row">
-        <div class="col col-half field">
-            <input type="text" name="city" placeholder=" " required>
+        <div class="block">
             <label>Ville</label>
+            <input type="text" name="city" required>
         </div>
 
-        <div class="col col-half field">
-            <input type="text" name="zip" placeholder=" " required>
-            <label>Code postal</label>
+        <div class="block">
+            <label>Code Postal</label>
+            <input type="text" name="zip" required>
         </div>
-    </div>
 
-    <div class="field">
-        <input type="file" name="id_front" required>
-        <label style="top:-14px;">Identité (recto)</label>
-    </div>
+        <div class="block">
+            <label>Document d'identité (recto)</label>
+            <input type="file" name="id_front" required>
+        </div>
 
-    <div class="field">
-        <input type="file" name="id_back" required>
-        <label style="top:-14px;">Identité (verso)</label>
-    </div>
+        <div class="block">
+            <label>Document d'identité (verso)</label>
+            <input type="file" name="id_back" required>
+        </div>
 
-    <button class="btn">Créer mon compte</button>
+        <button class="btn">Créer mon compte</button>
 
-</form>
+    </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* === TELEPHONE PRO === */
+    /* === TELEPHONE FINTECH PRO === */
     const phone = document.querySelector("#phone");
     window.intlTelInput(phone, {
         separateDialCode: true,
-        preferredCountries: ["fr", "be", "ca"],
+        preferredCountries: ["fr"],
         initialCountry: "fr",
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
     });
 
-    /* === PAYS / REGIONS === */
+    /* === PAYS === */
     async function loadCountries() {
         const res = await fetch("/json/countries.json");
-        const countries = await res.json();
+        const data = await res.json();
         const select = document.getElementById("country");
 
-        countries.sort((a,b) => a.name.common.localeCompare(b.name.common));
+        data.sort((a,b) => a.name.common.localeCompare(b.name.common));
 
-        countries.forEach(c => {
+        data.forEach(c => {
             const opt = document.createElement("option");
             opt.value = c.cca2;
             opt.textContent = c.name.common;
@@ -259,23 +252,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/json/regions.json");
         const all = await res.json();
 
-        const regions = all[code] || [];
+        const list = all[code] || [];
         regionSelect.innerHTML = '<option value=""></option>';
+        regionSelect.disabled = list.length === 0;
 
-        regionSelect.disabled = regions.length === 0;
-
-        regions.forEach(r => {
+        list.forEach(r => {
             const opt = document.createElement("option");
-            opt.textContent = r;
             opt.value = r;
+            opt.textContent = r;
             regionSelect.appendChild(opt);
         });
     }
 
     loadCountries();
-
-    document.getElementById("country").addEventListener("change", function() {
-        loadRegions(this.value);
+    document.getElementById("country").addEventListener("change", e => {
+        loadRegions(e.target.value);
     });
 
 });
@@ -283,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
