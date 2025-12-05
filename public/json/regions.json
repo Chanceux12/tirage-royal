@@ -1,0 +1,14 @@
+{
+  "FR": ["Auvergne-Rhône-Alpes", "Île-de-France", "Occitanie", "Nouvelle-Aquitaine", "Hauts-de-France", "Normandie", "Bretagne", "Grand Est", "Provence-Alpes-Côte d'Azur", "Centre-Val de Loire", "Pays de la Loire", "Bourgogne-Franche-Comté", "Corse"],
+  "BE": ["Bruxelles-Capitale", "Wallonie", "Flandre"],
+  "CH": ["Zurich", "Vaud", "Genève", "Berne", "Bâle-Ville", "Tessin", "Lucerne"],
+  "CA": ["Ontario", "Québec", "Colombie-Britannique", "Alberta", "Manitoba", "Nouvelle-Écosse"],
+  "US": ["California", "Texas", "Florida", "New York", "Illinois", "Pennsylvania", "Ohio"],
+  "CI": ["Abidjan", "Bouaké", "Yamoussoukro", "San-Pédro"],
+  "SN": ["Dakar", "Thiès", "Saint-Louis", "Ziguinchor", "Kaolack"],
+  "ML": ["Bamako", "Kayes", "Sikasso", "Ségou"],
+  "GN": ["Conakry", "Kankan", "Labé", "Faranah"],
+  "CD": ["Kinshasa", "Lubumbashi", "Goma", "Kisangani"],
+
+  "DEFAULT": []
+}
