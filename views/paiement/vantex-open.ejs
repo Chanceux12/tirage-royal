@@ -5,216 +5,114 @@
 <title>Ouvrir un compte VANTEX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
 
-/* ========== PALETTE LUXE ========== */
-:root {
-  --accent: #0F9496; /* couleur de ton image */
-  --gold: #D4AF37; /* Or premium */
-  --bg1: #050505;
-  --bg2: #0b0b0c;
-  --glass: rgba(255,255,255,0.03);
-  --muted: rgba(255,255,255,0.65);
-  --border: rgba(255,255,255,0.08);
-  --radius: 12px;
-  --transition: .2s ease;
-}
-
-/* ========== GLOBAL ========== */
+/* === FOND GLOBAL === */
 body {
-  margin: 0;
-  padding: 30px;
-  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-  font-family: Inter, Arial, sans-serif;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    margin: 0;
+    font-family: "Inter", Arial, sans-serif;
+    background: linear-gradient(135deg, #0A9999, #087C7C);
+    min-height: 100vh;
+    padding: 20px;
+    color: #fff;
 }
 
-.shell {
-  width: 100%;
-  max-width: 1200px;
-  display: grid;
-  grid-template-columns: 450px 1fr;
-  border-radius: 18px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.02);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+/* === CARD BANCAIRE === */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    color: #1a1a1a;
 }
 
-@media (max-width: 900px) {
-  .shell { grid-template-columns: 1fr; }
+/* HEADER */
+.form-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.form-title h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #0A9999;
+    font-weight: 800;
+}
+.form-title p {
+    margin: 4px 0 0;
+    color: #444;
 }
 
-/* PANEL LEFT */
-.panel-left {
-  padding: 40px;
-  background:
-    linear-gradient(135deg, rgba(15,148,150,0.14), rgba(212,175,55,0.08)),
-    radial-gradient(600px 300px at 10% 10%, rgba(15,148,150,0.12), transparent 40%);
+/* === CHAMPS BANQUE PREMIUM === */
+
+.field-container {
+    margin-bottom: 20px;
 }
 
-.logo-box {
-  width: 70px; height: 70px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent), var(--gold));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 26px;
-  color: #0a0a0a;
-  margin-bottom: 10px;
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #0A9999;
 }
 
-.panel-left h1 {
-  margin: 0;
-  font-size: 26px;
-  letter-spacing: .5px;
+/* Champ style bancaire */
+input, select {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1.7px solid #cfd8dc;
+    background: #fdfdfd;
+    transition: all 0.2s ease-in-out;
 }
 
-.panel-left .lead {
-  margin-top: 10px;
-  color: var(--muted);
-  max-width: 350px;
-  line-height: 1.5;
+input:focus, select:focus {
+    border-color: #0A9999;
+    box-shadow: 0 0 6px rgba(10,153,153,0.4);
+    outline: none;
 }
 
-/* PANEL RIGHT */
-.panel-right {
-  padding: 35px 45px;
+/* ROWS */
+.row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.col {
+    flex: 1;
+    min-width: 220px;
 }
 
-/* TITRES */
-.panel-right h2 {
-  margin: 0 0 6px 0;
-  font-size: 22px;
-}
-
-.panel-right p.sub {
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-
-/* FORM GRID */
-form { display: grid; gap: 14px; }
-
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-
-@media (max-width: 900px) {
-  .grid, .grid-3 { grid-template-columns: 1fr; }
-}
-
-/* FLOATING LABEL */
-.field {
-  position: relative;
-}
-
-.field input,
-.field select {
-  width: 100%;
-  padding: 15px 14px 10px 14px;
-  font-size: 15px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--glass);
-  color: white;
-  outline: none;
-  transition: var(--transition);
-}
-
-.field label {
-  position: absolute;
-  left: 12px;
-  top: 13px;
-  font-size: 14px;
-  color: var(--muted);
-  transition: .18s ease;
-  pointer-events: none;
-}
-
-/* Float effect */
-.field input:focus,
-.field select:focus,
-.field input:not(:placeholder-shown),
-.field select:not([value=""]) {
-  border-color: var(--accent);
-  background: rgba(15,148,150,0.03);
-}
-
-.field input:focus + label,
-.field select:focus + label,
-.field input:not(:placeholder-shown) + label,
-.field select:not([value=""]) + label {
-  transform: translateY(-10px) scale(0.9);
-  background: rgba(5,5,5,0.9);
-  padding: 0 6px;
-  top: 2px;
-  color: var(--accent);
-}
-
-/* SELECT DROPDOWN ARROW */
-.field select {
-  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%);
-  background-position: right 12px center;
-  background-size: 8px 8px;
-  background-repeat: no-repeat;
-  appearance: none;
-}
-
-/* FILE INPUTS */
-.files { display: flex; gap: 12px; flex-wrap: wrap; }
-input[type="file"] {
-  padding: 12px;
-  border: 1px dashed var(--border);
-  color: var(--muted);
-  background: transparent;
-  border-radius: var(--radius);
-}
-
-/* CHECKBOX */
-.checkbox { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-
-/* BUTTON */
+/* === BOUTON PREMIUM === */
 .btn {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(90deg, var(--gold), #b68b2c);
-  color: #0a0a0a;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 8px 30px rgba(212,175,55,0.22);
-  transition: .2s ease;
-}
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 40px rgba(212,175,55,0.32);
+    width: 100%;
+    padding: 15px;
+    background: #0A9999;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s;
 }
 
-/* ===== VALIDATION ===== */
-.field.success input,
-.field.success select {
-  border-color: #1dd1a1;
+.btn:hover {
+    background: #066b6b;
 }
-.field.error input,
-.field.error select {
-  border-color: #e84118;
-}
-.error {
-  font-size: 12px;
-  color: #e84118;
-  margin-top: 4px;
-  display: none;
-}
-.field.error .error {
-  display: block;
+
+/* Responsive */
+@media (max-width: 780px) {
+    .container {
+        padding: 20px;
+    }
+    .form-title h1 {
+        font-size: 1.7rem;
+    }
 }
 
 </style>
@@ -222,306 +120,182 @@ input[type="file"] {
 
 <body>
 
-<div class="shell">
-
-  <!-- PANEL LEFT -->
-  <div class="panel-left">
-    <div class="logo-box">V</div>
-    <h1>VANTEX BANK</h1>
-    <p class="lead">Votre espace bancaire premium, sécurisé, moderne et optimisé pour une ouverture rapide.</p>
-  </div>
-
-  <!-- PANEL RIGHT -->
-  <div class="panel-right">
-    <h2>Ouverture de compte</h2>
-    <p class="sub">Tous les champs marqués d’un * sont obligatoires.</p>
+<div class="container">
+    <div class="form-title">
+        <h1>Ouvrir un compte VANTEX</h1>
+        <p>Inscription rapide & sécurisée</p>
+    </div>
 
     <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-      <!-- Civilité / Prénom / Nom -->
-      <div class="grid">
-        <div class="field">
-          <select name="civility" id="civility" required>
-            <option value="">--</option>
-            <option value="M.">M.</option>
-            <option value="Mme">Mme</option>
-            <option value="Mlle">Mlle</option>
-            <option value="Dr">Dr</option>
-          </select>
-          <label for="civility">Civilité *</label>
-          <div class="error"></div>
+        <div class="row">
+            <div class="col field-container">
+                <label>Civilité *</label>
+                <select name="civility" required>
+                    <option value="">Sélectionner</option>
+                    <option>M.</option>
+                    <option>Mme</option>
+                    <option>Mlle</option>
+                </select>
+            </div>
+
+            <div class="col field-container">
+                <label>Prénom *</label>
+                <input type="text" name="firstname" required>
+            </div>
+
+            <div class="col field-container">
+                <label>Nom *</label>
+                <input type="text" name="lastname" required>
+            </div>
         </div>
 
-        <div class="field">
-          <input type="text" name="firstname" id="firstname" placeholder=" " required>
-          <label for="firstname">Prénom *</label>
-          <div class="error"></div>
+        <div class="row">
+            <div class="col field-container">
+                <label>Email *</label>
+                <input type="email" name="email" required>
+            </div>
+
+            <div class="col field-container">
+                <label>Téléphone *</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
         </div>
 
-        <div class="field">
-          <input type="text" name="lastname" id="lastname" placeholder=" " required>
-          <label for="lastname">Nom *</label>
-          <div class="error"></div>
-        </div>
-      </div>
-
-      <!-- Email / Tel -->
-      <div class="grid">
-        <div class="field">
-          <input type="email" name="email" id="email" placeholder=" " required>
-          <label for="email">Email *</label>
-          <div class="error"></div>
+        <div class="field-container">
+            <label>Profession *</label>
+            <input type="text" name="profession" required>
         </div>
 
-        <div class="field">
-          <input type="tel" name="phone" id="phone" placeholder=" " required>
-          <label for="phone">Téléphone *</label>
-          <div class="error"></div>
-        </div>
-      </div>
+        <div class="row">
+            <div class="col field-container">
+                <label>Type de pièce *</label>
+                <select name="id_type" required>
+                    <option value="">Sélectionner</option>
+                    <option value="passeport">Passeport</option>
+                    <option value="cni">Carte nationale d'identité</option>
+                </select>
+            </div>
 
-      <!-- Profession -->
-      <div class="field">
-        <input type="text" name="profession" id="profession" placeholder=" " required>
-        <label for="profession">Profession *</label>
-        <div class="error"></div>
-      </div>
-
-      <!-- Type pièce / Num pièce -->
-      <div class="grid">
-        <div class="field">
-          <select name="id_type" id="id_type" required>
-            <option value="">--</option>
-            <option value="passeport">Passeport</option>
-            <option value="cni">Carte d'identité</option>
-            <option value="titre_sejour">Titre de séjour</option>
-          </select>
-          <label for="id_type">Type de pièce *</label>
-          <div class="error"></div>
+            <div class="col field-container">
+                <label>Numéro de pièce *</label>
+                <input type="text" name="id_number" required>
+            </div>
         </div>
 
-        <div class="field">
-          <input type="text" name="id_number" id="id_number" placeholder=" " required>
-          <label for="id_number">Numéro de pièce *</label>
-          <div class="error"></div>
-        </div>
-      </div>
+        <div class="row">
+            <div class="col field-container">
+                <label for="country">Pays *</label>
+                <select id="country" name="country" required>
+                    <option value="">Chargement...</option>
+                </select>
+            </div>
 
-      <!-- Pays / Région -->
-      <div class="grid">
-        <div class="field">
-          <select name="country" id="country" required>
-            <option value="">Chargement...</option>
-          </select>
-          <label for="country">Pays *</label>
-          <div class="error"></div>
-        </div>
-
-        <div class="field">
-          <select name="region" id="region" required disabled>
-            <option value="">Sélectionnez un pays d'abord</option>
-          </select>
-          <label for="region">Région *</label>
-          <div class="error"></div>
-        </div>
-      </div>
-
-      <!-- Adresse -->
-      <div class="grid-3">
-        <div class="field">
-          <input type="text" name="street" id="street" placeholder=" " required>
-          <label for="street">Rue *</label>
-          <div class="error"></div>
+            <div class="col field-container">
+                <label for="region">Région / Province *</label>
+                <select id="region" name="region" required disabled>
+                    <option value="">Sélectionnez un pays d'abord</option>
+                </select>
+            </div>
         </div>
 
-        <div class="field">
-          <input type="text" name="city" id="city" placeholder=" " required>
-          <label for="city">Ville *</label>
-          <div class="error"></div>
+        <div class="row">
+            <div class="col field-container">
+                <label>Rue *</label>
+                <input type="text" name="street" required>
+            </div>
+
+            <div class="col field-container">
+                <label>Ville *</label>
+                <input type="text" name="city" required>
+            </div>
+
+            <div class="col field-container">
+                <label>Code postal *</label>
+                <input type="text" name="zip" required>
+            </div>
         </div>
 
-        <div class="field">
-          <input type="text" name="zip" id="zip" placeholder=" " required>
-          <label for="zip">Code postal *</label>
-          <div class="error"></div>
+        <div class="field-container">
+            <label>Documents d'identité *</label>
+            <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required>
+            <input style="margin-top:10px;" type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required>
         </div>
-      </div>
 
-      <!-- Fichiers -->
-      <div class="files">
-        <input type="file" name="id_front" required>
-        <input type="file" name="id_back" required>
-      </div>
+        <div class="field-container">
+            <label style="color:#222;font-weight:600;">
+                <input type="checkbox" required> J'accepte les conditions générales
+            </label>
+        </div>
 
-      <!-- CGU -->
-      <div class="checkbox">
-        <input type="checkbox" id="terms" name="terms" required>
-        <label for="terms">J'accepte les conditions générales</label>
-      </div>
-
-      <!-- BTN -->
-      <button class="btn" type="submit">Créer mon compte</button>
+        <button class="btn">Créer mon compte</button>
 
     </form>
-  </div>
-
 </div>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ====== INIT TÉLÉPHONE ====== */
-  const phone = document.getElementById("phone");
-  if (phone) {
-    window.intlTelInput(phone, {
-      separateDialCode: true,
-      initialCountry: "fr",
-      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-    });
-  }
-
-  /* ====== VALIDATION ====== */
-  function showError(field, msg) {
-    const box = field.closest(".field");
-    box.classList.add("error");
-    box.classList.remove("success");
-    box.querySelector(".error").textContent = msg;
-  }
-
-  function showSuccess(field) {
-    const box = field.closest(".field");
-    box.classList.remove("error");
-    box.classList.add("success");
-  }
-
-  function validate(field) {
-    if (!field.value.trim()) {
-      showError(field, "Ce champ est requis");
-      return false;
+    // TEL
+    const phone = document.querySelector("#phone");
+    if (phone) {
+        window.intlTelInput(phone, {
+            separateDialCode: true,
+            initialCountry: "fr",
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+        });
     }
 
-    if (field.type === "email") {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!regex.test(field.value)) {
-        showError(field, "Adresse email invalide");
-        return false;
-      }
+    // Country / Region local JSON
+    const countrySelect = document.getElementById("country");
+
+    async function loadCountries() {
+        const res = await fetch("/json/countries.json");
+        const countries = await res.json();
+
+        countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+        countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
+
+        countries.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.cca2;
+            opt.textContent = c.name.common;
+            countrySelect.appendChild(opt);
+        });
     }
 
-    if (field.type === "tel") {
-      if (field.value.replace(/\D/g, "").length < 6) {
-        showError(field, "Numéro invalide");
-        return false;
-      }
+    async function loadRegions(code) {
+        const regionSelect = document.getElementById("region");
+
+        const res = await fetch("/json/regions.json");
+        const all = await res.json();
+        const regions = all[code] || [];
+
+        if (regions.length === 0) {
+            regionSelect.innerHTML = "";
+            regionSelect.disabled = true;
+            return;
+        }
+
+        regionSelect.disabled = false;
+        regionSelect.innerHTML = "<option value=''>Sélectionnez</option>";
+        regions.forEach(r => {
+            const opt = document.createElement("option");
+            opt.value = r;
+            opt.textContent = r;
+            regionSelect.appendChild(opt);
+        });
     }
 
-    if (field.name === "zip" && field.value.length < 3) {
-      showError(field, "Code postal invalide");
-      return false;
-    }
-
-    if (field.name === "id_number" && field.value.length < 4) {
-      showError(field, "Numéro de pièce invalide");
-      return false;
-    }
-
-    showSuccess(field);
-    return true;
-  }
-
-  // Validation instantanée
-  document.querySelectorAll("input, select").forEach(el => {
-    el.addEventListener("input", () => validate(el));
-  });
-
-  // Validation submit
-  document.querySelector("form").addEventListener("submit", e => {
-    let ok = true;
-    document.querySelectorAll("input, select").forEach(el => {
-      if (!validate(el)) ok = false;
-    });
-    if (!ok) e.preventDefault();
-  });
-
-  /* ======== CHARGEMENT PAYS ======== */
-  const countrySelect = document.getElementById("country");
-  const regionSelect = document.getElementById("region");
-
-  async function loadCountries() {
-    try {
-      const res = await fetch("/json/countries.json");
-      const data = await res.json();
-      data.sort((a,b)=>a.name.common.localeCompare(b.name.common));
-
-      countrySelect.innerHTML = '<option value="">Sélectionnez un pays</option>';
-      data.forEach(c => {
-        let opt = document.createElement("option");
-        opt.value = c.cca2;
-        opt.textContent = c.name.common;
-        countrySelect.appendChild(opt);
-      });
-
-    } catch {
-      countrySelect.innerHTML = '<option>Erreur chargement</option>';
-    }
-  }
-  loadCountries();
-
-  /* ======== CHARGEMENT RÉGIONS ======== */
-  async function loadRegions(code) {
-    if (!code) {
-      regionSelect.innerHTML = '<option>Sélectionnez un pays</option>';
-      regionSelect.disabled = true;
-      return;
-    }
-
-    try {
-      const res = await fetch("/json/regions.json");
-      const regions = (await res.json())[code] || [];
-
-      if (!regions.length) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = "Entrez votre région";
-        input.name = "region";
-        input.id = "region";
-        input.required = true;
-        regionSelect.parentNode.replaceChild(input, regionSelect);
-        return;
-      }
-
-      regionSelect.innerHTML = '<option value="">Sélectionnez une région</option>';
-      regions.forEach(r=>{
-        let opt=document.createElement("option");
-        opt.value=r;
-        opt.textContent=r;
-        regionSelect.appendChild(opt);
-      });
-      regionSelect.disabled = false;
-    } catch {
-      regionSelect.innerHTML = '<option>Erreur</option>';
-    }
-  }
-
-  countrySelect.addEventListener("change", () => {
-    let reg = document.getElementById("region");
-    if (reg.tagName === "INPUT") {
-      let newSelect = document.createElement("select");
-      newSelect.id = "region";
-      newSelect.name = "region";
-      newSelect.required = true;
-      newSelect.disabled = true;
-      newSelect.innerHTML = '<option>Sélectionnez un pays</option>';
-      reg.parentNode.replaceChild(newSelect, reg);
-    }
-    loadRegions(countrySelect.value);
-  });
+    loadCountries();
+    countrySelect.onchange = () => loadRegions(countrySelect.value);
 
 });
 </script>
 
 </body>
 </html>
+
