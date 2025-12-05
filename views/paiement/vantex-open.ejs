@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -134,6 +134,16 @@
                 height: 280px;
             }
         }
+
+
+        /* ======= PREMIUM FLAGS STYLE ======= */
+        #country option {
+            padding-left: 35px;
+            background-size: 22px;
+            background-position: 8px center;
+            background-repeat: no-repeat;
+        }
+
     </style>
 </head>
 <body>
@@ -209,16 +219,16 @@
                 <div class="row">
                     <div class="col">
                         <label>Pays *</label>
-                        <select name="country" id="country" required></select>
+                        <select name="country" id="country" required>
+                            <option value="">Chargement...</option>
+                        </select>
                     </div>
 
                     <div class="col">
                         <label>Région / Province *</label>
-                        <div id="regionWrapper">
-                            <select id="region" name="region" required>
-                                <option value="">Sélectionnez une région</option>
-                            </select>
-                        </div>
+                        <select id="region" name="region" required disabled>
+                            <option value="">Sélectionnez un pays d'abord</option>
+                        </select>
                     </div>
                 </div>
 
@@ -264,57 +274,75 @@
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
         });
 
-        /* === SYSTEME PAYS AUTOMATIQUE === */
+        /*  ======================================================
+            PREMIUM SYSTEME AUTOMATIQUE PAYS + DRAPEAUX + REGIONS
+            ====================================================== */
+
         const countrySelect = document.getElementById("country");
-        const regionWrapper = document.getElementById("regionWrapper");
+        const regionSelect = document.getElementById("region");
 
-        const predefinedRegions = {
-            "FR": ["Île-de-France","PACA","Auvergne-Rhône-Alpes","Occitanie","Nouvelle-Aquitaine","Hauts-de-France","Bretagne","Normandie","Grand Est","Centre-Val de Loire","Bourgogne-Franche-Comté","Pays de la Loire","Corse"],
-            "CA": ["Alberta","Colombie-Britannique","Ontario","Québec","Manitoba","Nouvelle-Écosse","Saskatchewan","Nouveau-Brunswick"],
-            "US": ["California","Texas","Florida","New York","Pennsylvania","Ohio","Illinois","Georgia","North Carolina"]
-        };
+        // Charger tous les pays
+        async function loadCountries() {
+            const res = await fetch("https://restcountries.com/v3.1/all");
+            const countries = await res.json();
 
-        // Charger tous les pays via API
-        fetch("https://restcountries.com/v3.1/all")
-        .then(res => res.json())
-        .then(countries => {
             countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+            countrySelect.innerHTML = "<option value=''>Sélectionnez un pays</option>";
+
             countries.forEach(c => {
-                countrySelect.innerHTML += `<option value="${c.cca2}">${c.name.common}</option>`;
+                const opt = document.createElement("option");
+                opt.value = c.cca2;
+                opt.textContent = c.name.common;
+
+                if (c.flags && c.flags.svg) {
+                    opt.style.backgroundImage = `url(${c.flags.svg})`;
+                }
+
+                countrySelect.appendChild(opt);
             });
-        });
+        }
 
-        // Gestion dynamique des régions
-        countrySelect.addEventListener("change", () => {
-            const code = countrySelect.value;
+        // Charger automatiquement les régions selon pays
+        async function loadRegions(countryCode) {
+            regionSelect.disabled = true;
+            regionSelect.innerHTML = "<option value=''>Chargement...</option>";
 
-            regionWrapper.innerHTML = "";
+            const url = `https://secure.geonames.org/searchJSON?country=${countryCode}&featureCode=ADM1&maxRows=200&username=demo`;
 
-            if (predefinedRegions[code]) {
-                const select = document.createElement("select");
-                select.name = "region";
-                select.required = true;
-                select.innerHTML = `<option value="">Sélectionnez votre région</option>`;
+            const res = await fetch(url);
+            const data = await res.json();
 
-                predefinedRegions[code].forEach(r => {
-                    select.innerHTML += `<option value="${r}">${r}</option>`;
+            regionSelect.innerHTML = "<option value=''>Sélectionnez une région</option>";
+
+            if (data.geonames && data.geonames.length > 0) {
+                data.geonames.forEach(region => {
+                    const opt = document.createElement("option");
+                    opt.value = region.name;
+                    opt.textContent = region.name;
+                    regionSelect.appendChild(opt);
                 });
 
-                regionWrapper.appendChild(select);
-
+                regionSelect.disabled = false;
             } else {
-                const input = document.createElement("input");
-                input.type = "text";
-                input.name = "region";
-                input.placeholder = "Entrez votre région";
-                input.required = true;
-                regionWrapper.appendChild(input);
+                regionSelect.innerHTML = "<option value=''>Aucune région trouvée</option>";
             }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCountries();
+
+            countrySelect.addEventListener("change", () => {
+                if (countrySelect.value !== "") {
+                    loadRegions(countrySelect.value);
+                }
+            });
         });
     </script>
 
 </body>
 </html>
+
 
 
 
