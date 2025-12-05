@@ -2,118 +2,125 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Créer un compte VANTEX</title>
+<title>Ouvrir un compte VANTEX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.min.css" />
 
 <style>
 
-/* === THEME FINTECH N26/WISE === */
+/* ====== CORE STYLE ====== */
 body {
     margin: 0;
     font-family: "Inter", sans-serif;
-    background: #F5FAFA; 
+    background: #f5f7fa;
+    padding: 30px;
 }
 
-/* Container mobile-first */
-.form-wrapper {
-    max-width: 460px;
+/* ====== CENTERED CARD ====== */
+.card {
+    max-width: 900px;
     margin: auto;
-    padding: 22px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.07);
 }
 
-/* TITRE */
+/* TITLE */
 h1 {
-    font-size: 1.9rem;
+    font-size: 2rem;
     font-weight: 700;
+    margin-bottom: 5px;
+    color: #0A9999;
     text-align: center;
-    color: #0A5050;
-    margin-bottom: 6px;
 }
 p.subtitle {
     text-align: center;
-    color: #327575;
-    margin-bottom: 26px;
+    color: #5d676f;
+    margin-bottom: 32px;
 }
 
-/* BLOCS */
-.block {
+/* ===== FLOATING INPUT PROFESSIONAL ===== */
+.field {
+    position: relative;
     margin-bottom: 22px;
 }
 
-/* LABEL PRO FIXE (pas flottant) */
-label {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: #064D4D;
-    margin-bottom: 6px;
-    display: block;
-}
-
-/* INPUT FINTECH */
-input, select {
+.field input,
+.field select {
     width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1.6px solid #B8DCDC;
+    padding: 14px 12px 14px 12px;
+    border: 1.5px solid #cfd9e2;
     background: #fff;
+    border-radius: 10px;
     font-size: 1rem;
-    outline: none;
+    color: #1a1a1a;
     transition: .2s;
 }
 
-input:focus, select:focus {
+.field input:focus,
+.field select:focus {
     border-color: #0A9999;
-    box-shadow: 0 0 0 3px rgba(10,153,153,0.2);
+    box-shadow: 0 0 0 3px rgba(10, 153, 153, 0.20);
+    outline: none;
 }
 
-/* Icônes dans champs */
-.input-icon {
-    position: relative;
-}
-.input-icon i {
+/* LABEL FLOAT */
+.field label {
     position: absolute;
+    top: 14px;
     left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
+    font-size: 0.92rem;
+    color: #6c7a86;
+    background: white;
+    padding: 0 4px;
+    pointer-events: none;
+    transition: 0.25s ease;
+}
+
+.field input:not(:placeholder-shown) + label,
+.field select:valid + label,
+.field input:focus + label {
+    top: -9px;
+    font-size: 0.72rem;
     color: #0A9999;
 }
-.input-icon input {
-    padding-left: 40px;
+
+/* ===== GRID ===== */
+.grid {
+    display: grid;
+    gap: 18px;
 }
 
-/* BOUTON */
+@media (min-width: 830px) {
+    .grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ===== BUTTON ===== */
 .btn {
     width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    border: none;
+    padding: 15px;
     background: #0A9999;
-    color: #fff;
-    font-size: 1.15rem;
-    font-weight: 700;
+    color: white;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-    transition: .25s;
+    margin-top: 4px;
+    font-weight: 600;
 }
 .btn:hover {
-    background: #066F6F;
+    background: #087a7a;
 }
 
-/* DESKTOP */
-@media (min-width: 900px) {
-    body {
-        background: linear-gradient(135deg, #0A9999 0%, #066F6F 80%);
+/* ===== MOBILE IMPROVEMENT ===== */
+@media (max-width: 600px) {
+    .card {
+        padding: 26px;
     }
-    .form-wrapper {
-        margin-top: 60px;
-        background: #fff;
-        padding: 40px;
-        border-radius: 18px;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-    }
-    h1, p.subtitle { color: #044646; }
 }
 
 </style>
@@ -121,159 +128,123 @@ input:focus, select:focus {
 
 <body>
 
-<div class="form-wrapper">
+<div class="card">
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé • Haute qualité bancaire</p>
 
-    <h1>Créer un compte</h1>
-    <p class="subtitle">Ouverture moderne et sécurisée</p>
+<form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
-
-        <div class="block">
+    <div class="grid grid-2">
+        <div class="field">
+            <input type="text" name="civility" placeholder=" " required>
             <label>Civilité</label>
-            <select name="civility" required>
-                <option value="">Choisir</option>
-                <option>Mr</option>
-                <option>Mme</option>
-                <option>Mlle</option>
-            </select>
         </div>
 
-        <div class="block">
+        <div class="field">
+            <input type="text" name="firstname" placeholder=" " required>
             <label>Prénom</label>
-            <div class="input-icon">
-                <i>👤</i>
-                <input type="text" name="firstname" required>
-            </div>
         </div>
+    </div>
 
-        <div class="block">
-            <label>Nom</label>
-            <div class="input-icon">
-                <i>👤</i>
-                <input type="text" name="lastname" required>
-            </div>
-        </div>
+    <div class="field">
+        <input type="text" name="lastname" placeholder=" " required>
+        <label>Nom</label>
+    </div>
 
-        <div class="block">
-            <label>Email</label>
-            <div class="input-icon">
-                <i>📧</i>
-                <input type="email" name="email" required>
-            </div>
-        </div>
+    <div class="field">
+        <input type="email" name="email" placeholder=" " required>
+        <label>Email</label>
+    </div>
 
-        <div class="block">
-            <label>Téléphone</label>
-            <input type="tel" id="phone" name="phone" required>
-        </div>
+    <!-- PHONE PRO -->
+    <div class="field">
+        <input type="tel" id="phone" name="phone" placeholder=" " required>
+        <label>Téléphone</label>
+    </div>
 
-        <div class="block">
-            <label>Profession</label>
-            <input type="text" name="profession" required>
-        </div>
+    <div class="field">
+        <input type="text" name="profession" placeholder=" " required>
+        <label>Profession</label>
+    </div>
 
-        <div class="block">
-            <label>Pays</label>
+    <div class="grid grid-2">
+        <div class="field">
             <select id="country" name="country" required>
-                <option value=""></option>
+                <option value="" selected></option>
             </select>
+            <label>Pays</label>
         </div>
 
-        <div class="block">
-            <label>Région / Province</label>
+        <div class="field">
             <select id="region" name="region" required disabled>
-                <option value=""></option>
+                <option value="" selected></option>
             </select>
+            <label>Région / Province</label>
         </div>
+    </div>
 
-        <div class="block">
-            <label>Rue</label>
-            <input type="text" name="street" required>
-        </div>
+    <div class="field">
+        <input type="text" name="street" placeholder=" " required>
+        <label>Rue</label>
+    </div>
 
-        <div class="block">
+    <div class="grid grid-2">
+        <div class="field">
+            <input type="text" name="city" placeholder=" " required>
             <label>Ville</label>
-            <input type="text" name="city" required>
         </div>
 
-        <div class="block">
-            <label>Code Postal</label>
-            <input type="text" name="zip" required>
+        <div class="field">
+            <input type="text" name="zip" placeholder=" " required>
+            <label>Code postal</label>
         </div>
+    </div>
 
-        <div class="block">
-            <label>Document d'identité (recto)</label>
-            <input type="file" name="id_front" required>
-        </div>
+    <div class="field">
+        <input type="file" name="id_front" required>
+        <label style="top:-10px;background:white;">Identité (recto)</label>
+    </div>
 
-        <div class="block">
-            <label>Document d'identité (verso)</label>
-            <input type="file" name="id_back" required>
-        </div>
+    <div class="field">
+        <input type="file" name="id_back" required>
+        <label style="top:-10px;background:white;">Identité (verso)</label>
+    </div>
 
-        <button class="btn">Créer mon compte</button>
+    <button class="btn">Créer mon compte</button>
+</form>
 
-    </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
-
 <script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    /* === TELEPHONE FINTECH PRO === */
-    const phone = document.querySelector("#phone");
-    window.intlTelInput(phone, {
-        separateDialCode: true,
-        preferredCountries: ["fr"],
-        initialCountry: "fr",
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-    });
-
-    /* === PAYS === */
-    async function loadCountries() {
-        const res = await fetch("/json/countries.json");
-        const data = await res.json();
-        const select = document.getElementById("country");
-
-        data.sort((a,b) => a.name.common.localeCompare(b.name.common));
-
-        data.forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c.cca2;
-            opt.textContent = c.name.common;
-            select.appendChild(opt);
-        });
-    }
-
-    async function loadRegions(code) {
-        const regionSelect = document.getElementById("region");
-        const res = await fetch("/json/regions.json");
-        const all = await res.json();
-
-        const list = all[code] || [];
-        regionSelect.innerHTML = '<option value=""></option>';
-        regionSelect.disabled = list.length === 0;
-
-        list.forEach(r => {
-            const opt = document.createElement("option");
-            opt.value = r;
-            opt.textContent = r;
-            regionSelect.appendChild(opt);
-        });
-    }
-
-    loadCountries();
-    document.getElementById("country").addEventListener("change", e => {
-        loadRegions(e.target.value);
-    });
-
+/* PHONE */
+const phoneInput = document.querySelector("#phone");
+window.intlTelInput(phoneInput, {
+    separateDialCode: true,
+    initialCountry: "fr",
 });
+
+/* PAYS/REGIONS */
+async function loadCountries(){
+    const res = await fetch("/json/countries.json");
+    const countries = await res.json();
+    const el = document.getElementById("country");
+
+    countries.sort((a,b)=> a.name.common.localeCompare(b.name.common));
+
+    countries.forEach(c=>{
+        const opt = document.createElement("option");
+        opt.value = c.cca2;
+        opt.textContent = c.name.common;
+        el.appendChild(opt);
+    });
+}
+loadCountries();
 </script>
 
 </body>
 </html>
+
 
 
 
