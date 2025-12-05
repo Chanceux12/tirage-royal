@@ -9,138 +9,129 @@
 
 <style>
 
-/* === FOND GLOBAL TURQUOISE PREMIUM === */
+/* === FOND === */
 body {
     margin: 0;
-    font-family: "Inter", Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     background: linear-gradient(135deg, #0A9999, #066F6F);
     min-height: 100vh;
-    padding: 25px;
-    color: #ffffff;
+    padding: 18px;
 }
 
-/* === CARTE GLASSMORPHISM — ULTRA PREMIUM === */
+/* === CARD VERRE DEPOLI MAIS PLUS SOBRE === */
 .container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 40px;
-    border-radius: 28px;
+    max-width: 500px;
+    margin: auto;
+    padding: 28px 24px;
+    border-radius: 20px;
 
-    background: rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.16);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.20);
 
-    border: 1px solid rgba(255, 255, 255, 0.20);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
 }
 
-/* === TITRES === */
+/* === TITRE === */
 h1 {
     text-align: center;
-    font-size: 2.3rem;
-    font-weight: 800;
-    margin-bottom: 8px;
-    color: #ffffff;
+    color: #fff;
+    margin-bottom: 6px;
+    font-size: 1.9rem;
 }
-
 h2 {
     text-align: center;
-    margin-top: 0;
-    color: #e4fafa;
-    font-size: 1.1rem;
+    color: #e9ffff;
+    font-size: 1rem;
+    margin-bottom: 25px;
 }
 
-/* === LABELS FLOTTANTS + CHAMPS PREMIUM === */
+/* === CHAMPS PREMIUM — PLUS MINCES === */
 .field {
     position: relative;
-    margin-bottom: 32px; /* Écart augmenté = plus premium */
+    margin-bottom: 22px;
 }
 
 .field input,
 .field select {
     width: 100%;
-    padding: 16px 14px;
-    font-size: 1.05rem;
-    background: rgba(255,255,255,0.90);
-    border: 1.8px solid rgba(10,153,153,0.55);
-    border-radius: 14px;
-    color: #1b1b1b;
-    transition: all .3s ease;
-}
+    padding: 12px 12px 12px 12px;
+    font-size: 0.98rem;
 
-.field input:focus,
-.field select:focus {
-    border-color: #ffffff;
-    box-shadow: 0 0 8px rgba(255,255,255,0.6);
-    outline: none;
-}
+    background: rgba(255,255,255,0.92);
+    border: 1.4px solid rgba(8,120,120,0.6);
+    border-radius: 10px;
+    color: #1a1a1a;
 
-/* Label flottant (version premium) */
-.field label {
-    position: absolute;
-    top: 50%;
-    left: 16px;
-    transform: translateY(-50%);
-    padding: 0 6px;
-    color: #034646;
-    font-weight: 600;
-    pointer-events: none;
     transition: 0.25s ease;
 }
 
-/* Animation du label */
+/* Focus */
+.field input:focus,
+.field select:focus {
+    border-color: #fff;
+    box-shadow: 0 0 6px rgba(255,255,255,0.5);
+    outline: none;
+}
+
+/* Labels flottants — version soft */
+.field label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    padding: 0 4px;
+    color: #034646;
+    font-size: 0.88rem;
+    pointer-events: none;
+    transition: 0.25s;
+}
+
+/* Animation */
 .field input:focus + label,
 .field input:not(:placeholder-shown) + label,
 .field select:focus + label,
 .field select:not([value=""]) + label {
-    top: -10px;
-    background: rgba(255,255,255,0.9);
-    font-size: 0.78rem;
-    color: #013c3c;
-    padding-left: 4px;
-    padding-right: 4px;
-    border-radius: 4px;
+    top: -9px;
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.75);
 }
 
-/* === ROW PREMIUM === */
+/* === ROW COMPACT === */
 .row {
     display: flex;
-    gap: 28px; /* Espacement horizontal premium */
+    gap: 16px;
     flex-wrap: wrap;
 }
-
 .col {
     flex: 1;
-    min-width: 250px; /* Champs élargis */
+    min-width: 100%;
 }
 
-/* === BOUTON PREMIUM === */
+/* Desktop uniquement : 2 par ligne */
+@media (min-width: 670px) {
+    .col-half {
+        min-width: calc(50% - 10px);
+    }
+}
+
+/* === BOUTON === */
 .btn {
-    margin-top: 10px;
-    padding: 18px;
     width: 100%;
+    margin-top: 10px;
+    padding: 14px;
     background: #ffffff;
     color: #066F6F;
-    font-size: 1.25rem;
-    font-weight: 700;
-    border-radius: 16px;
     border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.3s ease;
 }
 
 .btn:hover {
-    background: #e1ffff;
-}
-
-/* === MOBILE === */
-@media (max-width: 780px) {
-    .container {
-        padding: 28px;
-    }
-    h1 {
-        font-size: 1.9rem;
-    }
+    background: #d9ffff;
 }
 
 </style>
@@ -149,123 +140,117 @@ h2 {
 <body>
 
 <div class="container">
+    <h1>Créer un compte</h1>
+    <h2>Ouverture rapide & sécurisée</h2>
 
-    <h1>Créer un compte VANTEX</h1>
-    <h2>Inscription sécurisée • Formulaire Premium</h2>
+<form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
-
-        <div class="row">
-            <div class="col field">
-                <input type="text" name="civility" id="civ" placeholder=" " required>
-                <label for="civ">Civilité</label>
-            </div>
-
-            <div class="col field">
-                <input type="text" name="firstname" id="firstname" placeholder=" " required>
-                <label for="firstname">Prénom</label>
-            </div>
-
-            <div class="col field">
-                <input type="text" name="lastname" id="lastname" placeholder=" " required>
-                <label for="lastname">Nom</label>
-            </div>
+    <div class="row">
+        <div class="col col-half field">
+            <input type="text" name="civility" placeholder=" " required>
+            <label>Civilité</label>
         </div>
 
-        <div class="row">
-            <div class="col field">
-                <input type="email" name="email" id="email" placeholder=" " required>
-                <label for="email">Email</label>
-            </div>
+        <div class="col col-half field">
+            <input type="text" name="firstname" placeholder=" " required>
+            <label>Prénom</label>
+        </div>
+    </div>
 
-            <div class="col field">
-                <input type="tel" name="phone" id="phone" placeholder=" " required>
-                <label for="phone">Téléphone</label>
-            </div>
+    <div class="field">
+        <input type="text" name="lastname" placeholder=" " required>
+        <label>Nom</label>
+    </div>
+
+    <div class="field">
+        <input type="email" name="email" placeholder=" " required>
+        <label>Email</label>
+    </div>
+
+    <!-- CHAMP TELEPHONE PREMIUM -->
+    <div class="field">
+        <input type="tel" id="phone" name="phone" placeholder=" " required>
+        <label>Téléphone</label>
+    </div>
+
+    <div class="field">
+        <input type="text" name="profession" placeholder=" " required>
+        <label>Profession</label>
+    </div>
+
+    <div class="field">
+        <select id="country" name="country" required>
+            <option value=""></option>
+        </select>
+        <label>Pays</label>
+    </div>
+
+    <div class="field">
+        <select id="region" name="region" required disabled>
+            <option value=""></option>
+        </select>
+        <label>Région / Province</label>
+    </div>
+
+    <div class="field">
+        <input type="text" name="street" placeholder=" " required>
+        <label>Rue</label>
+    </div>
+
+    <div class="row">
+        <div class="col col-half field">
+            <input type="text" name="city" placeholder=" " required>
+            <label>Ville</label>
         </div>
 
-        <div class="field">
-            <input type="text" name="profession" id="profession" placeholder=" " required>
-            <label for="profession">Profession</label>
+        <div class="col col-half field">
+            <input type="text" name="zip" placeholder=" " required>
+            <label>Code postal</label>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col field">
-                <select id="country" name="country" required>
-                    <option value=""></option>
-                </select>
-                <label>Pays</label>
-            </div>
+    <div class="field">
+        <input type="file" name="id_front" required>
+        <label style="top:-14px;">Identité (recto)</label>
+    </div>
 
-            <div class="col field">
-                <select id="region" name="region" required disabled>
-                    <option value=""></option>
-                </select>
-                <label>Région / Province</label>
-            </div>
-        </div>
+    <div class="field">
+        <input type="file" name="id_back" required>
+        <label style="top:-14px;">Identité (verso)</label>
+    </div>
 
-        <div class="row">
-            <div class="col field">
-                <input type="text" name="street" id="street" placeholder=" " required>
-                <label for="street">Rue</label>
-            </div>
+    <button class="btn">Créer mon compte</button>
 
-            <div class="col field">
-                <input type="text" name="city" id="city" placeholder=" " required>
-                <label for="city">Ville</label>
-            </div>
-
-            <div class="col field">
-                <input type="text" name="zip" id="zip" placeholder=" " required>
-                <label for="zip">Code postal</label>
-            </div>
-        </div>
-
-        <div class="field">
-            <input type="file" name="id_front" required>
-            <label style="top:-15px;font-size:.8rem;">Document d'identité (recto)</label>
-        </div>
-
-        <div class="field">
-            <input type="file" name="id_back" required>
-            <label style="top:-15px;font-size:.8rem;">Document d'identité (verso)</label>
-        </div>
-
-        <button class="btn" type="submit">Créer mon compte</button>
-
-    </form>
+</form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* === Telephone === */
+    /* === TELEPHONE PRO === */
     const phone = document.querySelector("#phone");
-    if (phone) {
-        window.intlTelInput(phone, {
-            separateDialCode: true,
-            initialCountry: "fr",
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-        });
-    }
+    window.intlTelInput(phone, {
+        separateDialCode: true,
+        preferredCountries: ["fr", "be", "ca"],
+        initialCountry: "fr",
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+    });
 
     /* === PAYS / REGIONS === */
     async function loadCountries() {
-        const countrySelect = document.getElementById("country");
         const res = await fetch("/json/countries.json");
         const countries = await res.json();
+        const select = document.getElementById("country");
 
-        countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+        countries.sort((a,b) => a.name.common.localeCompare(b.name.common));
 
         countries.forEach(c => {
             const opt = document.createElement("option");
             opt.value = c.cca2;
             opt.textContent = c.name.common;
-            countrySelect.appendChild(opt);
+            select.appendChild(opt);
         });
     }
 
@@ -276,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const regions = all[code] || [];
         regionSelect.innerHTML = '<option value=""></option>';
+
         regionSelect.disabled = regions.length === 0;
 
         regions.forEach(r => {
@@ -287,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadCountries();
+
     document.getElementById("country").addEventListener("change", function() {
         loadRegions(this.value);
     });
@@ -296,6 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
