@@ -9,7 +9,7 @@
 
 <style>
 
-/* === FOND GLOBAL TURQUOISE === */
+/* === FOND GLOBAL TURQUOISE PREMIUM === */
 body {
     margin: 0;
     font-family: "Inter", Arial, sans-serif;
@@ -19,54 +19,52 @@ body {
     color: #ffffff;
 }
 
-/* === CARTE VERRE DEPOLI === */
+/* === CARTE GLASSMORPHISM — ULTRA PREMIUM === */
 .container {
     max-width: 900px;
     margin: 40px auto;
-    padding: 35px;
-    border-radius: 24px;
+    padding: 40px;
+    border-radius: 28px;
 
-    /* effet verre dépoli (glassmorphism) */
     background: rgba(255, 255, 255, 0.22);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.30);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
 }
 
-/* === TITRE === */
+/* === TITRES === */
 h1 {
     text-align: center;
     font-size: 2.3rem;
     font-weight: 800;
+    margin-bottom: 8px;
     color: #ffffff;
-    margin-bottom: 5px;
 }
+
 h2 {
     text-align: center;
     margin-top: 0;
     color: #e4fafa;
-    font-weight: 400;
     font-size: 1.1rem;
 }
 
-/* === LABELS FLOTTANTS === */
+/* === LABELS FLOTTANTS + CHAMPS PREMIUM === */
 .field {
     position: relative;
-    margin-bottom: 25px;
+    margin-bottom: 32px; /* Écart augmenté = plus premium */
 }
 
 .field input,
 .field select {
     width: 100%;
-    padding: 14px;
-    font-size: 1rem;
+    padding: 16px 14px;
+    font-size: 1.05rem;
     background: rgba(255,255,255,0.90);
-    border: 1.6px solid rgba(10,153,153,0.55);
-    border-radius: 12px;
+    border: 1.8px solid rgba(10,153,153,0.55);
+    border-radius: 14px;
     color: #1b1b1b;
-
     transition: all .3s ease;
 }
 
@@ -77,59 +75,57 @@ h2 {
     outline: none;
 }
 
-/* Label flottant */
+/* Label flottant (version premium) */
 .field label {
     position: absolute;
     top: 50%;
-    left: 14px;
+    left: 16px;
     transform: translateY(-50%);
-    background: transparent;
     padding: 0 6px;
     color: #034646;
     font-weight: 600;
-
     pointer-events: none;
     transition: 0.25s ease;
 }
 
-/* Animation flottante */
+/* Animation du label */
 .field input:focus + label,
 .field input:not(:placeholder-shown) + label,
 .field select:focus + label,
 .field select:not([value=""]) + label {
-    top: -8px;
-    background: rgba(255,255,255,0.7);
+    top: -10px;
+    background: rgba(255,255,255,0.9);
     font-size: 0.78rem;
     color: #013c3c;
     padding-left: 4px;
     padding-right: 4px;
+    border-radius: 4px;
 }
 
-/* === ROW GRID RESPONSIVE === */
+/* === ROW PREMIUM === */
 .row {
     display: flex;
-    gap: 20px;
+    gap: 28px; /* Espacement horizontal premium */
     flex-wrap: wrap;
 }
 
 .col {
     flex: 1;
-    min-width: 240px;
+    min-width: 250px; /* Champs élargis */
 }
 
 /* === BOUTON PREMIUM === */
 .btn {
-    margin-top: 20px;
+    margin-top: 10px;
+    padding: 18px;
     width: 100%;
-    padding: 16px;
     background: #ffffff;
     color: #066F6F;
-    border: none;
-    border-radius: 14px;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 700;
+    border-radius: 16px;
+    border: none;
     cursor: pointer;
-
     transition: 0.3s ease;
 }
 
@@ -140,7 +136,10 @@ h2 {
 /* === MOBILE === */
 @media (max-width: 780px) {
     .container {
-        padding: 20px;
+        padding: 28px;
+    }
+    h1 {
+        font-size: 1.9rem;
     }
 }
 
@@ -152,7 +151,7 @@ h2 {
 <div class="container">
 
     <h1>Créer un compte VANTEX</h1>
-    <h2>Inscription sécurisée • Version Premium</h2>
+    <h2>Inscription sécurisée • Formulaire Premium</h2>
 
     <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
@@ -192,15 +191,15 @@ h2 {
 
         <div class="row">
             <div class="col field">
-                <select name="country" id="country" required>
-                    <option value="" selected></option>
+                <select id="country" name="country" required>
+                    <option value=""></option>
                 </select>
                 <label>Pays</label>
             </div>
 
             <div class="col field">
-                <select name="region" id="region" required disabled>
-                    <option value="" selected></option>
+                <select id="region" name="region" required disabled>
+                    <option value=""></option>
                 </select>
                 <label>Région / Province</label>
             </div>
@@ -223,14 +222,14 @@ h2 {
             </div>
         </div>
 
-        <div class="field" style="margin-top:15px;">
+        <div class="field">
             <input type="file" name="id_front" required>
-            <label style="top:-15px; font-size:.8rem;">Document d'identité (recto)</label>
+            <label style="top:-15px;font-size:.8rem;">Document d'identité (recto)</label>
         </div>
 
         <div class="field">
             <input type="file" name="id_back" required>
-            <label style="top:-15px; font-size:.8rem;">Document d'identité (verso)</label>
+            <label style="top:-15px;font-size:.8rem;">Document d'identité (verso)</label>
         </div>
 
         <button class="btn" type="submit">Créer mon compte</button>
@@ -241,9 +240,10 @@ h2 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* === TÉLÉPHONE === */
+    /* === Telephone === */
     const phone = document.querySelector("#phone");
     if (phone) {
         window.intlTelInput(phone, {
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* === PAYS / RÉGIONS === */
+    /* === PAYS / REGIONS === */
     async function loadCountries() {
         const countrySelect = document.getElementById("country");
         const res = await fetch("/json/countries.json");
@@ -275,20 +275,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const all = await res.json();
 
         const regions = all[code] || [];
-
         regionSelect.innerHTML = '<option value=""></option>';
         regionSelect.disabled = regions.length === 0;
 
         regions.forEach(r => {
             const opt = document.createElement("option");
-            opt.value = r;
             opt.textContent = r;
+            opt.value = r;
             regionSelect.appendChild(opt);
         });
     }
 
     loadCountries();
-
     document.getElementById("country").addEventListener("change", function() {
         loadRegions(this.value);
     });
@@ -298,5 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
