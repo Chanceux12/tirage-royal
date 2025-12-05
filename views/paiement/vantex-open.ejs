@@ -1,253 +1,321 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Ouvrir un compte VANTEX</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Ouvrir un compte VANTEX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- CSS intl-tel-input -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.min.css"/>
+    <!-- International Phone CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
-<style>
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #11998e, #0575e6);
-    color: #fff;
-}
-.container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    background: rgba(255,255,255,0.08);
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.25);
-}
-h1 { margin-bottom: 0.5rem; color: #ffcc33; }
-p.subtitle { margin-bottom: 2rem; font-size: 1.1rem; color: #fff; }
-.form-wrapper { display: flex; gap: 2rem; flex-wrap: wrap; }
-.left-image { flex: 1; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.3); object-fit: cover; max-height: 600px; }
-.right-form { flex: 2; min-width: 300px; }
-form { display: flex; flex-direction: column; gap: 1rem; }
-label { font-weight: bold; margin-bottom: 0.3rem; }
-input[type="text"], input[type="email"], input[type="tel"], select, input[type="file"] {
-    padding: 0.7rem;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-}
-input[type="file"] { background: rgba(255,255,255,0.2); color: #fff; }
-.flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-.flex-row > div { flex: 1; min-width: 150px; }
-.checkbox-wrapper { display: flex; align-items: center; gap: 0.5rem; }
-.btn-submit {
-    margin-top: 1rem; padding: 1rem; font-size: 1.1rem; font-weight: bold;
-    border-radius: 8px; border: none; background: linear-gradient(90deg, #ffcc33, #e6a800);
-    color: #000; cursor: pointer; box-shadow: 0 0 15px rgba(255,184,0,0.45); transition: 0.3s;
-}
-.btn-submit:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,184,0,0.75); }
-@media (max-width: 900px) {
-    .form-wrapper { flex-direction: column; }
-    .left-image { display: none; }
-}
-</style>
+    <style>
+        /* ======== STYLE GLOBAL PREMIUM ======== */
+        body {
+            margin: 0;
+            font-family: "Inter", Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1a1a1a;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.6rem;
+            color: #0057b8;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* ======== CONTAINER ======== */
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* ====== IMAGE GAUCHE ====== */
+        .left-img {
+            background: url('/image/bank-form.jpg') center/cover no-repeat;
+            min-height: 100%;
+        }
+
+        /* ====== FORMULAIRE ====== */
+        .form {
+            padding: 2.5rem;
+        }
+
+        .form h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #003b77;
+        }
+
+        /* Inputs */
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #003b77;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1.5px solid #d5d9de;
+            font-size: 1rem;
+            outline: none;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: #0057b8;
+            box-shadow: 0 0 5px rgba(0, 87, 184, 0.3);
+        }
+
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        /* Button */
+        .btn {
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 1rem;
+            background: #0057b8;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #003b77;
+        }
+
+        /* Checkbox */
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        input[type="file"] {
+            padding: 0.6rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-img {
+                height: 280px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-<h1>Ouvrir un compte VANTEX</h1>
-<p class="subtitle">Commencez votre expérience bancaire en quelques minutes...</p>
+    <div class="header">
+        <h1>Ouvrir un compte VANTEX</h1>
+        <p>Rejoignez une banque moderne, rapide et sécurisée en quelques minutes.</p>
+    </div>
 
-<div class="form-wrapper">
-    <img src="/image/bank-form.jpg" alt="Vantex" class="left-image">
-    <div class="right-form">
-        <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+    <div class="container">
+        <div class="left-img"></div>
 
-            <!-- Civilité, Prénom, Nom -->
-            <div class="flex-row">
-                <div>
-                    <label for="civility">Civilité *</label>
-                    <select name="civility" id="civility" required>
-                        <option value="">Sélectionnez</option>
-                        <option value="M.">M.</option>
-                        <option value="Mme">Mme</option>
-                        <option value="Mlle">Mlle</option>
-                        <option value="Dr">Dr</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="firstname">Prénom *</label>
-                    <input type="text" name="firstname" id="firstname" required>
-                </div>
-                <div>
-                    <label for="lastname">Nom *</label>
-                    <input type="text" name="lastname" id="lastname" required>
-                </div>
-            </div>
+        <div class="form">
+            <h2>Informations personnelles</h2>
 
-            <!-- Email, Téléphone -->
-            <div class="flex-row">
-                <div>
-                    <label for="email">Email *</label>
-                    <input type="email" name="email" id="email" required>
-                </div>
-                <div>
-                    <label for="phone">Téléphone *</label>
-                    <input type="tel" name="phone" id="phone" required>
-                </div>
-            </div>
+            <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-            <!-- Profession -->
-            <div>
-                <label for="profession">Profession *</label>
-                <input type="text" name="profession" id="profession" required>
-            </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Civilité *</label>
+                        <select name="civility" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="M.">M.</option>
+                            <option value="Mme">Mme</option>
+                            <option value="Mlle">Mlle</option>
+                            <option value="Dr">Dr</option>
+                        </select>
+                    </div>
 
-            <!-- Type et numéro de pièce -->
-            <div class="flex-row">
-                <div>
-                    <label for="id_type">Type de pièce *</label>
-                    <select name="id_type" id="id_type" required>
-                        <option value="">Sélectionnez</option>
-                        <option value="passeport">Passeport</option>
-                        <option value="carte_identite">Carte d'identité</option>
-                        <option value="titre_sejour">Titre de séjour</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="id_number">Numéro de pièce *</label>
-                    <input type="text" name="id_number" id="id_number" required>
-                </div>
-            </div>
+                    <div class="col">
+                        <label>Prénom *</label>
+                        <input type="text" name="firstname" required>
+                    </div>
 
-            <!-- Pays + Région -->
-            <div class="flex-row">
-                <div>
-                    <label for="country">Pays *</label>
-                    <select name="country" id="country" required></select>
+                    <div class="col">
+                        <label>Nom *</label>
+                        <input type="text" name="lastname" required>
+                    </div>
                 </div>
 
-                <div id="regionWrapper">
-                    <label for="region">Région / Province *</label>
-                    <select name="region" id="region" required>
-                        <option value="">Sélectionnez votre région</option>
-                    </select>
-                </div>
-            </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Email *</label>
+                        <input type="email" name="email" required>
+                    </div>
 
-            <!-- Rue, Ville, Code postal -->
-            <div class="flex-row">
-                <div>
-                    <label for="street">Rue *</label>
-                    <input type="text" name="street" id="street" required>
+                    <div class="col">
+                        <label>Téléphone *</label>
+                        <input type="tel" name="phone" id="phone" required>
+                    </div>
                 </div>
-                <div>
-                    <label for="city">Ville *</label>
-                    <input type="text" name="city" id="city" required>
-                </div>
-                <div>
-                    <label for="zip">Code postal *</label>
-                    <input type="text" name="zip" id="zip" required>
-                </div>
-            </div>
 
-            <!-- Documents d'identité -->
-            <div>
-                <label>Documents d'identité (JPG, PNG, PDF max 5MB) *</label>
+                <label>Profession *</label>
+                <input type="text" name="profession" required>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Type de pièce *</label>
+                        <select name="id_type" required>
+                            <option value="">Sélectionnez</option>
+                            <option value="passeport">Passeport</option>
+                            <option value="cni">Carte d'identité</option>
+                            <option value="titre_sejour">Titre de séjour</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
+                        <label>Numéro de pièce *</label>
+                        <input type="text" name="id_number" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Pays *</label>
+                        <select name="country" id="country" required></select>
+                    </div>
+
+                    <div class="col">
+                        <label>Région / Province *</label>
+                        <div id="regionWrapper">
+                            <select id="region" name="region" required>
+                                <option value="">Sélectionnez une région</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Rue *</label>
+                        <input type="text" name="street" required>
+                    </div>
+                    <div class="col">
+                        <label>Ville *</label>
+                        <input type="text" name="city" required>
+                    </div>
+                    <div class="col">
+                        <label>Code postal *</label>
+                        <input type="text" name="zip" required>
+                    </div>
+                </div>
+
+                <label>Documents d'identité *</label>
                 <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required>
                 <input type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required>
-            </div>
 
-            <!-- Conditions générales -->
-            <div class="checkbox-wrapper">
-                <input type="checkbox" name="terms" id="terms" required>
-                <label for="terms">J'accepte les conditions générales et la politique de confidentialité *</label>
-            </div>
+                <div class="checkbox">
+                    <input type="checkbox" name="terms" required>
+                    <label>J'accepte les conditions générales</label>
+                </div>
 
-            <button type="submit" class="btn-submit">Ouvrir mon compte</button>
-        </form>
+                <button class="btn">Créer mon compte</button>
+
+            </form>
+        </div>
     </div>
-</div>
-</div>
 
-<!-- JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
-<script>
-// ============ Téléphone international ============
-const phoneInput = document.querySelector("#phone");
-window.intlTelInput(phoneInput, {
-    separateDialCode: true,
-    initialCountry: "fr",
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-});
+    <!-- International Phone JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
-// ================== Gestion pays ==================
-const countrySelect = document.getElementById("country");
-const regionWrapper = document.getElementById("regionWrapper");
-
-const regions = {
-    "FR": ["Île-de-France","Provence-Alpes-Côte d'Azur","Auvergne-Rhône-Alpes","Occitanie","Nouvelle-Aquitaine","Hauts-de-France","Bretagne","Normandie","Grand Est","Centre-Val de Loire","Bourgogne-Franche-Comté","Pays de la Loire","Corse"],
-    "CA": ["Alberta","Colombie-Britannique","Manitoba","Nouveau-Brunswick","Terre-Neuve-et-Labrador","Nouvelle-Écosse","Ontario","Île-du-Prince-Édouard","Québec","Saskatchewan","Territoires du Nord-Ouest","Yukon","Nunavut"],
-    "US": ["Alabama","Alaska","Arizona","Arkansas","Californie","Caroline du Nord","Caroline du Sud","Colorado","Connecticut","Delaware","Floride","Géorgie","Hawaï","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiane","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","Nouveau-Mexique","New York","Ohio","Oklahoma","Oregon","Pennsylvanie","Rhode Island","Tennessee","Texas","Utah","Vermont","Virginie","Virginie-Occidentale","Washington","Wisconsin","Wyoming"]
-};
-
-// Charger automatiquement tous les pays
-fetch("https://restcountries.com/v3.1/all")
-.then(res => res.json())
-.then(data => {
-    data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-    data.forEach(country => {
-        const opt = document.createElement("option");
-        opt.value = country.cca2;
-        opt.textContent = country.name.common;
-        countrySelect.appendChild(opt);
-    });
-});
-
-// Changer la région selon le pays
-countrySelect.addEventListener("change", () => {
-    const code = countrySelect.value;
-
-    regionWrapper.innerHTML = ` 
-        <label for="region">Région / Province *</label>
-    `;
-
-    // Pays avec régions définies
-    if (regions[code]) {
-        const select = document.createElement("select");
-        select.name = "region";
-        select.id = "region";
-        select.required = true;
-
-        const defaultOpt = document.createElement("option");
-        defaultOpt.value = "";
-        defaultOpt.textContent = "Sélectionnez votre région";
-        select.appendChild(defaultOpt);
-
-        regions[code].forEach(r => {
-            const opt = document.createElement("option");
-            opt.value = r;
-            opt.textContent = r;
-            select.appendChild(opt);
+    <script>
+        /* === INIT PHONE === */
+        const phoneInput = document.querySelector("#phone");
+        window.intlTelInput(phoneInput, {
+            separateDialCode: true,
+            initialCountry: "fr",
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
         });
 
-        regionWrapper.appendChild(select);
-    } else {
-        // Champ texte libre
-        const input = document.createElement("input");
-        input.type = "text";
-        input.name = "region";
-        input.id = "region";
-        input.required = true;
-        input.placeholder = "Entrez votre région";
-        regionWrapper.appendChild(input);
-    }
-});
-</script>
+        /* === SYSTEME PAYS AUTOMATIQUE === */
+        const countrySelect = document.getElementById("country");
+        const regionWrapper = document.getElementById("regionWrapper");
+
+        const predefinedRegions = {
+            "FR": ["Île-de-France","PACA","Auvergne-Rhône-Alpes","Occitanie","Nouvelle-Aquitaine","Hauts-de-France","Bretagne","Normandie","Grand Est","Centre-Val de Loire","Bourgogne-Franche-Comté","Pays de la Loire","Corse"],
+            "CA": ["Alberta","Colombie-Britannique","Ontario","Québec","Manitoba","Nouvelle-Écosse","Saskatchewan","Nouveau-Brunswick"],
+            "US": ["California","Texas","Florida","New York","Pennsylvania","Ohio","Illinois","Georgia","North Carolina"]
+        };
+
+        // Charger tous les pays via API
+        fetch("https://restcountries.com/v3.1/all")
+        .then(res => res.json())
+        .then(countries => {
+            countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+            countries.forEach(c => {
+                countrySelect.innerHTML += `<option value="${c.cca2}">${c.name.common}</option>`;
+            });
+        });
+
+        // Gestion dynamique des régions
+        countrySelect.addEventListener("change", () => {
+            const code = countrySelect.value;
+
+            regionWrapper.innerHTML = "";
+
+            if (predefinedRegions[code]) {
+                const select = document.createElement("select");
+                select.name = "region";
+                select.required = true;
+                select.innerHTML = `<option value="">Sélectionnez votre région</option>`;
+
+                predefinedRegions[code].forEach(r => {
+                    select.innerHTML += `<option value="${r}">${r}</option>`;
+                });
+
+                regionWrapper.appendChild(select);
+
+            } else {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = "region";
+                input.placeholder = "Entrez votre région";
+                input.required = true;
+                regionWrapper.appendChild(input);
+            }
+        });
+    </script>
 
 </body>
 </html>
+
 
 
 
