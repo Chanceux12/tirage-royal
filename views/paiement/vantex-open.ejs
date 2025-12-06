@@ -32,7 +32,7 @@ body {
 .card-img {
   width: 100%;
   height: 220px;
-  background: url('/image/vantex.jpg') center/cover no-repeat;
+  background: url('/images/vantex.jpg') center/cover no-repeat;
   order: 2; /* Sur mobile, après le formulaire */
 }
 
@@ -209,11 +209,9 @@ h1 {
           <label>Pays</label>
         </div>
 
-        <!-- REGION -->
+        <!-- REGION TEXTE LIBRE -->
         <div class="field">
-          <select id="region" name="region" required disabled>
-            <option value="" selected disabled></option>
-          </select>
+          <input type="text" name="region" placeholder=" " required />
           <label>Région / Province</label>
         </div>
 
@@ -283,32 +281,6 @@ async function loadCountries() {
   });
 }
 loadCountries();
-
-/* REGIONS */
-async function loadRegions(code){
-  const sel=document.getElementById("region");
-  sel.innerHTML='<option disabled selected></option>';
-  sel.disabled=true;
-
-  if(!code) return;
-
-  const res=await fetch("/json/regions.json");
-  const data=await res.json();
-  const list=data[code] || [];
-
-  if(list.length){
-    list.forEach(r=>{
-      const o=document.createElement("option");
-      o.value=r;
-      o.textContent=r;
-      sel.appendChild(o);
-    });
-    sel.disabled=false;
-  }
-}
-document.getElementById("country").addEventListener("change",function(){
-  loadRegions(this.value);
-});
 </script>
 
 </body>
