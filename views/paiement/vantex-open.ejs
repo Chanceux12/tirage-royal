@@ -8,36 +8,34 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
-/* ====== RESET ====== */
 * { box-sizing: border-box; }
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
   background: #f4f6f7;
   padding: 30px;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* ====== CARD + IMAGE ====== */
+/* WRAPPER */
 .card-wrapper {
   max-width: 1100px;
   margin: auto;
-  background: #ffffff;
+  background: #fff;
   border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
   overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
 }
 
-/* IMAGE en haut sur mobile */
+/* IMAGE MOBILE : BANNIÈRE */
 .card-img {
   width: 100%;
   height: 220px;
-  background: url('/images/vantex-banner.jpg') center/cover no-repeat;
+  background: url('/images/vantex.jpg') center/cover no-repeat;
 }
 
-/* IMAGE à gauche sur PC */
+/* IMAGE À GAUCHE SUR PC */
 @media (min-width: 920px) {
   .card-wrapper {
     flex-direction: row;
@@ -48,19 +46,17 @@ body {
   }
 }
 
-/* FORM CARD */
+/* FORMULAIRE */
 .card {
   width: 100%;
   padding: 40px;
 }
 
-/* ===== TITRE ===== */
 h1 {
   text-align: center;
   color: #0A9999;
-  margin-bottom: 4px;
   font-size: 2rem;
-  font-weight: 700;
+  margin-bottom: 4px;
 }
 .subtitle {
   text-align: center;
@@ -68,85 +64,62 @@ h1 {
   color: #707b81;
 }
 
-/* ===== GRID ===== */
+/* GRID */
 .form-grid {
   display: grid;
   gap: 22px;
 }
 .grid-2 { grid-template-columns: 1fr; }
-
 @media (min-width: 850px) {
   .grid-2 { grid-template-columns: 1fr 1fr; }
 }
 
-/* ====== FIELD ====== */
+/* FIELD */
 .field {
   position: relative;
 }
+
 .field input,
 .field select {
   width: 100%;
   height: 50px;
   padding: 0 14px;
-  font-size: 1rem;
   border: 1.7px solid #dce3e8;
   border-radius: 10px;
+  font-size: 1rem;
   background: #fff;
-  color: #1c1f21;
-  transition: border-color .2s, box-shadow .2s;
+  transition: 0.2s;
 }
+
 .field input:focus,
 .field select:focus {
-  outline: none;
   border-color: #0A9999;
   box-shadow: 0 0 0 3px rgba(10,153,153,0.18);
 }
 
-/* LABEL */
+/* LABEL FLOATING */
 .field label {
   position: absolute;
   left: 14px;
-  top: 17px;
-  color: #6e7a82;
-  background: transparent;
-  font-size: 0.95rem;
-  transition: 0.22s ease;
-  pointer-events: none;
-  padding: 0 6px;
-}
-
-.field input:not(:placeholder-shown) + label,
-.field select:valid + label,
-.field input:focus + label,
-.field select:focus + label {
-  top: -9px;
-  font-size: 0.74rem;
-  background: #ffffff;
+  top: -10px;
+  background: #fff;
+  padding: 0 5px;
+  font-size: 0.78rem;
   color: #0A9999;
-  border-radius: 4px;
+  pointer-events: none;
 }
 
-/* ===== TEL ===== */
-.iti {
+/* TELEPHONE */
+.phone .iti {
   width: 100%;
 }
 .phone input {
-  padding-left: 85px !important;
-}
-.phone label {
-  left: 16px;
+  padding-left: 90px !important;
 }
 
-/* FILE INPUT */
+/* FILE */
 .field input[type=file] {
   padding-top: 11px;
-}
-.field.file label {
-  top: -9px;
-  font-size: 0.74rem;
-  background: #fff;
-  color: #0A9999;
-  border-radius: 4px;
 }
 
 /* BUTTON */
@@ -155,23 +128,14 @@ h1 {
   height: 52px;
   margin-top: 12px;
   background: #0A9999;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 10px;
   font-size: 1.08rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: background .2s;
 }
-.btn:hover {
-  background: #087a7a;
-}
+.btn:hover { background: #087a7a; }
 
-@media (max-width: 600px) {
-  body { padding: 16px; }
-  .card { padding: 24px; }
-  h1 { font-size: 1.6rem; }
-}
 </style>
 </head>
 
@@ -179,169 +143,172 @@ h1 {
 
 <div class="card-wrapper">
 
-    <!-- IMAGE -->
-    <div class="card-img"></div>
+  <div class="card-img"></div>
 
-    <!-- FORMULAIRE -->
-    <div class="card">
+  <div class="card">
 
-      <h1>Créer un compte VANTEX</h1>
-      <p class="subtitle">Formulaire sécurisé — Style bancaire professionnel</p>
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé — Style bancaire professionnel</p>
 
-      <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-        <div class="form-grid grid-2">
+      <div class="form-grid grid-2">
 
-          <!-- CIVILITE -->
-          <div class="field">
-            <select name="civility" required>
-              <option value="" disabled selected></option>
-              <option value="M.">M.</option>
-              <option value="Mme">Mme</option>
-            </select>
-            <label>Civilité</label>
-          </div>
-
-          <!-- PRENOM -->
-          <div class="field">
-            <input type="text" name="firstname" placeholder=" " required />
-            <label>Prénom</label>
-          </div>
-
-          <!-- NOM -->
-          <div class="field" style="grid-column: 1/-1;">
-            <input type="text" name="lastname" placeholder=" " required />
-            <label>Nom</label>
-          </div>
-
-          <!-- EMAIL -->
-          <div class="field">
-            <input type="email" name="email" placeholder=" " required />
-            <label>Email</label>
-          </div>
-
-          <!-- TELEPHONE -->
-          <div class="field phone">
-            <input type="tel" id="phone" name="phone" placeholder=" " required />
-            <label>Téléphone</label>
-          </div>
-
-          <!-- PROFESSION -->
-          <div class="field" style="grid-column: 1/-1;">
-            <input type="text" name="profession" placeholder=" " required />
-            <label>Profession</label>
-          </div>
-
-          <!-- COUNTRY -->
-          <div class="field">
-            <select id="country" name="country" required>
-              <option value="" selected disabled></option>
-            </select>
-            <label>Pays</label>
-          </div>
-
-          <!-- REGION -->
-          <div class="field">
-            <select id="region" name="region" required disabled>
-              <option value="" selected disabled></option>
-            </select>
-            <label>Région / Province</label>
-          </div>
-
-          <!-- STREET -->
-          <div class="field" style="grid-column: 1/-1;">
-            <input type="text" name="street" placeholder=" " required />
-            <label>Rue</label>
-          </div>
-
-          <!-- CITY -->
-          <div class="field">
-            <input type="text" name="city" placeholder=" " required />
-            <label>Ville</label>
-          </div>
-
-          <!-- ZIP -->
-          <div class="field">
-            <input type="text" name="zip" placeholder=" " required />
-            <label>Code postal</label>
-          </div>
-
-          <!-- FILES -->
-          <div class="field file" style="grid-column: 1/-1;">
-            <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required />
-            <label>Document d'identité — recto</label>
-          </div>
-
-          <div class="field file" style="grid-column: 1/-1;">
-            <input type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required />
-            <label>Document d'identité — verso</label>
-          </div>
-
+        <!-- CIVILITÉ -->
+        <div class="field">
+          <select name="civility" required>
+            <option value="" disabled selected></option>
+            <option value="M.">M.</option>
+            <option value="Mme">Mme</option>
+            <option value="Mlle">Mlle</option>
+            <option value="Dr">Dr</option>
+            <option value="Pr">Pr</option>
+            <option value="Me">Me</option>
+            <option value="Pr.">Pr.</option>
+            <option value="Ing.">Ing.</option>
+          </select>
+          <label>Civilité</label>
         </div>
 
-        <button class="btn">Créer mon compte</button>
+        <!-- PRENOM -->
+        <div class="field">
+          <input type="text" name="firstname" placeholder=" " required />
+          <label>Prénom</label>
+        </div>
 
-      </form>
-    </div>
+        <!-- NOM -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="lastname" placeholder=" " required />
+          <label>Nom</label>
+        </div>
+
+        <!-- EMAIL -->
+        <div class="field">
+          <input type="email" name="email" placeholder=" " required />
+          <label>Email</label>
+        </div>
+
+        <!-- PHONE -->
+        <div class="field phone">
+          <label style="top:-10px;">Téléphone</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
+
+        <!-- PROFESSION -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="profession" placeholder=" " required />
+          <label>Profession</label>
+        </div>
+
+        <!-- COUNTRY -->
+        <div class="field">
+          <select id="country" name="country" required>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Pays</label>
+        </div>
+
+        <!-- REGION -->
+        <div class="field">
+          <select id="region" name="region" required disabled>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Région / Province</label>
+        </div>
+
+        <!-- STREET -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
+
+        <!-- CITY -->
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
+
+        <!-- ZIP -->
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
+
+        <!-- FILES -->
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — recto</label>
+        </div>
+
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — verso</label>
+        </div>
+
+      </div>
+
+      <button class="btn">Créer mon compte</button>
+
+    </form>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
-/* ----- PHONE ----- */
-const input = document.querySelector("#phone");
-window.intlTelInput(input, {
+const phone = document.querySelector("#phone");
+window.intlTelInput(phone, {
   separateDialCode: true,
   initialCountry: "fr",
   preferredCountries: ["fr","be","ca","ch"],
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
 });
 
-/* ----- COUNTRIES ----- */
+/* PAYS */
 async function loadCountries() {
   const res = await fetch("/json/countries.json");
   const data = await res.json();
   const sel = document.getElementById("country");
 
   data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
-
-  data.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.cca2;
-    opt.textContent = c.name.common;
+  data.forEach(c=>{
+    const opt=document.createElement("option");
+    opt.value=c.cca2;
+    opt.textContent=c.name.common;
     sel.appendChild(opt);
   });
 }
 loadCountries();
 
-/* ----- REGIONS ----- */
-async function loadRegions(code) {
-  const sel = document.getElementById("region");
-  sel.innerHTML = '<option disabled selected></option>';
-  sel.disabled = true;
-  if (!code) return;
+/* REGIONS */
+async function loadRegions(code){
+  const sel=document.getElementById("region");
+  sel.innerHTML='<option disabled selected></option>';
+  sel.disabled=true;
 
-  const res = await fetch("/json/regions.json");
-  const data = await res.json();
-  const list = data[code] || [];
+  if(!code) return;
 
-  if (list.length) {
+  const res=await fetch("/json/regions.json");
+  const data=await res.json();
+  const list=data[code] || [];
+
+  if(list.length){
     list.forEach(r=>{
-      const opt = document.createElement("option");
-      opt.value = r;
-      opt.textContent = r;
-      sel.appendChild(opt);
+      const o=document.createElement("option");
+      o.value=r;
+      o.textContent=r;
+      sel.appendChild(o);
     });
-    sel.disabled = false;
+    sel.disabled=false;
   }
 }
-
-document.getElementById("country").addEventListener("change", function() {
+document.getElementById("country").addEventListener("change",function(){
   loadRegions(this.value);
 });
 </script>
 
 </body>
 </html>
+
 
 
