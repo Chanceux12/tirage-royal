@@ -1,171 +1,314 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formulaire</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Créer un compte VANTEX</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
-/* --- CONTENEUR GLOBAL --- */
-.page-wrapper {
-    display: flex;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #f4f6f7;
+  padding: 30px;
+}
+
+/* WRAPPER */
+.card-wrapper {
+  max-width: 1100px;
+  margin: auto;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+/* IMAGE */
+.card-img {
+  width: 100%;
+  height: 220px;
+  background: url('/image/vantex.jpg') center/cover no-repeat;
+}
+
+/* IMAGE À GAUCHE SUR PC */
+@media (min-width: 920px) {
+  .card-wrapper {
     flex-direction: row;
-    width: 100%;
-    min-height: 100vh;
+  }
+  .card-img {
+    width: 40%;
+    height: auto;
+  }
 }
 
-/* --- IMAGE À GAUCHE SUR ORDINATEUR --- */
-.image-side {
-    width: 45%;
-    background-image: url("https://picsum.photos/900/1200"); /* 🔥 Mets ton image ici */
-    background-size: cover;
-    background-position: center;
+/* FORMULAIRE */
+.card {
+  width: 100%;
+  padding: 40px;
 }
 
-/* --- FORMULAIRE --- */
-.form-container {
-    width: 55%;
-    padding: 40px;
-    background: #fff;
+h1 {
+  text-align: center;
+  color: #0A9999;
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+.subtitle {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #707b81;
 }
 
-/* Champs */
-.form-group {
-    margin-bottom: 20px;
+/* GRID */
+.form-grid {
+  display: grid;
+  gap: 22px;
+}
+.grid-2 { grid-template-columns: 1fr; }
+@media (min-width: 850px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
 }
 
-label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 6px;
+/* FIELD */
+.field {
+  position: relative;
 }
 
-input, select {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+.field input,
+.field select {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border: 1.7px solid #dce3e8;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
+  transition: 0.2s;
 }
 
-/* --- CHAMP TÉLÉPHONE EXACTEMENT COMME TON IMAGE --- */
-.phone-wrapper {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    overflow: hidden;
+.field input:focus,
+.field select:focus {
+  border-color: #0A9999;
+  box-shadow: 0 0 0 3px rgba(10,153,153,0.18);
 }
 
-.phone-flag {
-    display: flex;
-    align-items: center;
-    background: #f5f5f5;
-    padding: 8px 12px;
-    gap: 6px;
-    border-right: 1px solid #ccc;
-    font-size: 15px;
+/* LABEL FLOATING */
+.field label {
+  position: absolute;
+  left: 14px;
+  top: -10px;
+  background: #fff;
+  padding: 0 5px;
+  font-size: 0.78rem;
+  color: #0A9999;
+  pointer-events: none;
 }
 
-.phone-flag img {
-    width: 22px;
-    height: 16px;
-    object-fit: cover;
+/* TELEPHONE */
+.phone .iti {
+  width: 100%;
+}
+.phone input {
+  padding-left: 90px !important;
 }
 
-.phone-input {
-    border: none;
-    flex: 1;
-    padding: 12px;
-    font-size: 16px;
-    outline: none;
+/* FILE */
+.field input[type=file] {
+  padding-top: 11px;
 }
 
-/* --- MOBILE : image en haut façon bannière --- */
-@media (max-width: 768px) {
-    .page-wrapper {
-        flex-direction: column;
-    }
-
-    .image-side {
-        width: 100%;
-        height: 180px;
-    }
-
-    .form-container {
-        width: 100%;
-        padding: 20px;
-    }
+/* BUTTON */
+.btn {
+  width: 100%;
+  height: 52px;
+  margin-top: 12px;
+  background: #0A9999;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.08rem;
+  cursor: pointer;
 }
+.btn:hover { background: #087a7a; }
+
 </style>
 </head>
 
 <body>
 
-<div class="page-wrapper">
+<div class="card-wrapper">
 
-    <!-- 🔥 IMAGE À GAUCHE (ordinateur) — EN BANNIÈRE SUR MOBILE -->
-    <div class="image-side"></div>
+  <div class="card-img"></div>
 
-    <!-- 🔥 FORMULAIRE -->
-    <div class="form-container">
+  <div class="card">
 
-        <h2>Formulaire d'inscription</h2>
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé — Style bancaire professionnel</p>
+
+    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+
+      <div class="form-grid grid-2">
 
         <!-- CIVILITÉ -->
-        <div class="form-group">
-            <label for="civilite">Civilité</label>
-            <select id="civilite">
-                <option value="M.">M.</option>
-                <option value="Mme">Mme</option>
-                <option value="Mlle">Mlle</option>
-                <option value="Dr">Dr</option>
-                <option value="Pr">Pr</option>
-            </select>
+        <div class="field">
+          <select name="civility" required>
+            <option value="" disabled selected></option>
+            <option value="M.">M.</option>
+            <option value="Mme">Mme</option>
+            <option value="Mlle">Mlle</option>
+            <option value="Dr">Dr</option>
+            <option value="Pr">Pr</option>
+            <option value="Me">Me</option>
+            <option value="Pr.">Pr.</option>
+            <option value="Ing.">Ing.</option>
+          </select>
+          <label>Civilité</label>
+        </div>
+
+        <!-- PRENOM -->
+        <div class="field">
+          <input type="text" name="firstname" placeholder=" " required />
+          <label>Prénom</label>
         </div>
 
         <!-- NOM -->
-        <div class="form-group">
-            <label>Nom</label>
-            <input type="text">
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="lastname" placeholder=" " required />
+          <label>Nom</label>
         </div>
 
-        <!-- PRÉNOM -->
-        <div class="form-group">
-            <label>Prénom</label>
-            <input type="text">
+        <!-- EMAIL -->
+        <div class="field">
+          <input type="email" name="email" placeholder=" " required />
+          <label>Email</label>
         </div>
 
-        <!-- TÉLÉPHONE -->
-        <div class="form-group">
-            <label>Téléphone</label>
-
-            <div class="phone-wrapper">
-                <div class="phone-flag">
-                    <img src="https://flagcdn.com/w20/fr.png" alt="">
-                    +33
-                </div>
-                <input class="phone-input" type="tel" placeholder="Téléphone">
-            </div>
-
+        <!-- PHONE -->
+        <div class="field phone">
+          <label style="top:-10px;">Téléphone</label>
+          <input type="tel" id="phone" name="phone" required />
         </div>
 
-        <button style="
-            width:100%;
-            padding:15px;
-            font-size:17px;
-            border:none;
-            border-radius:6px;
-            background:#0066ff;
-            color:#fff;
-            cursor:pointer;">
-            S'inscrire
-        </button>
+        <!-- PROFESSION -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="profession" placeholder=" " required />
+          <label>Profession</label>
+        </div>
 
-    </div>
+        <!-- COUNTRY -->
+        <div class="field">
+          <select id="country" name="country" required>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Pays</label>
+        </div>
+
+        <!-- REGION -->
+        <div class="field">
+          <select id="region" name="region" required disabled>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Région / Province</label>
+        </div>
+
+        <!-- STREET -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
+
+        <!-- CITY -->
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
+
+        <!-- ZIP -->
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
+
+        <!-- FILES -->
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — recto</label>
+        </div>
+
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — verso</label>
+        </div>
+
+      </div>
+
+      <button class="btn">Créer mon compte</button>
+
+    </form>
+  </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+<script>
+const phone = document.querySelector("#phone");
+window.intlTelInput(phone, {
+  separateDialCode: true,
+  initialCountry: "fr",
+  preferredCountries: ["fr","be","ca","ch"],
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+});
+
+/* PAYS */
+async function loadCountries() {
+  const res = await fetch("/json/countries.json");
+  const data = await res.json();
+  const sel = document.getElementById("country");
+
+  data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
+  data.forEach(c=>{
+    const opt=document.createElement("option");
+    opt.value=c.cca2;
+    opt.textContent=c.name.common;
+    sel.appendChild(opt);
+  });
+}
+loadCountries();
+
+/* REGIONS */
+async function loadRegions(code){
+  const sel=document.getElementById("region");
+  sel.innerHTML='<option disabled selected></option>';
+  sel.disabled=true;
+
+  if(!code) return;
+
+  const res=await fetch("/json/regions.json");
+  const data=await res.json();
+  const list=data[code] || [];
+
+  if(list.length){
+    list.forEach(r=>{
+      const o=document.createElement("option");
+      o.value=r;
+      o.textContent=r;
+      sel.appendChild(o);
+    });
+    sel.disabled=false;
+  }
+}
+document.getElementById("country").addEventListener("change",function(){
+  loadRegions(this.value);
+});
+</script>
 
 </body>
 </html>
+
 
 
