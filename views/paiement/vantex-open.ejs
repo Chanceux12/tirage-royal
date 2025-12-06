@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -13,7 +13,7 @@
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
-  background: #f4f6f7; /* GRIS CLAIR PREMIUM */
+  background: #f4f6f7;
   padding: 30px;
   -webkit-font-smoothing: antialiased;
 }
@@ -22,10 +22,22 @@ body {
 .card {
   max-width: 900px;
   margin: auto;
+  display: flex;
   background: #ffffff;
-  padding: 40px;
   border-radius: 16px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+/* IMAGE SIDE */
+.card-image {
+  flex: 1;
+  background: url('https://via.placeholder.com/400x600') center/cover no-repeat;
+}
+
+.card-content {
+  flex: 1;
+  padding: 40px;
 }
 
 /* ===== TITRE ===== */
@@ -62,11 +74,11 @@ h1 {
 .field input,
 .field select {
   width: 100%;
-  height: 50px; /* TAILLE B */
+  height: 50px;
   padding: 0 14px;
   font-size: 1rem;
   border: 1.7px solid #dce3e8;
-  border-radius: 10px; /* SEMI-ARRONDI */
+  border-radius: 10px;
   background: #fff;
   color: #1c1f21;
   transition: border-color .2s, box-shadow .2s;
@@ -109,7 +121,7 @@ h1 {
   width: 100%;
 }
 .iti input {
-  padding-left: 70px !important; /* pour ne pas chevaucher le drapeau */
+  padding-left: 70px !important;
 }
 .field.phone label {
   left: 16px;
@@ -145,9 +157,17 @@ h1 {
   background: #087a7a;
 }
 
-@media (max-width: 600px) {
-  body { padding: 16px; }
-  .card { padding: 24px; }
+@media (max-width: 850px) {
+  .card {
+    flex-direction: column;
+  }
+  .card-image {
+    height: 200px;
+    width: 100%;
+  }
+  .card-content {
+    padding: 24px;
+  }
   h1 { font-size: 1.6rem; }
 }
 </style>
@@ -156,98 +176,105 @@ h1 {
 <body>
 
 <div class="card">
-  <h1>Créer un compte VANTEX</h1>
-  <p class="subtitle">Formulaire sécurisé — Style bancaire professionnel</p>
+  <div class="card-image"></div>
+  <div class="card-content">
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé — Style bancaire professionnel</p>
 
-<form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-  <div class="form-grid grid-2">
+      <div class="form-grid grid-2">
 
-    <!-- CIVILITE -->
-    <div class="field">
-      <input type="text" name="civility" placeholder=" " required />
-      <label>Civilité</label>
-    </div>
+        <!-- CIVILITE -->
+        <div class="field">
+          <select name="civility" required>
+            <option value="" disabled selected></option>
+            <option value="M.">M.</option>
+            <option value="Mme">Mme</option>
+          </select>
+          <label>Civilité</label>
+        </div>
 
-    <!-- PRENOM -->
-    <div class="field">
-      <input type="text" name="firstname" placeholder=" " required />
-      <label>Prénom</label>
-    </div>
+        <!-- PRENOM -->
+        <div class="field">
+          <input type="text" name="firstname" placeholder=" " required />
+          <label>Prénom</label>
+        </div>
 
-    <!-- NOM (pleine largeur) -->
-    <div class="field" style="grid-column: 1/-1;">
-      <input type="text" name="lastname" placeholder=" " required />
-      <label>Nom</label>
-    </div>
+        <!-- NOM (pleine largeur) -->
+        <div class="field" style="grid-column: 1/-1;">
+          <input type="text" name="lastname" placeholder=" " required />
+          <label>Nom</label>
+        </div>
 
-    <!-- EMAIL -->
-    <div class="field">
-      <input type="email" name="email" placeholder=" " required />
-      <label>Email</label>
-    </div>
+        <!-- EMAIL -->
+        <div class="field">
+          <input type="email" name="email" placeholder=" " required />
+          <label>Email</label>
+        </div>
 
-    <!-- TELEPHONE -->
-    <div class="field phone">
-      <input type="tel" id="phone" name="phone" placeholder=" " required />
-      <label>Téléphone</label>
-    </div>
+        <!-- TELEPHONE -->
+        <div class="field phone">
+          <input type="tel" id="phone" name="phone" placeholder=" " required />
+          <label>Téléphone</label>
+        </div>
 
-    <!-- PROFESSION (pleine largeur) -->
-    <div class="field" style="grid-column: 1/-1;">
-      <input type="text" name="profession" placeholder=" " required />
-      <label>Profession</label>
-    </div>
+        <!-- PROFESSION (pleine largeur) -->
+        <div class="field" style="grid-column: 1/-1;">
+          <input type="text" name="profession" placeholder=" " required />
+          <label>Profession</label>
+        </div>
 
-    <!-- COUNTRY -->
-    <div class="field">
-      <select id="country" name="country" required>
-        <option value="" selected disabled></option>
-      </select>
-      <label>Pays</label>
-    </div>
+        <!-- COUNTRY -->
+        <div class="field">
+          <select id="country" name="country" required>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Pays</label>
+        </div>
 
-    <!-- REGION -->
-    <div class="field">
-      <select id="region" name="region" required disabled>
-        <option value="" selected disabled></option>
-      </select>
-      <label>Région / Province</label>
-    </div>
+        <!-- REGION -->
+        <div class="field">
+          <select id="region" name="region" required disabled>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Région / Province</label>
+        </div>
 
-    <!-- STREET full width -->
-    <div class="field" style="grid-column: 1/-1;">
-      <input type="text" name="street" placeholder=" " required />
-      <label>Rue</label>
-    </div>
+        <!-- STREET full width -->
+        <div class="field" style="grid-column: 1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
 
-    <!-- CITY / ZIP -->
-    <div class="field">
-      <input type="text" name="city" placeholder=" " required />
-      <label>Ville</label>
-    </div>
+        <!-- CITY / ZIP -->
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
 
-    <div class="field">
-      <input type="text" name="zip" placeholder=" " required />
-      <label>Code postal</label>
-    </div>
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
 
-    <!-- FILES -->
-    <div class="field file" style="grid-column: 1/-1;">
-      <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required />
-      <label>Document d'identité — recto</label>
-    </div>
+        <!-- FILES -->
+        <div class="field file" style="grid-column: 1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.jpeg,.png,.pdf" required />
+          <label>Document d'identité — recto</label>
+        </div>
 
-    <div class="field file" style="grid-column: 1/-1;">
-      <input type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required />
-      <label>Document d'identité — verso</label>
-    </div>
+        <div class="field file" style="grid-column: 1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.jpeg,.png,.pdf" required />
+          <label>Document d'identité — verso</label>
+        </div>
 
+      </div>
+
+      <button class="btn">Créer mon compte</button>
+
+    </form>
   </div>
-
-  <button class="btn">Créer mon compte</button>
-
-</form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
