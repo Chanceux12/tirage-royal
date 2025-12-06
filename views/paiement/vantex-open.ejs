@@ -1,249 +1,369 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Ouvrir un compte VANTEX</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- intl-tel-input CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.min.css" />
 
 <style>
-
-/* ====== CORE STYLE ====== */
-body {
-    margin: 0;
-    font-family: "Inter", sans-serif;
-    background: #f5f7fa;
-    padding: 30px;
+/* ---------- RESET / BASE ---------- */
+:root{
+  --primary: #0A9999;
+  --muted: #6c7a86;
+  --card-bg: #ffffff;
+  --page-bg: #f5f7fa;
+  --input-radius: 10px;
+  --gap: 18px;
 }
 
-/* ====== CENTERED CARD ====== */
-.card {
-    max-width: 900px;
-    margin: auto;
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--page-bg);
+  color:#111;
+  padding:28px;
+  -webkit-font-smoothing:antialiased;
 }
 
-/* TITLE */
-h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: #0A9999;
-    text-align: center;
-}
-p.subtitle {
-    text-align: center;
-    color: #5d676f;
-    margin-bottom: 32px;
+/* ---------- CARD ---------- */
+.card{
+  max-width: 980px;
+  margin: 12px auto;
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 8px 30px rgba(12,20,24,0.06);
 }
 
-/* ===== FLOATING INPUT PROFESSIONAL ===== */
-.field {
-    position: relative;
-    margin-bottom: 22px;
+/* header */
+.header {
+  text-align:center;
+  margin-bottom:20px;
 }
-
-.field input,
-.field select {
-    width: 100%;
-    padding: 14px 12px 14px 12px;
-    border: 1.5px solid #cfd9e2;
-    background: #fff;
-    border-radius: 10px;
-    font-size: 1rem;
-    color: #1a1a1a;
-    transition: .2s;
+.header h1{
+  margin:0;
+  font-size:1.9rem;
+  color:var(--primary);
+  font-weight:700;
 }
+.header p{ margin:6px 0 0; color:#61707a; }
 
-.field input:focus,
-.field select:focus {
-    border-color: #0A9999;
-    box-shadow: 0 0 0 3px rgba(10, 153, 153, 0.20);
-    outline: none;
-}
-
-/* LABEL FLOAT */
-.field label {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    font-size: 0.92rem;
-    color: #6c7a86;
-    background: white;
-    padding: 0 4px;
-    pointer-events: none;
-    transition: 0.25s ease;
-}
-
-.field input:not(:placeholder-shown) + label,
-.field select:valid + label,
-.field input:focus + label {
-    top: -9px;
-    font-size: 0.72rem;
-    color: #0A9999;
-}
-
-/* ===== GRID ===== */
+/* ---------- GRID LAYOUT ---------- */
 .grid {
-    display: grid;
-    gap: 18px;
+  display: grid;
+  gap: var(--gap);
 }
 
-@media (min-width: 830px) {
-    .grid-2 {
-        grid-template-columns: 1fr 1fr;
-    }
+/* two columns on desktop */
+@media (min-width: 820px) {
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .col-span-2 { grid-column: 1 / -1; } /* full width row */
 }
 
-/* ===== BUTTON ===== */
+/* mobile = 1 column */
+@media (max-width: 819px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------- FIELD (floating labels) ---------- */
+.field {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+/* shared inputs/selects */
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="tel"],
+.field select,
+.field input[type="file"]{
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.98rem;
+  border-radius: var(--input-radius);
+  border: 1.4px solid #e3e8ee;
+  background: #fff;
+  color: #111;
+  transition: box-shadow .15s ease, border-color .15s ease;
+  -webkit-appearance: none;
+}
+
+/* file input slightly different (we keep this simple) */
+.field input[type="file"]{
+  padding:10px 12px;
+}
+
+/* focus state */
+.field input:focus,
+.field select:focus{
+  outline: none;
+  border-color: rgba(10,153,153,0.9);
+  box-shadow: 0 6px 18px rgba(10,153,153,0.07);
+}
+
+/* label (placed AFTER the input in DOM for simpler selectors) */
+.field label {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  font-size: 0.90rem;
+  color: var(--muted);
+  background: transparent;
+  padding: 0 6px;
+  pointer-events: none;
+  transition: transform .15s ease, top .15s ease, font-size .15s ease, background .15s ease;
+}
+
+/* label when input has value or is focused */
+/* input:not(:placeholder-shown) works for text inputs (we use placeholder=" " on all) */
+.field input:not(:placeholder-shown) + label,
+.field input:focus + label,
+.field select:valid + label,
+.field select:focus + label,
+.field input[type="file"] + label{
+  top: -9px;
+  font-size: 0.72rem;
+  background: var(--card-bg);
+  color: var(--primary);
+  transform: translateY(0);
+}
+
+/* ensure select shows label after user picks (select:valid) — first option must be empty with value "" */
+
+/* ---------- PHONE FIELD (intl-tel-input integration) ---------- */
+/* container specific to phone to adjust spacing for flag */
+.field--phone input[type="tel"]{
+  padding-left: 64px; /* leave space for flag */
+}
+
+/* position the flag container placed by intl-tel-input */
+.iti {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.iti__flag-container {
+  box-shadow:none;
+}
+
+/* make the dropdown icon not overlap */
+.iti__arrow {
+  display: none;
+}
+
+/* ensure the plugin element doesn't break layout on small screens */
+.field--phone { position: relative; }
+
+/* when flag present, label should move to the right a bit */
+.field--phone label { left: 72px; }
+
+/* ---------- BUTTON ---------- */
+.actions {
+  margin-top: 6px;
+}
 .btn {
-    width: 100%;
-    padding: 15px;
-    background: #0A9999;
-    color: white;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 4px;
-    font-weight: 600;
+  display:block;
+  width:100%;
+  padding: 14px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
 }
-.btn:hover {
-    background: #087a7a;
-}
+.btn:hover { background: #087a7a; }
 
-/* ===== MOBILE IMPROVEMENT ===== */
-@media (max-width: 600px) {
-    .card {
-        padding: 26px;
-    }
-}
+/* subtle small helper text */
+.helper { font-size:0.9rem; color:#6a7880; margin-top:6px; }
 
+/* file label tweak so they don't overlap */
+.field input[type="file"] + label { top: -14px; font-size: .82rem; background: var(--card-bg); padding: 0 6px; color: #444; }
+
+/* small screens: reduce paddings */
+@media (max-width:420px){
+  .card{ padding:20px; }
+  .field label { left:12px; }
+  .field--phone label { left:66px; }
+  .iti { left:8px; }
+  .field input[type="tel"]{ padding-left:58px; }
+}
 </style>
 </head>
-
 <body>
 
-<div class="card">
-    <h1>Créer un compte VANTEX</h1>
-    <p class="subtitle">Formulaire sécurisé • Haute qualité bancaire</p>
+<div class="card" role="main" aria-labelledby="form-title">
+  <div class="header">
+    <h1 id="form-title">Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé — rapide et professionnel</p>
+  </div>
 
-<form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+  <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data" novalidate>
 
     <div class="grid grid-2">
-        <div class="field">
-            <input type="text" name="civility" placeholder=" " required>
-            <label>Civilité</label>
-        </div>
+      <div class="field">
+        <input type="text" name="firstname" id="firstname" placeholder=" " required />
+        <label for="firstname">Prénom</label>
+      </div>
 
-        <div class="field">
-            <input type="text" name="firstname" placeholder=" " required>
-            <label>Prénom</label>
-        </div>
-    </div>
-
-    <div class="field">
-        <input type="text" name="lastname" placeholder=" " required>
-        <label>Nom</label>
-    </div>
-
-    <div class="field">
-        <input type="email" name="email" placeholder=" " required>
-        <label>Email</label>
-    </div>
-
-    <!-- PHONE PRO -->
-    <div class="field">
-        <input type="tel" id="phone" name="phone" placeholder=" " required>
-        <label>Téléphone</label>
-    </div>
-
-    <div class="field">
-        <input type="text" name="profession" placeholder=" " required>
-        <label>Profession</label>
+      <div class="field">
+        <input type="text" name="lastname" id="lastname" placeholder=" " required />
+        <label for="lastname">Nom</label>
+      </div>
     </div>
 
     <div class="grid grid-2">
-        <div class="field">
-            <select id="country" name="country" required>
-                <option value="" selected></option>
-            </select>
-            <label>Pays</label>
-        </div>
+      <div class="field">
+        <input type="email" name="email" id="email" placeholder=" " required />
+        <label for="email">Email</label>
+      </div>
 
-        <div class="field">
-            <select id="region" name="region" required disabled>
-                <option value="" selected></option>
-            </select>
-            <label>Région / Province</label>
-        </div>
-    </div>
-
-    <div class="field">
-        <input type="text" name="street" placeholder=" " required>
-        <label>Rue</label>
+      <div class="field field--phone">
+        <input type="tel" name="phone" id="phone" placeholder=" " required />
+        <label for="phone">Téléphone</label>
+      </div>
     </div>
 
     <div class="grid grid-2">
-        <div class="field">
-            <input type="text" name="city" placeholder=" " required>
-            <label>Ville</label>
-        </div>
+      <div class="field">
+        <input type="text" name="profession" id="profession" placeholder=" " required />
+        <label for="profession">Profession</label>
+      </div>
 
-        <div class="field">
-            <input type="text" name="zip" placeholder=" " required>
-            <label>Code postal</label>
-        </div>
+      <div class="field">
+        <select id="country" name="country" required>
+          <option value="">Sélectionner</option>
+        </select>
+        <label for="country">Pays</label>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="field">
+        <select id="region" name="region" required disabled>
+          <option value="">Sélectionner un pays d'abord</option>
+        </select>
+        <label for="region">Région / Province</label>
+      </div>
+
+      <div class="field">
+        <input type="text" name="street" id="street" placeholder=" " required />
+        <label for="street">Rue</label>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="field">
+        <input type="text" name="city" id="city" placeholder=" " required />
+        <label for="city">Ville</label>
+      </div>
+
+      <div class="field">
+        <input type="text" name="zip" id="zip" placeholder=" " required />
+        <label for="zip">Code postal</label>
+      </div>
     </div>
 
     <div class="field">
-        <input type="file" name="id_front" required>
-        <label style="top:-10px;background:white;">Identité (recto)</label>
+      <input type="file" name="id_front" id="id_front" required />
+      <label for="id_front">Document d'identité (recto)</label>
     </div>
 
     <div class="field">
-        <input type="file" name="id_back" required>
-        <label style="top:-10px;background:white;">Identité (verso)</label>
+      <input type="file" name="id_back" id="id_back" required />
+      <label for="id_back">Document d'identité (verso)</label>
     </div>
 
-    <button class="btn">Créer mon compte</button>
-</form>
-
+    <div class="actions">
+      <button type="submit" class="btn">Créer mon compte</button>
+      <p class="helper">En soumettant, vous acceptez les conditions générales.</p>
+    </div>
+  </form>
 </div>
 
+<!-- intl-tel-input JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
 <script>
-/* PHONE */
-const phoneInput = document.querySelector("#phone");
-window.intlTelInput(phoneInput, {
-    separateDialCode: true,
-    initialCountry: "fr",
-});
-
-/* PAYS/REGIONS */
-async function loadCountries(){
-    const res = await fetch("/json/countries.json");
-    const countries = await res.json();
-    const el = document.getElementById("country");
-
-    countries.sort((a,b)=> a.name.common.localeCompare(b.name.common));
-
-    countries.forEach(c=>{
-        const opt = document.createElement("option");
-        opt.value = c.cca2;
-        opt.textContent = c.name.common;
-        el.appendChild(opt);
+/* ===== init phone field ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  const phoneInput = document.querySelector("#phone");
+  if (phoneInput) {
+    const iti = window.intlTelInput(phoneInput, {
+      separateDialCode: true,
+      preferredCountries: ["fr","be","ch","ma","ci"],
+      initialCountry: "fr",
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
     });
-}
-loadCountries();
+
+    // Move the plugin container into our field (some builds already do this)
+    // intl-tel-input adds .iti next to the input; if it's inserted in body, ensure it is absolutely positioned (CSS above handles it)
+  }
+
+  /* ===== load countries from local JSON ===== */
+  async function loadCountries() {
+    try {
+      const res = await fetch("/json/countries.json");
+      if (!res.ok) throw new Error("countries.json introuvable");
+      const countries = await res.json();
+      countries.sort((a,b)=>a.name.common.localeCompare(b.name.common));
+      const sel = document.getElementById("country");
+      countries.forEach(c=>{
+        const opt = document.createElement("option");
+        opt.value = c.cca2 || c.ccn3 || c.name.common;
+        opt.textContent = c.name.common;
+        sel.appendChild(opt);
+      });
+    } catch(err){
+      console.error(err);
+    }
+  }
+
+  /* ===== load regions local fallback ===== */
+  async function loadRegions(code) {
+    const sel = document.getElementById("region");
+    sel.innerHTML = '<option value="">Sélectionner</option>';
+    sel.disabled = true;
+    if (!code) return;
+    try {
+      const res = await fetch("/json/regions.json");
+      if (!res.ok) throw new Error("regions.json introuvable");
+      const data = await res.json();
+      const arr = data[code] || data["DEFAULT"] || [];
+      if (arr.length) {
+        arr.forEach(r=>{
+          const opt = document.createElement("option");
+          opt.value = r;
+          opt.textContent = r;
+          sel.appendChild(opt);
+        });
+        sel.disabled = false;
+      } else {
+        sel.disabled = true;
+      }
+    } catch(e){
+      console.warn(e);
+    }
+  }
+
+  loadCountries();
+  document.getElementById("country").addEventListener("change", (ev)=>{
+    loadRegions(ev.target.value);
+  });
+
+});
 </script>
 
 </body>
 </html>
+
 
 
 
