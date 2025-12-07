@@ -5,6 +5,7 @@ const Retrait = require('../models/Retrait');
 const { ensureAuthenticated } = require('../middlewares/auth');
 const { isAdmin } = require('../middlewares/authMiddleware');
 const sendMail = require('../utils/sendMail');
+const VantexRequest = require("../models/VantexRequest");
 
 // ✅ Route pour afficher la page des utilisateurs à approuver
 router.get('/approvals', ensureAuthenticated,isAdmin, async (req, res) => {
@@ -169,6 +170,67 @@ router.post('/retraits/refuser/:id', ensureAuthenticated,isAdmin, async (req, re
     res.redirect('/admin/retraits');
   }
 });
+
+
+
+
+
+
+
+
+
+
+// page : demandes en attente
+router.get('/vantex/en-attente', ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const demandes = await VantexRequest.find({ status: "en-attente" }).sort({ createdAt: -1 });
+    res.render('admin/vantex_en_attente', { demandes, success: req.flash('success'), error: req.flash('error') });
+  } catch (err) {
+    console.error(err);
+    req.flash('error','Erreur serveur');
+    res.redirect('/admin');
+  }
+});
+
+// valider / rejeter
+router.post('/vantex/valider/:id', ensureAuthenticated, isAdmin, async (req, res) => {
+  await VantexRequest.findByIdAndUpdate(req.params.id, { status: "valider" });
+  req.flash('success', 'Demande validée');
+  res.redirect('back');
+});
+router.post('/vantex/rejeter/:id', ensureAuthenticated, isAdmin, async (req, res) => {
+  await VantexRequest.findByIdAndUpdate(req.params.id, { status: "rejeter" });
+  req.flash('success', 'Demande rejetée');
+  res.redirect('back');
+});
+
+// servir les fichiers (affichage / téléchargement) — Vercel friendly (les images sont en base64)
+router.get('/vantex/file/:id/:which', ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { id, which } = req.params; // which = 'front' ou 'back'
+    const doc = await VantexRequest.findById(id);
+    if (!doc) return res.status(404).send("Introuvable");
+
+    let b64, mime;
+    if (which === 'front') { b64 = doc.id_front; mime = doc.id_front_mime; }
+    else if (which === 'back') { b64 = doc.id_back; mime = doc.id_back_mime; }
+    else return res.status(400).send("Paramètre invalide");
+
+    if (!b64) return res.status(404).send("Fichier absent");
+
+    const buffer = Buffer.from(b64, 'base64');
+    res.setHeader('Content-Type', mime || 'application/octet-stream');
+    // For inline display in browser:
+    res.setHeader('Content-Disposition', 'inline; filename="' + which + '"');
+    res.send(buffer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur");
+  }
+});
+// === END VANTEX ADMIN ===
+
+
 
 
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Demandes VANTEX - En attente</title>
+</head>
+<body>
+  <h1>Demandes VANTEX — En attente</h1>
+  <% if (success) { %><p style="color:green"><%= success %></p><% } %>
+  <% if (error) { %><p style="color:red"><%= error %></p><% } %>
+
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Nom</th><th>Email</th><th>Téléphone</th><th>Pieces</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% demandes.forEach(d => { %>
+        <tr>
+          <td><%= d.firstname %> <%= d.lastname %></td>
+          <td><%= d.email %></td>
+          <td><%= d.phone %></td>
+          <td>
+            <% if (d.id_front) { %>
+              <a href="/admin/vantex/file/<%= d._id %>/front" target="_blank">Voir recto</a>
+            <% } %>
+            <% if (d.id_back) { %>
+              | <a href="/admin/vantex/file/<%= d._id %>/back" target="_blank">Voir verso</a>
+            <% } %>
+          </td>
+          <td>
+            <% if (d.status === 'en-attente') { %>
+              <form action="/admin/vantex/valider/<%= d._id %>" method="POST" style="display:inline">
+                <button type="submit">Valider</button>
+              </form>
+              <form action="/admin/vantex/rejeter/<%= d._id %>" method="POST" style="display:inline;margin-left:6px;">
+                <button type="submit" style="background:red;color:#fff">Rejeter</button>
+              </form>
+            <% } else { %>
+              <strong><%= d.status %></strong>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
