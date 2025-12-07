@@ -417,83 +417,46 @@ exports.vantexOpenPage = (req, res) => {
   res.render('paiement/vantex-open', { user: req.user, messages: req.flash() });
 };
 
-// =====================
-// Soumission formulaire VANTEX
-// =====================
-exports.vantexOpenSubmit = async (req, res) => {
-  try {
-    const {
-      civility,
-      firstname,
-      lastname,
-      email,
-      phone,
-      profession,
-      id_type,
-      id_number,
-      country,
-      region,
-      street,
-      city,
-      zip,
-      terms
-    } = req.body;
+const multer = require("multer");
+const VantexRequest = require("../models/VantexRequest");
 
-    // Validation simple côté serveur
-    if (!civility || !firstname || !lastname || !email || !phone || !profession || 
-        !id_type || !id_number || !country || !region || !street || !city || !zip || !terms) {
-      req.flash('error', 'Tous les champs obligatoires doivent être remplis.');
-      return res.redirect('/paiement/vantex-open');
+// Configuration multer
+const upload = multer({ storage: multer.memoryStorage() });
+
+exports.vantexOpenSubmit = [
+  upload.fields([
+    { name: "id_front", maxCount: 1 },
+    { name: "id_back", maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        civility, firstname, lastname, email, phone,
+        profession, country, region, street, city, zip
+      } = req.body;
+
+      if (!firstname || !lastname || !email) {
+        return res.status(400).send("Formulaire incomplet");
+      }
+
+      const idFrontFile = req.files?.id_front?.[0];
+      const idBackFile = req.files?.id_back?.[0];
+
+      const doc = new VantexRequest({
+        civility, firstname, lastname, email, phone,
+        profession, country, region, street, city, zip,
+        id_front: idFrontFile ? idFrontFile.buffer.toString("base64") : null,
+        id_front_mime: idFrontFile ? idFrontFile.mimetype : null,
+        id_back: idBackFile ? idBackFile.buffer.toString("base64") : null,
+        id_back_mime: idBackFile ? idBackFile.mimetype : null
+      });
+
+      await doc.save();
+
+      res.redirect("/merci"); // page de remerciement
+    } catch (err) {
+      console.error("Erreur ouverture compte VANTEX:", err);
+      res.status(500).send("Erreur serveur");
     }
-
-    // Vérification fichiers
-    if (!req.files || !req.files.id_front || !req.files.id_back) {
-      req.flash('error', 'Veuillez télécharger les deux documents d’identité.');
-      return res.redirect('/paiement/vantex-open');
-    }
-
-    // Sauvegarde des fichiers côté serveur (ex: /uploads/vantex)
-    const uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'vantex');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-    const frontFile = req.files.id_front;
-    const backFile = req.files.id_back;
-
-    const frontPath = path.join(uploadDir, `${Date.now()}-front-${frontFile.name}`);
-    const backPath = path.join(uploadDir, `${Date.now()}-back-${backFile.name}`);
-
-    await frontFile.mv(frontPath);
-    await backFile.mv(backPath);
-
-    // Ici tu peux soit enregistrer dans une collection spécifique "VantexAccounts"
-    // Pour simplifier on met à jour l'utilisateur connecté avec infos VANTEX
-    const user = await User.findById(req.user._id);
-    user.vantexAccount = {
-      civility,
-      firstname,
-      lastname,
-      email,
-      phone,
-      profession,
-      id_type,
-      id_number,
-      country,
-      region,
-      street,
-      city,
-      zip,
-      id_front: `/uploads/vantex/${path.basename(frontPath)}`,
-      id_back: `/uploads/vantex/${path.basename(backPath)}`,
-      status: 'en_attente'
-    };
-
-    await user.save();
-
-    req.flash('success', 'Votre demande d’ouverture de compte VANTEX a été envoyée avec succès. Elle sera vérifiée par l’administrateur.');
-    res.redirect('/paiement/vantex');
-  } catch (err) {
-    console.error('Erreur ouverture compte VANTEX:', err);
-    req.flash('error', 'Erreur serveur, veuillez réessayer.');
-    res.redirect('/paiement/vantex-open');
   }
-};
+];

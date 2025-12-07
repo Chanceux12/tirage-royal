@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demandes VANTEX — Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+  font-family: "Inter", sans-serif;
+  background: #f4f6f7;
+  margin: 0;
+  padding: 20px;
+}
+h1 { text-align: center; color: #0A9999; margin-bottom: 30px; }
+
+.table-container { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.95rem;
+}
+th { background: #0A9999; color: #fff; }
+tr:last-child td { border-bottom: none; }
+img { max-width: 100px; height: auto; border-radius: 5px; }
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 5px;
+}
+.approve { background: #0A9999; color: #fff; }
+.approve:hover { background: #087a7a; }
+.refuse { background: #e74c3c; color: #fff; }
+.refuse:hover { background: #c0392b; }
+
+.flash {
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+.flash-success { background: #d4edda; color: #155724; }
+.flash-error { background: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+
+<h1>Demandes VANTEX — Admin</h1>
+
+<!-- Flash messages -->
+<% if(success) { %>
+  <div class="flash flash-success"><%= success %></div>
+<% } %>
+<% if(error) { %>
+  <div class="flash flash-error"><%= error %></div>
+<% } %>
+
+<div class="table-container">
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom & Prénom</th>
+      <th>Email</th>
+      <th>Téléphone</th>
+      <th>Profession</th>
+      <th>Pays / Région</th>
+      <th>Adresse</th>
+      <th>Code postal / Ville</th>
+      <th>Documents</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% demandes.forEach(d => { %>
+      <tr>
+        <td><%= d._id %></td>
+        <td><%= d.civility %> <%= d.firstname %> <%= d.lastname %></td>
+        <td><%= d.email %></td>
+        <td><%= d.phone %></td>
+        <td><%= d.profession %></td>
+        <td><%= d.country %> / <%= d.region %></td>
+        <td><%= d.street %></td>
+        <td><%= d.zip %> / <%= d.city %></td>
+        <td>
+          <% if(d.id_front) { %>
+            <img src="data:<%= d.id_front_mime %>;base64,<%= d.id_front %>" alt="Recto">
+          <% } %>
+          <% if(d.id_back) { %>
+            <img src="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>" alt="Verso">
+          <% } %>
+        </td>
+        <td><%= d.status %></td>
+        <td>
+          <% if(d.status === "en attente") { %>
+            <form style="display:inline" method="POST" action="/admin/vantex/approve/<%= d._id %>">
+              <button type="submit" class="approve">Approuver</button>
+            </form>
+            <form style="display:inline" method="POST" action="/admin/vantex/refuse/<%= d._id %>">
+              <button type="submit" class="refuse">Refuser</button>
+            </form>
+          <% } else { %>
+            <span>—</span>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+</div>
+
+</body>
+</html>
