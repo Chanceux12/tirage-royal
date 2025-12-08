@@ -150,6 +150,32 @@ h1 {
 .iti__selected-flag .iti__dial-code {
   color: #000 !important;
 }
+
+/* MODAL RÉCAP */
+#reviewModal {
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+#reviewModal h2 {
+  color: #0A9999;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#reviewModal ul { list-style: none; padding: 0; }
+#reviewModal li { margin-bottom: 10px; font-size: 1rem; }
+
+#modalBtns { display: flex; justify-content: space-between; margin-top: 20px; }
 </style>
 </head>
 
@@ -161,9 +187,10 @@ h1 {
     <h1>Créer un compte VANTEX</h1>
     <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience financière simple, rapide et sécurisée.</p>
 
-    <form action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
+    <form id="vantexForm" action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
       <div class="form-grid grid-2">
 
+        <!-- CIVILITÉ -->
         <div class="field">
           <select name="civility" required>
             <option value="" disabled selected></option>
@@ -179,31 +206,37 @@ h1 {
           <label>Civilité</label>
         </div>
 
+        <!-- Prénom -->
         <div class="field">
           <input type="text" name="firstname" placeholder=" " required />
           <label>Prénom</label>
         </div>
 
+        <!-- Nom -->
         <div class="field" style="grid-column:1/-1;">
           <input type="text" name="lastname" placeholder=" " required />
           <label>Nom</label>
         </div>
 
+        <!-- Email -->
         <div class="field">
           <input type="email" name="email" placeholder=" " required />
           <label>Email</label>
         </div>
 
+        <!-- Téléphone -->
         <div class="field phone">
           <label style="top:-10px;">Téléphone</label>
           <input type="tel" id="phone" name="phone" required />
         </div>
 
+        <!-- Profession -->
         <div class="field" style="grid-column:1/-1;">
           <input type="text" name="profession" placeholder=" " required />
           <label>Profession</label>
         </div>
 
+        <!-- Pays -->
         <div class="field">
           <select id="country" name="country" required>
             <option value="" selected disabled></option>
@@ -211,31 +244,37 @@ h1 {
           <label>Pays</label>
         </div>
 
+        <!-- Région -->
         <div class="field">
           <input type="text" name="region" placeholder=" " required />
           <label>Région / Province</label>
         </div>
 
+        <!-- Rue -->
         <div class="field" style="grid-column:1/-1;">
           <input type="text" name="street" placeholder=" " required />
           <label>Rue</label>
         </div>
 
+        <!-- Ville -->
         <div class="field">
           <input type="text" name="city" placeholder=" " required />
           <label>Ville</label>
         </div>
 
+        <!-- Code postal -->
         <div class="field">
           <input type="text" name="zip" placeholder=" " required />
           <label>Code postal</label>
         </div>
 
+        <!-- ID Recto -->
         <div class="field file" style="grid-column:1/-1;">
           <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
           <label>Document d'identité — recto</label>
         </div>
 
+        <!-- ID Verso -->
         <div class="field file" style="grid-column:1/-1;">
           <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
           <label>Document d'identité — verso</label>
@@ -243,11 +282,21 @@ h1 {
 
       </div>
 
-      <button class="btn">Soumettre ma demande</button>
+      <button type="button" id="reviewBtn" class="btn">Vérifier mes informations</button>
     </form>
   </div>
 
   <div class="card-img"></div>
+</div>
+
+<!-- MODAL DE RÉCAP -->
+<div id="reviewModal">
+  <h2>Vérifiez vos informations</h2>
+  <ul id="reviewContent"></ul>
+  <div id="modalBtns">
+    <button id="editBtn" class="btn">Modifier</button>
+    <button id="submitFinalBtn" class="btn">Confirmer et soumettre</button>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
@@ -261,11 +310,11 @@ window.intlTelInput(phone, {
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
 });
 
+// Charger les pays
 async function loadCountries() {
   const res = await fetch("/json/countries.json");
   const data = await res.json();
   const sel = document.getElementById("country");
-
   data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
   data.forEach(c=>{
     const opt=document.createElement("option");
@@ -275,6 +324,33 @@ async function loadCountries() {
   });
 }
 loadCountries();
+
+// MODAL DE RÉCAP
+const form = document.getElementById('vantexForm');
+const reviewBtn = document.getElementById('reviewBtn');
+const reviewModal = document.getElementById('reviewModal');
+const reviewContent = document.getElementById('reviewContent');
+const editBtn = document.getElementById('editBtn');
+const submitFinalBtn = document.getElementById('submitFinalBtn');
+
+reviewBtn.addEventListener('click', () => {
+  const formData = new FormData(form);
+  let html = '';
+  formData.forEach((value, key) => {
+    if(value && value.name) value = value.name; // fichier -> nom
+    html += `<li><strong>${key}:</strong> ${value}</li>`;
+  });
+  reviewContent.innerHTML = html;
+  reviewModal.style.display = 'block';
+});
+
+editBtn.addEventListener('click', () => {
+  reviewModal.style.display = 'none';
+});
+
+submitFinalBtn.addEventListener('click', () => {
+  form.submit();
+});
 </script>
 
 </body>

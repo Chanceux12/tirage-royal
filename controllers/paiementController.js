@@ -447,10 +447,20 @@ exports.vantexOpenSubmit = async (req, res) => {
       return res.redirect('/paiement/vantex');
     }
 
+    // Vérification d'une demande en attente pour le même email ou téléphone
+    const existing = await VantexRequest.findOne({
+      $or: [{ email }, { phone }],
+      status: 'en attente'
+    });
+    if (existing) {
+      req.flash('error', 'Vous avez déjà une demande en attente avec cet email ou téléphone.');
+      return res.redirect('/paiement/vantex');
+    }
+
     const id_front_file = req.files.id_front[0];
     const id_back_file = req.files.id_back[0];
 
-    // Conversion en base64 pour stockage
+    // Conversion en base64
     const id_front = id_front_file.buffer.toString('base64');
     const id_back = id_back_file.buffer.toString('base64');
 
@@ -478,7 +488,7 @@ exports.vantexOpenSubmit = async (req, res) => {
 
     await demande.save();
 
-    req.flash('success', 'Votre demande a été enregistrée avec succès.');
+    req.flash('success', 'Votre demande a été enregistrée avec succès. Elle est en attente de vérification.');
     res.redirect('/paiement/vantex/merci');
 
   } catch (err) {

@@ -16,10 +16,18 @@ router.post(
     { name: "id_front", maxCount: 1 },
     { name: "id_back", maxCount: 1 }
   ]),
+  (req, res, next) => {
+    // Sécurité : vérifier que req.body existe
+    if (!req.body) {
+      req.flash('error', "Formulaire invalide. Veuillez réessayer.");
+      return res.redirect("/paiement/vantex");
+    }
+    next();
+  },
   paiementController.vantexOpenSubmit
 );
 
-// Page Merci
+// Page Merci après soumission
 router.get("/paiement/vantex/merci", ensureAuthenticated, (req, res) => {
   res.render("paiement/merci", {
     success: req.flash('success'),
@@ -28,4 +36,3 @@ router.get("/paiement/vantex/merci", ensureAuthenticated, (req, res) => {
 });
 
 module.exports = router;
-
