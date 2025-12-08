@@ -8,28 +8,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
-/* ———– BASE ———– */
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
   background: linear-gradient(135deg, #11998e, #0575e6);
+  padding: 0;
   min-height: 100vh;
 }
 
-/* ———– CARD ———– */
+/* CARD */
 .card-wrapper {
   max-width: 1100px;
-  margin: 40px auto;
+  margin: 50px auto;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
 }
 
+/* IMAGE */
 .card-img {
   width: 100%;
   height: 220px;
@@ -42,116 +43,74 @@ body {
   .card-img { width: 40%; height: auto; order: 0; }
 }
 
-.card { padding: 40px; width: 100%; }
+/* FORM */
+.card { width: 100%; padding: 40px; order: 1; }
+h1 { text-align:center; color:#0A9999; font-size:2rem; margin-bottom:10px; }
+.subtitle { text-align:center; margin-bottom:32px; color:#555; }
 
-/* ———– TITRES ———– */
-h1 {
-  text-align: center;
-  color: #0A9999;
-  margin-bottom: 10px;
-  font-weight: 600;
+/* GRID */
+.form-grid { display:grid; gap:22px; }
+.grid-2 { grid-template-columns:1fr; }
+@media (min-width:850px) { .grid-2 { grid-template-columns:1fr 1fr; } }
+
+/* FIELDS */
+.field { position:relative; }
+.field input, .field select {
+  width:100%; height:50px; padding:0 14px;
+  border:1.7px solid #dce3e8; border-radius:10px; background:#fff;
 }
-
-.subtitle {
-  text-align: center;
-  color: #555;
-  margin-bottom: 25px;
-}
-
-/* ———– FORMULAIRE ———– */
-.form-grid {
-  display: grid;
-  gap: 22px;
-}
-.grid-2 { grid-template-columns: 1fr; }
-
-@media (min-width: 850px) {
-  .grid-2 { grid-template-columns: 1fr 1fr; }
-}
-
-.field {
-  position: relative;
-}
-
-.field input,
-.field select {
-  width: 100%;
-  height: 50px;
-  padding: 0 15px;
-  font-size: 1rem;
-  border: 1.6px solid #dce3e8;
-  border-radius: 10px;
-}
-
 .field label {
-  position: absolute;
-  top: -10px;
-  left: 15px;
-  background: #fff;
-  padding: 0 5px;
-  font-size: 0.78rem;
-  color: #0A9999;
+  position:absolute; left:14px; top:-10px; background:#fff;
+  padding:0 5px; font-size:0.78rem; color:#0A9999;
 }
 
-.phone .iti { width: 100%; }
-
-/* ———– BOUTON ———– */
+/* BUTTON */
 .btn {
-  width: 100%;
-  height: 50px;
-  margin-top: 20px;
-  background: #0A9999;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.05rem;
-  cursor: pointer;
+  width:100%; height:52px; background:#0A9999; border:none;
+  border-radius:10px; color:#fff; font-size:1.08rem; cursor:pointer;
+}
+.btn:hover { background:#087a7a; }
+
+/* VERIFY BLOCK */
+#verify-block {
+  display:none;
+  padding:20px;
+  background:#f5f7f8;
+  border-radius:12px;
 }
 
-/* ———– SECTION "VÉRIFIER" ———– */
-.verify-section {
-  margin-top: 45px;
-  padding: 30px;
-  background: #f9ffff;
-  border: 2px solid #0A9999;
-  border-radius: 14px;
+.verify-row {
+  margin-bottom:12px;
+  font-size:1rem;
+  padding:10px;
+  border-bottom:1px solid #ddd;
 }
 
 .verify-title {
-  font-size: 1.25rem;
-  color: #0A9999;
-  margin-bottom: 10px;
-  font-weight: 600;
+  font-weight:600;
+  color:#0575e6;
 }
 
-.verify-line {
-  padding: 6px 0;
-  font-size: 0.95rem;
+.actions {
+  margin-top:25px;
 }
 
-.modify-btn {
-  margin-top: 18px;
-  padding: 10px 15px;
-  background: #ddd;
-  display: inline-block;
-  border-radius: 10px;
-  cursor: pointer;
+#submit-final {
+  background:#11998e;
 }
 
-.cgu-box {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
+#modify-btn {
+  background:#777;
+  margin-bottom:12px;
 }
 
-.btn:disabled {
-  background: #8acbcc;
-  cursor: not-allowed;
+.conditions {
+  margin:15px 0;
+  font-size:0.9rem;
 }
+
 </style>
 </head>
-
 
 <body>
 
@@ -160,107 +119,116 @@ h1 {
   <div class="card">
 
     <h1>Créer un compte VANTEX</h1>
-    <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience simple.</p>
+    <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience simple et sécurisée.</p>
 
-    <!-- ———– FORMULAIRE ———– -->
-    <form id="vantexForm" action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
-
+    <!-- MODE FORMULAIRE -->
+    <form id="form-mode" method="POST" enctype="multipart/form-data" action="#">
       <div class="form-grid grid-2">
 
+        <!-- CIVILITÉ -->
         <div class="field">
-          <select id="civility" name="civility" required>
+          <select name="civility" required>
             <option value="" disabled selected></option>
             <option>M.</option>
             <option>Mme</option>
             <option>Mlle</option>
+            <option>Dr</option>
+            <option>Pr</option>
+            <option>Me</option>
+            <option>Ing.</option>
           </select>
           <label>Civilité</label>
         </div>
 
+        <!-- PRÉNOM -->
         <div class="field">
-          <input id="firstname" name="firstname" type="text" required />
+          <input type="text" name="firstname" required />
           <label>Prénom</label>
         </div>
 
+        <!-- NOM -->
         <div class="field" style="grid-column:1/-1;">
-          <input id="lastname" name="lastname" type="text" required />
+          <input type="text" name="lastname" required />
           <label>Nom</label>
         </div>
 
+        <!-- EMAIL -->
         <div class="field">
-          <input id="email" name="email" type="email" required />
+          <input type="email" name="email" required />
           <label>Email</label>
         </div>
 
+        <!-- PHONE -->
         <div class="field phone">
           <label style="top:-10px;">Téléphone</label>
-          <input id="phone" name="phone" type="tel" required />
+          <input type="tel" name="phone" id="phone" required />
         </div>
 
+        <!-- PROFESSION -->
         <div class="field" style="grid-column:1/-1;">
-          <input id="profession" name="profession" type="text" required />
+          <input type="text" name="profession" required />
           <label>Profession</label>
         </div>
 
+        <!-- COUNTRY -->
         <div class="field">
           <select id="country" name="country" required></select>
           <label>Pays</label>
         </div>
 
         <div class="field">
-          <input id="region" name="region" type="text" required />
-          <label>Région / Province</label>
+          <input type="text" name="region" required />
+          <label>Région</label>
         </div>
 
         <div class="field" style="grid-column:1/-1;">
-          <input id="street" name="street" type="text" required />
+          <input type="text" name="street" required />
           <label>Rue</label>
         </div>
 
         <div class="field">
-          <input id="city" name="city" type="text" required />
+          <input type="text" name="city" required />
           <label>Ville</label>
         </div>
 
         <div class="field">
-          <input id="zip" name="zip" type="text" required />
+          <input type="text" name="zip" required />
           <label>Code postal</label>
         </div>
 
         <div class="field" style="grid-column:1/-1;">
-          <input type="file" name="id_front" required />
-          <label>Document identité — recto</label>
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document identité recto</label>
         </div>
 
         <div class="field" style="grid-column:1/-1;">
-          <input type="file" name="id_back" required />
-          <label>Document identité — verso</label>
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document identité verso</label>
         </div>
 
       </div>
 
-      <!-- CONDITIONS GÉNÉRALES -->
-      <div class="cgu-box">
-        <input type="checkbox" id="cgu">
-        <label for="cgu">J'accepte les conditions générales VANTEX</label>
-      </div>
-
-      <button class="btn" id="submitBtn" disabled>Soumettre ma demande</button>
-
+      <button type="button" class="btn" onclick="showVerify()">Vérifier mes informations</button>
     </form>
 
+    <!-- MODE VÉRIFICATION -->
+    <div id="verify-block">
+      <h2>Vérifiez vos informations</h2>
 
-    <!-- ———– SECTION "VÉRIFIER MES INFORMATIONS" ———– -->
-    <div class="verify-section">
+      <div id="verify-content"></div>
 
-      <div class="verify-title">📄 Vérifier mes informations</div>
-
-      <div id="verifyContent"></div>
-
-      <div class="modify-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-        Modifier mes informations
+      <div class="conditions">
+        <input type="checkbox" id="accept" />
+        <label for="accept">J’accepte les conditions générales.</label>
       </div>
 
+      <div class="actions">
+        <button id="modify-btn" class="btn" onclick="modify()">Modifier</button>
+        <form method="POST" action="/paiement/vantex/submit">
+          <input type="hidden" id="final-data" name="json_data" />
+          <button id="submit-final" class="btn" disabled>Soumettre ma demande</button>
+        </form>
+      </div>
     </div>
 
   </div>
@@ -269,58 +237,70 @@ h1 {
 
 </div>
 
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
 const phone = document.querySelector("#phone");
-window.intlTelInput(phone, { separateDialCode: true, initialCountry: "fr" });
+window.intlTelInput(phone, {
+  separateDialCode: true,
+  initialCountry: "fr",
+  preferredCountries: ["fr","be","ca","ch"],
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+});
 
-
-// ————————— CHARGER PAYS —————————
+/* LOAD COUNTRIES */
 async function loadCountries() {
   const res = await fetch("/json/countries.json");
-  const countries = await res.json();
-  const sel = document.getElementById("country");
-  countries.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.name.common;
-    opt.textContent = c.name.common;
-    sel.appendChild(opt);
+  const data = await res.json();
+  const sel = document.querySelector("#country");
+
+  data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
+  data.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c.name.common;
+    o.textContent = c.name.common;
+    sel.appendChild(o);
   });
 }
 loadCountries();
 
+/* MODE VÉRIFICATION */
+function showVerify() {
+  const form = document.querySelector("#form-mode");
+  const verify = document.querySelector("#verify-block");
+  const content = document.querySelector("#verify-content");
 
-// ————————— AFFICHAGE VÉRIFICATION —————————
-const fields = ["civility","firstname","lastname","email","phone",
-  "profession","country","region","street","city","zip"];
+  const fd = new FormData(form);
 
-function updateVerify() {
   let html = "";
-  fields.forEach(id => {
-    const val = document.getElementById(id).value;
-    if (val.trim()) {
-      html += `<div class="verify-line"><strong>${id} :</strong> ${val}</div>`;
-    }
+  fd.forEach((v, k) => {
+    if (k === "id_front" || k === "id_back") return;
+    html += `<div class="verify-row"><span class="verify-title">${k}:</span> ${v}</div>`;
   });
-  document.getElementById("verifyContent").innerHTML = html;
+
+  content.innerHTML = html;
+
+  document.querySelector("#final-data").value = JSON.stringify(Object.fromEntries(fd));
+
+  form.style.display = "none";
+  verify.style.display = "block";
 }
 
-fields.forEach(id => {
-  document.getElementById(id).addEventListener("input", updateVerify);
-});
-phone.addEventListener("input", updateVerify);
+/* RETOUR EN MODE MODIFICATION */
+function modify() {
+  document.querySelector("#verify-block").style.display = "none";
+  document.querySelector("#form-mode").style.display = "block";
+}
 
-
-// ————————— CGU —————————
-document.getElementById("cgu").addEventListener("change", e=>{
-  document.getElementById("submitBtn").disabled = !e.target.checked;
+/* ACTIVER BOUTON SOUMISSION SI CONDITIONS */
+document.querySelector("#accept").addEventListener("change", e => {
+  document.querySelector("#submit-final").disabled = !e.target.checked;
 });
 </script>
 
 </body>
 </html>
+
 
 
 
