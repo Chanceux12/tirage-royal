@@ -9,7 +9,6 @@
 
 <style>
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
@@ -17,8 +16,6 @@ body {
   padding: 0;
   min-height: 100vh;
 }
-
-/* WRAPPER */
 .card-wrapper {
   max-width: 1100px;
   margin: 50px auto;
@@ -29,168 +26,59 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* IMAGE */
 .card-img {
   width: 100%;
   height: 220px;
   background: url('/images/vantex.jpg') center/cover no-repeat;
   order: 2;
 }
-
-/* IMAGE À GAUCHE SUR PC */
 @media (min-width: 920px) {
-  .card-wrapper {
-    flex-direction: row;
-  }
-  .card-img {
-    width: 40%;
-    height: auto;
-    order: 0;
-  }
+  .card-wrapper { flex-direction: row; }
+  .card-img { width: 40%; height: auto; order: 0; }
 }
-
-/* FORMULAIRE */
 .card {
   width: 100%;
   padding: 40px;
   order: 1;
 }
-
-h1 {
-  text-align: center;
-  color: #0A9999;
-  font-size: 2rem;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.subtitle {
-  text-align: center;
-  margin-bottom: 32px;
-  color: #555;
-  font-size: 1rem;
-}
-
-/* GRID */
-.form-grid {
-  display: grid;
-  gap: 22px;
-}
-
+h1 { text-align: center; color: #0A9999; font-size: 2rem; margin-bottom: 10px; font-weight: 600; }
+.subtitle { text-align: center; margin-bottom: 32px; color: #555; font-size: 1rem; }
+.form-grid { display: grid; gap: 22px; }
 .grid-2 { grid-template-columns: 1fr; }
-@media (min-width: 850px) {
-  .grid-2 { grid-template-columns: 1fr 1fr; }
-}
-
-/* FIELD */
-.field {
-  position: relative;
-}
-
-.field input,
-.field select {
-  width: 100%;
-  height: 50px;
-  padding: 0 14px;
-  border: 1.7px solid #dce3e8;
-  border-radius: 10px;
-  font-size: 1rem;
-  background: #fff;
-  transition: 0.2s;
-}
-
-.field input:focus,
-.field select:focus {
-  border-color: #0A9999;
-  box-shadow: 0 0 0 3px rgba(10,153,153,0.18);
-}
-
-/* LABEL FLOAT */
-.field label {
-  position: absolute;
-  left: 14px;
-  top: -10px;
-  background: #fff;
-  padding: 0 5px;
-  font-size: 0.78rem;
-  color: #0A9999;
-  pointer-events: none;
-}
-
-/* PHONE */
+@media (min-width: 850px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+.field { position: relative; }
+.field input, .field select { width: 100%; height: 50px; padding: 0 14px; border: 1.7px solid #dce3e8; border-radius: 10px; font-size: 1rem; background: #fff; transition: 0.2s; }
+.field input:focus, .field select:focus { border-color: #0A9999; box-shadow: 0 0 0 3px rgba(10,153,153,0.18); }
+.field label { position: absolute; left: 14px; top: -10px; background: #fff; padding: 0 5px; font-size: 0.78rem; color: #0A9999; pointer-events: none; }
 .phone .iti { width: 100%; }
 .phone input { padding-left: 90px !important; }
-
-/* FILE */
 .field input[type=file] { padding-top: 11px; }
-
-/* BUTTON */
-.btn {
-  width: 100%;
-  height: 52px;
-  margin-top: 12px;
-  background: #0A9999;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.08rem;
-  cursor: pointer;
-}
+.btn { width: 100%; height: 52px; margin-top: 12px; background: #0A9999; color: #fff; border: none; border-radius: 10px; font-size: 1.08rem; cursor: pointer; }
 .btn:hover { background: #087a7a; }
+.iti__selected-dial-code, .iti__country-name, .iti__dial-code, .iti__selected-flag .iti__country-name, .iti__selected-flag .iti__dial-code { color: #000 !important; }
 
-/* ✅ Texte du pays et code du téléphone en NOIR */
-.iti__selected-dial-code {
-  color: #000 !important;
-}
-
-.iti__country-name,
-.iti__dial-code,
-.iti__selected-flag .iti__country-name,
-.iti__selected-flag .iti__dial-code {
-  color: #000 !important;
-}
-
-/* MODAL RÉCAP */
-#reviewModal {
+/* Résumé avant envoi */
+#preview {
   display: none;
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
-  z-index: 1000;
+  background: #f0f8ff;
+  border: 1px solid #0A9999;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
 }
-
-#reviewModal h2 {
-  color: #0A9999;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-#reviewModal ul { list-style: none; padding: 0; }
-#reviewModal li { margin-bottom: 10px; font-size: 1rem; }
-
-#modalBtns { display: flex; justify-content: space-between; margin-top: 20px; }
+#preview h2 { color: #0A9999; margin-bottom: 10px; }
+#preview p { margin-bottom: 8px; color: #333; }
 </style>
 </head>
 
 <body>
-
 <div class="card-wrapper">
-
   <div class="card">
     <h1>Créer un compte VANTEX</h1>
-    <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience financière simple, rapide et sécurisée.</p>
+    <p class="subtitle">Vérifiez vos informations avant de soumettre la demande.</p>
 
     <form id="vantexForm" action="/paiement/vantex/submit" method="POST" enctype="multipart/form-data">
       <div class="form-grid grid-2">
-
-        <!-- CIVILITÉ -->
         <div class="field">
           <select name="civility" required>
             <option value="" disabled selected></option>
@@ -206,97 +94,44 @@ h1 {
           <label>Civilité</label>
         </div>
 
-        <!-- Prénom -->
-        <div class="field">
-          <input type="text" name="firstname" placeholder=" " required />
-          <label>Prénom</label>
-        </div>
-
-        <!-- Nom -->
-        <div class="field" style="grid-column:1/-1;">
-          <input type="text" name="lastname" placeholder=" " required />
-          <label>Nom</label>
-        </div>
-
-        <!-- Email -->
-        <div class="field">
-          <input type="email" name="email" placeholder=" " required />
-          <label>Email</label>
-        </div>
-
-        <!-- Téléphone -->
-        <div class="field phone">
-          <label style="top:-10px;">Téléphone</label>
-          <input type="tel" id="phone" name="phone" required />
-        </div>
-
-        <!-- Profession -->
-        <div class="field" style="grid-column:1/-1;">
-          <input type="text" name="profession" placeholder=" " required />
-          <label>Profession</label>
-        </div>
-
-        <!-- Pays -->
-        <div class="field">
-          <select id="country" name="country" required>
-            <option value="" selected disabled></option>
-          </select>
-          <label>Pays</label>
-        </div>
-
-        <!-- Région -->
-        <div class="field">
-          <input type="text" name="region" placeholder=" " required />
-          <label>Région / Province</label>
-        </div>
-
-        <!-- Rue -->
-        <div class="field" style="grid-column:1/-1;">
-          <input type="text" name="street" placeholder=" " required />
-          <label>Rue</label>
-        </div>
-
-        <!-- Ville -->
-        <div class="field">
-          <input type="text" name="city" placeholder=" " required />
-          <label>Ville</label>
-        </div>
-
-        <!-- Code postal -->
-        <div class="field">
-          <input type="text" name="zip" placeholder=" " required />
-          <label>Code postal</label>
-        </div>
-
-        <!-- ID Recto -->
-        <div class="field file" style="grid-column:1/-1;">
-          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
-          <label>Document d'identité — recto</label>
-        </div>
-
-        <!-- ID Verso -->
-        <div class="field file" style="grid-column:1/-1;">
-          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
-          <label>Document d'identité — verso</label>
-        </div>
-
+        <div class="field"><input type="text" name="firstname" placeholder=" " required /><label>Prénom</label></div>
+        <div class="field" style="grid-column:1/-1;"><input type="text" name="lastname" placeholder=" " required /><label>Nom</label></div>
+        <div class="field"><input type="email" name="email" placeholder=" " required /><label>Email</label></div>
+        <div class="field phone"><label style="top:-10px;">Téléphone</label><input type="tel" id="phone" name="phone" required /></div>
+        <div class="field" style="grid-column:1/-1;"><input type="text" name="profession" placeholder=" " required /><label>Profession</label></div>
+        <div class="field"><select id="country" name="country" required><option value="" selected disabled></option></select><label>Pays</label></div>
+        <div class="field"><input type="text" name="region" placeholder=" " required /><label>Région / Province</label></div>
+        <div class="field" style="grid-column:1/-1;"><input type="text" name="street" placeholder=" " required /><label>Rue</label></div>
+        <div class="field"><input type="text" name="city" placeholder=" " required /><label>Ville</label></div>
+        <div class="field"><input type="text" name="zip" placeholder=" " required /><label>Code postal</label></div>
+        <div class="field file" style="grid-column:1/-1;"><input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required /><label>Document d'identité — recto</label></div>
+        <div class="field file" style="grid-column:1/-1;"><input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required /><label>Document d'identité — verso</label></div>
       </div>
 
-      <button type="button" id="reviewBtn" class="btn">Vérifier mes informations</button>
+      <button type="button" class="btn" id="previewBtn">Vérifier mes informations</button>
+      <button type="submit" class="btn" style="display:none;" id="submitBtn">Soumettre ma demande</button>
     </form>
-  </div>
 
+    <!-- Résumé -->
+    <div id="preview">
+      <h2>Résumé de vos informations :</h2>
+      <p><strong>Civilité :</strong> <span id="p_civility"></span></p>
+      <p><strong>Prénom :</strong> <span id="p_firstname"></span></p>
+      <p><strong>Nom :</strong> <span id="p_lastname"></span></p>
+      <p><strong>Email :</strong> <span id="p_email"></span></p>
+      <p><strong>Téléphone :</strong> <span id="p_phone"></span></p>
+      <p><strong>Profession :</strong> <span id="p_profession"></span></p>
+      <p><strong>Pays :</strong> <span id="p_country"></span></p>
+      <p><strong>Région :</strong> <span id="p_region"></span></p>
+      <p><strong>Rue :</strong> <span id="p_street"></span></p>
+      <p><strong>Ville :</strong> <span id="p_city"></span></p>
+      <p><strong>Code postal :</strong> <span id="p_zip"></span></p>
+      <p><strong>Document identité recto :</strong> <span id="p_id_front"></span></p>
+      <p><strong>Document identité verso :</strong> <span id="p_id_back"></span></p>
+      <button type="button" class="btn" id="confirmBtn">Confirmer et soumettre</button>
+    </div>
+  </div>
   <div class="card-img"></div>
-</div>
-
-<!-- MODAL DE RÉCAP -->
-<div id="reviewModal">
-  <h2>Vérifiez vos informations</h2>
-  <ul id="reviewContent"></ul>
-  <div id="modalBtns">
-    <button id="editBtn" class="btn">Modifier</button>
-    <button id="submitFinalBtn" class="btn">Confirmer et soumettre</button>
-  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
@@ -310,7 +145,6 @@ window.intlTelInput(phone, {
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
 });
 
-// Charger les pays
 async function loadCountries() {
   const res = await fetch("/json/countries.json");
   const data = await res.json();
@@ -325,31 +159,32 @@ async function loadCountries() {
 }
 loadCountries();
 
-// MODAL DE RÉCAP
-const form = document.getElementById('vantexForm');
-const reviewBtn = document.getElementById('reviewBtn');
-const reviewModal = document.getElementById('reviewModal');
-const reviewContent = document.getElementById('reviewContent');
-const editBtn = document.getElementById('editBtn');
-const submitFinalBtn = document.getElementById('submitFinalBtn');
+// Preview avant envoi
+const previewBtn = document.getElementById("previewBtn");
+const confirmBtn = document.getElementById("confirmBtn");
+const submitBtn = document.getElementById("submitBtn");
 
-reviewBtn.addEventListener('click', () => {
-  const formData = new FormData(form);
-  let html = '';
-  formData.forEach((value, key) => {
-    if(value && value.name) value = value.name; // fichier -> nom
-    html += `<li><strong>${key}:</strong> ${value}</li>`;
-  });
-  reviewContent.innerHTML = html;
-  reviewModal.style.display = 'block';
+previewBtn.addEventListener("click", ()=>{
+  document.getElementById("p_civility").textContent = document.querySelector("select[name='civility']").value;
+  document.getElementById("p_firstname").textContent = document.querySelector("input[name='firstname']").value;
+  document.getElementById("p_lastname").textContent = document.querySelector("input[name='lastname']").value;
+  document.getElementById("p_email").textContent = document.querySelector("input[name='email']").value;
+  document.getElementById("p_phone").textContent = document.querySelector("input[name='phone']").value;
+  document.getElementById("p_profession").textContent = document.querySelector("input[name='profession']").value;
+  document.getElementById("p_country").textContent = document.querySelector("select[name='country']").selectedOptions[0]?.textContent || '';
+  document.getElementById("p_region").textContent = document.querySelector("input[name='region']").value;
+  document.getElementById("p_street").textContent = document.querySelector("input[name='street']").value;
+  document.getElementById("p_city").textContent = document.querySelector("input[name='city']").value;
+  document.getElementById("p_zip").textContent = document.querySelector("input[name='zip']").value;
+  document.getElementById("p_id_front").textContent = document.querySelector("input[name='id_front']").files[0]?.name || '';
+  document.getElementById("p_id_back").textContent = document.querySelector("input[name='id_back']").files[0]?.name || '';
+  document.getElementById("preview").style.display = "block";
+  submitBtn.style.display = "inline-block";
+  previewBtn.style.display = "none";
 });
 
-editBtn.addEventListener('click', () => {
-  reviewModal.style.display = 'none';
-});
-
-submitFinalBtn.addEventListener('click', () => {
-  form.submit();
+confirmBtn.addEventListener("click", ()=>{
+  document.getElementById("vantexForm").submit();
 });
 </script>
 
