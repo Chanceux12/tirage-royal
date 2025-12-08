@@ -68,6 +68,13 @@ h1 { text-align: center; color: #0A9999; font-size: 2rem; margin-bottom: 10px; f
 }
 #preview h2 { color: #0A9999; margin-bottom: 10px; }
 #preview p { margin-bottom: 8px; color: #333; }
+#preview button { margin-top: 10px; }
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.checkbox-container input { margin-right: 10px; }
 </style>
 </head>
 
@@ -108,6 +115,11 @@ h1 { text-align: center; color: #0A9999; font-size: 2rem; margin-bottom: 10px; f
         <div class="field file" style="grid-column:1/-1;"><input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required /><label>Document d'identité — verso</label></div>
       </div>
 
+      <div class="checkbox-container">
+        <input type="checkbox" id="cgu" required />
+        <label for="cgu">J’accepte les <a href="/conditions-generales" target="_blank">Conditions Générales</a></label>
+      </div>
+
       <button type="button" class="btn" id="previewBtn">Vérifier mes informations</button>
       <button type="submit" class="btn" style="display:none;" id="submitBtn">Soumettre ma demande</button>
     </form>
@@ -128,6 +140,7 @@ h1 { text-align: center; color: #0A9999; font-size: 2rem; margin-bottom: 10px; f
       <p><strong>Code postal :</strong> <span id="p_zip"></span></p>
       <p><strong>Document identité recto :</strong> <span id="p_id_front"></span></p>
       <p><strong>Document identité verso :</strong> <span id="p_id_back"></span></p>
+      <button type="button" class="btn" id="editBtn">Modifier mes informations</button>
       <button type="button" class="btn" id="confirmBtn">Confirmer et soumettre</button>
     </div>
   </div>
@@ -159,9 +172,10 @@ async function loadCountries() {
 }
 loadCountries();
 
-// Preview avant envoi
+// Prévisualisation
 const previewBtn = document.getElementById("previewBtn");
 const confirmBtn = document.getElementById("confirmBtn");
+const editBtn = document.getElementById("editBtn");
 const submitBtn = document.getElementById("submitBtn");
 
 previewBtn.addEventListener("click", ()=>{
@@ -183,10 +197,21 @@ previewBtn.addEventListener("click", ()=>{
   previewBtn.style.display = "none";
 });
 
+editBtn.addEventListener("click", ()=>{
+  document.getElementById("preview").style.display = "none";
+  previewBtn.style.display = "inline-block";
+  submitBtn.style.display = "none";
+});
+
 confirmBtn.addEventListener("click", ()=>{
+  if(!document.getElementById("cgu").checked){
+    alert("Vous devez accepter les Conditions Générales pour soumettre la demande.");
+    return;
+  }
   document.getElementById("vantexForm").submit();
 });
 </script>
 
 </body>
 </html>
+
