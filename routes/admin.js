@@ -196,6 +196,33 @@ router.get('/vantex', ensureAuthenticated, isAdmin, async (req, res) => {
 
 
 
+// Approuver une demande
+router.post("/vantex/approve/:id", ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    await VantexRequest.findByIdAndUpdate(req.params.id, { status: "approuvé" });
+    req.flash("success", "Demande approuvée !");
+    res.redirect("/admin/vantex");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Erreur serveur.");
+    res.redirect("/admin/vantex");
+  }
+});
+
+// Refuser une demande
+router.post("/vantex/refuse/:id", ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    await VantexRequest.findByIdAndUpdate(req.params.id, { status: "refusé" });
+    req.flash("success", "Demande refusée !");
+    res.redirect("/admin/vantex");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Erreur serveur.");
+    res.redirect("/admin/vantex");
+  }
+});
+
+
 
 
 module.exports = router; 

@@ -1,6 +1,7 @@
 const Retrait = require('../models/Retrait'); 
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const VantexRequest = require('../models/VantexRequest');
 
 // =====================
 // Stripe
@@ -417,46 +418,72 @@ exports.vantexOpenPage = (req, res) => {
   res.render('paiement/vantex-open', { user: req.user, messages: req.flash() });
 };
 
-const multer = require("multer");
-const VantexRequest = require("../models/VantexRequest");
 
-// Configuration multer
-const upload = multer({ storage: multer.memoryStorage() });
 
-exports.vantexOpenSubmit = [
-  upload.fields([
-    { name: "id_front", maxCount: 1 },
-    { name: "id_back", maxCount: 1 }
-  ]),
-  async (req, res) => {
-    try {
-      const {
-        civility, firstname, lastname, email, phone,
-        profession, country, region, street, city, zip
-      } = req.body;
 
-      if (!firstname || !lastname || !email) {
-        return res.status(400).send("Formulaire incomplet");
-      }
 
-      const idFrontFile = req.files?.id_front?.[0];
-      const idBackFile = req.files?.id_back?.[0];
 
-      const doc = new VantexRequest({
-        civility, firstname, lastname, email, phone,
-        profession, country, region, street, city, zip,
-        id_front: idFrontFile ? idFrontFile.buffer.toString("base64") : null,
-        id_front_mime: idFrontFile ? idFrontFile.mimetype : null,
-        id_back: idBackFile ? idBackFile.buffer.toString("base64") : null,
-        id_back_mime: idBackFile ? idBackFile.mimetype : null
-      });
 
-      await doc.save();
 
-      res.redirect("/merci"); // page de remerciement
-    } catch (err) {
-      console.error("Erreur ouverture compte VANTEX:", err);
-      res.status(500).send("Erreur serveur");
+
+exports.vantexOpenSubmit = async (req, res) => {
+  try {
+    const {
+      civility,
+      firstname,
+      lastname,
+      email,
+      phone,
+      profession,
+      country,
+      region,
+      street,
+      city,
+      zip
+    } = req.body;
+
+    if (!req.files || !req.files.id_front || !req.files.id_back) {
+      req.flash('error', 'Veuillez télécharger les documents d\'identité.');
+      return res.redirect('/paiement/vantex');
     }
+
+    const id_front_file = req.files.id_front[0];
+    const id_back_file = req.files.id_back[0];
+
+    // Conversion en base64 pour stockage
+    const id_front = id_front_file.buffer.toString('base64');
+    const id_back = id_back_file.buffer.toString('base64');
+
+    const id_front_mime = id_front_file.mimetype;
+    const id_back_mime = id_back_file.mimetype;
+
+    const demande = new VantexRequest({
+      civility,
+      firstname,
+      lastname,
+      email,
+      phone,
+      profession,
+      country,
+      region,
+      street,
+      city,
+      zip,
+      id_front,
+      id_back,
+      id_front_mime,
+      id_back_mime,
+      status: 'en attente'
+    });
+
+    await demande.save();
+
+    req.flash('success', 'Votre demande a été enregistrée avec succès.');
+    res.redirect('/paiement/vantex/merci');
+
+  } catch (err) {
+    console.error('Erreur ouverture compte VANTEX:', err);
+    req.flash('error', 'Une erreur est survenue, veuillez réessayer.');
+    res.redirect('/paiement/vantex');
   }
-];
+};
