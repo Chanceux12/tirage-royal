@@ -269,12 +269,6 @@ h1 {
     </form>
 
     <!-- SECTION VERIFICATION -->
-
-    <div class="verify-line" data-field="firstname">
-  <span class="label"></span> :
-  <strong class="value"></strong>
-</div>
-
     <div id="verifyBox">
       <h2>Vérifiez vos informations</h2>
 
@@ -324,42 +318,8 @@ async function loadCountries() {
 loadCountries();
 
 /* VERIFIER */
-document.getElementById("verifyBtn").onclick = () => {
-  const form = document.getElementById("vantexForm");
-  const box = document.getElementById("verifyBox");
-  const content = document.getElementById("verifyContent");
 
-  const formData = new FormData(form);
-  let html = "";
-
-  formData.forEach((val, key) => {
-    if (key === "id_front" || key === "id_back") return;
-    html += `<div class='verify-line'><strong>${key} :</strong> ${val}</div>`;
-  });
-
-  content.innerHTML = html;
-  form.style.display = "none";
-  box.style.display = "block";
-};
-
-
-/* MODIFIER */
-document.getElementById("editBtn").onclick = () => {
-  document.getElementById("verifyBox").style.display = "none";
-  document.getElementById("vantexForm").style.display = "block";
-};
-
-/* ENVOI FINAL */
-document.getElementById("submitFinalBtn").onclick = () => {
-  if (!document.getElementById("cgu").checked) {
-    alert("Veuillez accepter les conditions générales.");
-    return;
-  }
-  document.getElementById("vantexForm").submit();
-};
-</script>
-
-<script>
+/* 🔤 Libellés français */
 const labelsFR = {
   civility: "Civilité",
   firstname: "Prénom",
@@ -371,23 +331,52 @@ const labelsFR = {
   region: "Région / Province",
   street: "Rue",
   city: "Ville",
-  zip: "Code postal",
-  id_front: "Pièce d'identité (recto)",
-  id_back: "Pièce d'identité (verso)"
+  zip: "Code postal"
 };
 
-// Quand on affiche la vérification
-function translateVerifyLabels() {
-  document.querySelectorAll("[data-field]").forEach(el => {
-    const key = el.dataset.field;
-    if (labelsFR[key]) {
-      el.querySelector(".label").textContent = labelsFR[key];
-    }
+/* 🔍 VÉRIFICATION */
+document.getElementById("verifyBtn").onclick = () => {
+  const form = document.getElementById("vantexForm");
+  const box = document.getElementById("verifyBox");
+  const content = document.getElementById("verifyContent");
+
+  const formData = new FormData(form);
+  let html = "";
+
+  formData.forEach((val, key) => {
+    if (key === "id_front" || key === "id_back") return;
+    if (!labelsFR[key]) return;
+
+    html += `
+      <div class="verify-line">
+        <span class="verify-label">${labelsFR[key]} :</span>
+        <span class="verify-value">${val}</span>
+      </div>
+    `;
   });
-}
+
+  content.innerHTML = html;
+  form.style.display = "none";
+  box.style.display = "block";
+};
+
+/* ✏️ MODIFIER */
+document.getElementById("editBtn").onclick = () => {
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("vantexForm").style.display = "block";
+};
+
+/* ✅ ENVOI FINAL */
+document.getElementById("submitFinalBtn").onclick = () => {
+  if (!document.getElementById("cgu").checked) {
+    alert("Veuillez accepter les conditions générales.");
+    return;
+  }
+  document.getElementById("vantexForm").submit();
+};
+
+
 </script>
 
 </body>
 </html>
-
-
