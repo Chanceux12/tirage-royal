@@ -337,6 +337,23 @@ document.getElementById("verifyBtn").onclick = () => {
 };
 
 
+/* MODIFIER */
+document.getElementById("editBtn").onclick = () => {
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("vantexForm").style.display = "block";
+};
+
+/* ENVOI FINAL */
+document.getElementById("submitFinalBtn").onclick = () => {
+  if (!document.getElementById("cgu").checked) {
+    alert("Veuillez accepter les conditions générales.");
+    return;
+  }
+  document.getElementById("vantexForm").submit();
+};
+</script>
+
+<script>
 const labelsFR = {
   civility: "Civilité",
   firstname: "Prénom",
@@ -353,7 +370,8 @@ const labelsFR = {
   id_back: "Pièce d'identité (verso)"
 };
 
- function translateVerifyLabels() {
+// Quand on affiche la vérification
+function translateVerifyLabels() {
   document.querySelectorAll("[data-field]").forEach(el => {
     const key = el.dataset.field;
     if (labelsFR[key]) {
@@ -361,22 +379,6 @@ const labelsFR = {
     }
   });
 }
-
-
-/* MODIFIER */
-document.getElementById("editBtn").onclick = () => {
-  document.getElementById("verifyBox").style.display = "none";
-  document.getElementById("vantexForm").style.display = "block";
-};
-
-/* ENVOI FINAL */
-document.getElementById("submitFinalBtn").onclick = () => {
-  if (!document.getElementById("cgu").checked) {
-    alert("Veuillez accepter les conditions générales.");
-    return;
-  }
-  document.getElementById("vantexForm").submit();
-};
 </script>
 
 </body>
