@@ -1,6 +1,8 @@
 const nodemailer = require("nodemailer");
 
 module.exports = async function sendVantexCode(email, code) {
+  console.log("📧 Envoi code VANTEX vers :", email);
+  
   const transporter = nodemailer.createTransport({
     host: process.env.VANTEX_EMAIL_HOST,
     port: 465,
@@ -10,6 +12,10 @@ module.exports = async function sendVantexCode(email, code) {
       pass: process.env.VANTEX_EMAIL_PASS
     }
   });
+console.log("SMTP:", {
+  host: process.env.VANTEX_EMAIL_HOST,
+  user: process.env.VANTEX_EMAIL_USER
+});
 
   await transporter.sendMail({
     from: `"VANTEX – Tirage Royal" <${process.env.VANTEX_EMAIL_USER}>`,

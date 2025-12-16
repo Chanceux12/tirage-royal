@@ -434,14 +434,29 @@ function startTimer(seconds){
   clearInterval(countdown);
   let remaining = seconds;
   const timerEl = document.getElementById("timer");
-  countdown = setInterval(()=>{
-    const m = String(Math.floor(remaining/60)).padStart(2,'0');
-    const s = String(remaining%60).padStart(2,'0');
-    timerEl.textContent = `${m}:${s}`;
+
+  timerEl.textContent = "02:00";
+
+  countdown = setInterval(() => {
+    if (remaining <= 0) {
+      clearInterval(countdown);
+      timerEl.textContent = "00:00";
+      document.getElementById("codeError").textContent = "Le code a expiré.";
+      return;
+    }
+
     remaining--;
-    if(remaining<0){clearInterval(countdown); document.getElementById("codeError").textContent="Le code a expiré.";}
-  },1000);
+
+    const minutes = Math.floor(remaining / 60);
+    const secondsLeft = remaining % 60;
+
+    timerEl.textContent =
+      String(minutes).padStart(2, "0") + ":" +
+      String(secondsLeft).padStart(2, "0");
+
+  }, 1000);
 }
+
 
 /* SUBMIT FINAL DANS CODEBOX */
 document.getElementById("submitFinalBtn").onclick = async () => {
@@ -452,10 +467,29 @@ document.getElementById("submitFinalBtn").onclick = async () => {
   document.getElementById("verifyBox").style.display="none";
   document.getElementById("codeBox").style.display="block";
   const email=document.vantexForm.email.value;
-  const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
-  const data=await res.json();
-  if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code envoyé à votre e-mail.";}
-  else{document.getElementById("codeError").textContent="Impossible d'envoyer le code, vérifiez l’e-mail."; document.getElementById("codeBox").style.display="none"; document.getElementById("verifyBox").style.display="block";}
+  const res = await fetch("/vantex/send-code", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email })
+});
+
+if (!res.ok) {
+  document.getElementById("codeError").textContent = "Erreur serveur.";
+  document.getElementById("codeBox").style.display = "none";
+  document.getElementById("verifyBox").style.display = "block";
+  return;
+}
+
+const data = await res.json();
+
+if (data.success) {
+  document.getElementById("codeError").textContent = "Code envoyé à votre e-mail.";
+  startTimer(120);
+} else {
+  document.getElementById("codeError").textContent = "Impossible d'envoyer le code.";
+  document.getElementById("codeBox").style.display = "none";
+  document.getElementById("verifyBox").style.display = "block";
+}
 };
 
 /* VALIDATION CODE */
@@ -473,10 +507,26 @@ document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
 /* RENVOYER CODE */
 document.getElementById("resendBtn").onclick = async ()=>{
   const email=document.vantexForm.email.value;
-  const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
-  const data=await res.json();
-  if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code renvoyé.";}
-  else{document.getElementById("codeError").textContent="Impossible de renvoyer le code.";}
+  const res = await fetch("/vantex/send-code", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email })
+});
+
+if (!res.ok) {
+  document.getElementById("codeError").textContent = "Erreur serveur.";
+  return;
+}
+
+const data = await res.json();
+
+if (data.success) {
+  document.getElementById("codeError").textContent = "Code renvoyé.";
+  startTimer(120);
+} else {
+  document.getElementById("codeError").textContent = "Impossible de renvoyer le code.";
+}
+
 };
 
 /* MODIFIER EMAIL */

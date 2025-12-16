@@ -42,18 +42,16 @@ router.get("/paiement/vantex/merci", ensureAuthenticated, (req, res) => {
 /* ============================= */
 router.post(
   "/vantex/send-code",
-  ensureAuthenticated,
   paiementController.sendVerificationCode
 );
+
 
 /* ============================= */
 /*  VERIFICATION DU CODE         */
 /* ============================= */
 router.post(
   "/vantex/verify-code",
-  ensureAuthenticated,
-  paiementController.verifyEmailCode
+   paiementController.verifyEmailCode
 );
-
 
 module.exports = router;
