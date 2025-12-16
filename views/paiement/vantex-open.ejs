@@ -476,27 +476,15 @@ function startTimer(duration) {
 /* ============================= */
 
 document.getElementById("submitFinalBtn").onclick = async () => {
-  if (!isSigned) {
-    alert("Veuillez signer avant de soumettre.");
-    return;
-  }
-
-  if (!document.getElementById("cgu").checked) {
-    alert("Veuillez accepter les conditions générales.");
-    return;
-  }
-
+  if(!isSigned){alert("Veuillez signer avant de soumettre."); return;}
+  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales."); return;}
   document.getElementById("signatureInput").value = canvas.toDataURL();
 
-  // Affichage immédiat
   document.getElementById("verifyBox").style.display = "none";
   document.getElementById("codeBox").style.display = "block";
-  document.getElementById("codeError").textContent = "";
-
-  // 🔥 LE TIMER DÉMARRE TOUJOURS
-  startTimer(120);
 
   const email = document.vantexForm.email.value;
+  console.log("📤 Envoi code pour email:", email);
 
   try {
     const res = await fetch("/vantex/send-code", {
@@ -506,19 +494,21 @@ document.getElementById("submitFinalBtn").onclick = async () => {
     });
 
     const data = await res.json();
+    console.log("📥 Réponse serveur send-code:", data);
 
-    if (!data.success) {
-      document.getElementById("codeError").textContent =
-        "Le code n’a pas pu être envoyé.";
+    if(data.success){
+      startTimer(120);
+      document.getElementById("codeError").textContent = "Code envoyé à votre e-mail.";
     } else {
-      document.getElementById("codeError").textContent =
-        "Code envoyé à votre e-mail.";
+      document.getElementById("codeError").textContent = "Impossible d'envoyer le code, vérifiez l’e-mail.";
+      document.getElementById("codeBox").style.display = "none";
+      document.getElementById("verifyBox").style.display = "block";
     }
-
-  } catch (err) {
+  } catch(err){
     console.error(err);
-    document.getElementById("codeError").textContent =
-      "Erreur réseau.";
+    document.getElementById("codeError").textContent = "Erreur lors de l'envoi du code.";
+    document.getElementById("codeBox").style.display = "none";
+    document.getElementById("verifyBox").style.display = "block";
   }
 };
 

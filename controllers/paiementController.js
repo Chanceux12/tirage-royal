@@ -517,6 +517,8 @@ const sendVantexCode = require("../services/sendVantexCode");
 exports.sendVerificationCode = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("💌 Envoi code pour email:", email); 
+
     if (!email) return res.json({ success: false });
 
     let record = await EmailVerification.findOne({ email });
@@ -540,7 +542,8 @@ exports.sendVerificationCode = async (req, res) => {
       },
       { upsert: true, new: true }
     );
-
+      console.log("📧 Appel sendVantexCode avec code:", code);
+      
     await sendVantexCode(email, code);
     console.log("💡 Code généré :", code);
 
