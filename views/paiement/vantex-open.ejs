@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>   
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css" />
 
 <style>
-/* ===================== CSS ORIGINAL — STRICTEMENT INCHANGÉ ===================== */
+/* TON CSS ORIGINAL - RIEN CHANGÉ */
 * { box-sizing: border-box; }
 
 body {
@@ -130,216 +130,334 @@ h1 {
 }
 .btn:hover { background: #087a7a; }
 
-.iti__selected-dial-code,
+/* PHONE BLACK TEXT */
+.iti__selected-dial-code { color: #000 !important; }
 .iti__country-name,
-.iti__dial-code { color:#000!important; }
+.iti__dial-code,
+.iti__selected-flag .iti__country-name,
+.iti__selected-flag .iti__dial-code { color: #000 !important; }
 
+/* SECTION DE VERIFICATION */
 #verifyBox {
-  display:none;
-  margin-top:30px;
-  padding:20px;
-  border:2px solid #0A9999;
-  border-radius:12px;
-  background:#f7fdfd;
+  display: none;
+  margin-top: 30px;
+  padding: 20px;
+  border: 2px solid #0A9999;
+  border-radius: 12px;
+  background: #f7fdfd;
+}
+#verifyBox h2 {
+  text-align: center;
+  color: #0A9999;
+  margin-bottom: 20px;
+}
+.verify-line {
+  margin: 8px 0;
+  font-size: 1rem;
 }
 
-#verifyBox, #verifyBox * { color:#000!important; }
+/* 🔍 Lisibilité section Vérification */
+#verifyBox,
+#verifyBox h2,
+#verifyBox .verify-line,
+#verifyBox strong,
+#verifyBox span,
+#verifyBox label {
+  color: #000 !important;
+}
 
-.verify-line { margin:8px 0; font-size:1rem; }
+/* Texte CGU bien lisible */
+#verifyBox input[type="checkbox"] + span {
+  color: #000 !important;
+}
+
+/* Aperçu documents */
+#previewFront, #previewBack {
+  margin-top: 5px;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #333;
+}
 </style>
 </head>
 
 <body>
 
 <div class="card-wrapper">
-<div class="card">
 
-<h1>Créer un compte VANTEX</h1>
-<p class="subtitle">Rejoignez VANTEX et profitez d’une expérience financière simple, rapide et sécurisée.</p>
+  <div class="card">
+    <h1>Créer un compte VANTEX</h1>
+    <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience financière simple, rapide et sécurisée.</p>
 
-<form id="vantexForm" method="POST" action="/paiement/vantex/submit" enctype="multipart/form-data">
-<div class="form-grid grid-2">
+    <!-- FORMULAIRE -->
+    <form id="vantexForm" method="POST" action="/paiement/vantex/submit" enctype="multipart/form-data">
+      <div class="form-grid grid-2">
 
-<div class="field">
-<select name="civility" required>
-<option value="" disabled selected></option>
-<option value="M.">M.</option>
-<option value="Mme">Mme</option>
-<option value="Mlle">Mlle</option>
-</select>
-<label>Civilité</label>
-</div>
+        <div class="field">
+          <select name="civility" required>
+            <option value="" disabled selected></option>
+            <option value="M.">M.</option>
+            <option value="Mme">Mme</option>
+            <option value="Mlle">Mlle</option>
+            <option value="Dr">Dr</option>
+            <option value="Pr">Pr</option>
+            <option value="Me">Me</option>
+            <option value="Pr.">Pr.</option>
+            <option value="Ing.">Ing.</option>
+          </select>
+          <label>Civilité</label>
+        </div>
 
-<div class="field">
-<input type="text" name="firstname" required>
-<label>Prénom</label>
-</div>
+        <div class="field">
+          <input type="text" name="firstname" placeholder=" " required />
+          <label>Prénom</label>
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<input type="text" name="lastname" required>
-<label>Nom</label>
-</div>
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="lastname" placeholder=" " required />
+          <label>Nom</label>
+        </div>
 
-<div class="field">
-<input type="email" name="email" required>
-<label>Email</label>
-</div>
+        <div class="field">
+          <input type="email" name="email" placeholder=" " required />
+          <label>Email</label>
+        </div>
 
-<div class="field phone">
-<label style="top:-10px;">Téléphone</label>
-<input type="tel" id="phone" name="phone" required>
-</div>
+        <div class="field phone">
+          <label style="top:-10px;">Téléphone</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<input type="text" name="profession" required>
-<label>Profession</label>
-</div>
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="profession" placeholder=" " required />
+          <label>Profession</label>
+        </div>
 
-<div class="field">
-<select id="country" name="country" required></select>
-<label>Pays</label>
-</div>
+        <div class="field">
+          <select id="country" name="country" required>
+            <option value="" selected disabled></option>
+          </select>
+          <label>Pays</label>
+        </div>
 
-<div class="field">
-<input type="text" name="region" required>
-<label>Région / Province</label>
-</div>
+        <div class="field">
+          <input type="text" name="region" placeholder=" " required />
+          <label>Région / Province</label>
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<input type="text" name="street" required>
-<label>Rue</label>
-</div>
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
 
-<div class="field">
-<input type="text" name="city" required>
-<label>Ville</label>
-</div>
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
 
-<div class="field">
-<input type="text" name="zip" required>
-<label>Code postal</label>
-</div>
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<input type="file" name="id_front" required>
-<label>Document d'identité — recto</label>
-<span id="fileFrontName"></span>
-</div>
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — recto</label>
+          <div id="previewFront"></div>
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<input type="file" name="id_back" required>
-<label>Document d'identité — verso</label>
-<span id="fileBackName"></span>
-</div>
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — verso</label>
+          <div id="previewBack"></div>
+        </div>
 
-<div class="field" style="grid-column:1/-1;">
-<label>Signature</label>
-<canvas id="signaturePad" width="300" height="100" style="border:1px solid #ccc;border-radius:8px;"></canvas>
-<p id="signatureError" style="color:red;display:none;">Veuillez signer avant de continuer.</p>
-<button type="button" id="clearSig">Effacer</button>
-<input type="hidden" name="signature" id="signatureInput">
-</div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Signature <span id="sigError" style="color:red; display:none;">(Signature obligatoire)</span></label>
+          <canvas id="signaturePad" width="300" height="100" style="border:1px solid #ccc; border-radius:8px;"></canvas>
+          <button type="button" id="clearSig" style="margin-top:5px;">Effacer</button>
+          <input type="hidden" name="signature" id="signatureInput" required />
+        </div>
 
-</div>
+      </div>
 
-<button type="button" id="verifyBtn" class="btn">Vérifier mes informations</button>
-</form>
+      <button type="button" id="verifyBtn" class="btn">Vérifier mes informations</button>
+    </form>
 
-<div id="verifyBox">
-<h2>Vérifiez vos informations</h2>
-<div id="verifyContent"></div>
+    <!-- SECTION VERIFICATION -->
+    <div id="verifyBox">
+      <h2>Vérifiez vos informations</h2>
 
-<label style="display:flex;gap:10px;margin-top:15px;">
-<input type="checkbox" id="cgu">
-<span>J'accepte les conditions générales</span>
-</label>
+      <div id="verifyContent"></div>
 
-<button class="btn" id="editBtn">Modifier</button>
-<button class="btn" id="submitFinalBtn" style="background:#0a7;">Soumettre ma demande</button>
-</div>
+      <label style="display:flex; align-items:center; gap:10px; margin-top:15px;">
+        <input type="checkbox" id="cgu" required>  
+        <span>J'accepte les conditions générales</span>
+      </label>
 
-</div>
-<div class="card-img"></div>
+      <button class="btn" id="editBtn">Modifier</button>
+      <button class="btn" id="submitFinalBtn" style="margin-top:10px; background:#0a7;">Soumettre ma demande</button>
+    </div>
+
+  </div>
+
+  <div class="card-img"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
-/* ================= TEL ================= */
-intlTelInput(document.querySelector("#phone"), {
-  separateDialCode:true,
-  initialCountry:"fr",
-  preferredCountries:["fr","be","ca"]
+/* TEL */
+const phone = document.querySelector("#phone");
+window.intlTelInput(phone, {
+  separateDialCode: true,
+  initialCountry: "fr",
+  preferredCountries: ["fr","be","ca","ch"],
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
 });
 
-/* ================= PAYS ================= */
-fetch("/json/countries.json").then(r=>r.json()).then(data=>{
-  const sel=document.getElementById("country");
-  data.sort((a,b)=>a.name.common.localeCompare(b.name.common))
-  .forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c.name.common;o.textContent=c.name.common;
-    sel.appendChild(o);
+/* CHARGER LES PAYS */
+async function loadCountries() {
+  const res = await fetch("/json/countries.json");
+  const data = await res.json();
+  const sel = document.getElementById("country");
+
+  data.sort((a,b)=> a.name.common.localeCompare(b.name.common));
+  data.forEach(c=>{
+    const opt=document.createElement("option");
+    opt.value=c.name.common;
+    opt.textContent=c.name.common;
+    sel.appendChild(opt);
   });
-});
+}
+loadCountries();
 
-/* ================= FICHIERS ================= */
-document.querySelector('[name="id_front"]').onchange=e=>{
-  document.getElementById("fileFrontName").textContent=e.target.files[0]?.name||"";
-};
-document.querySelector('[name="id_back"]').onchange=e=>{
-  document.getElementById("fileBackName").textContent=e.target.files[0]?.name||"";
+/* APERÇU DOCUMENTS (uniquement nom de fichier) */
+const idFrontInput = document.querySelector('input[name="id_front"]');
+const idBackInput = document.querySelector('input[name="id_back"]');
+
+idFrontInput.onchange = (e) => {
+  const file = e.target.files[0];
+  document.getElementById("previewFront").textContent = file ? file.name : '';
 };
 
-/* ================= SIGNATURE ================= */
-const canvas=document.getElementById("signaturePad");
-const ctx=canvas.getContext("2d");
-let drawing=false, hasSigned=false;
-
-canvas.onmousedown=()=>{drawing=true;hasSigned=true;document.getElementById("signatureError").style.display="none";};
-canvas.onmouseup=canvas.onmouseleave=()=>{drawing=false;ctx.beginPath();};
-canvas.onmousemove=e=>{
-  if(!drawing)return;
-  ctx.lineWidth=2;ctx.lineCap="round";ctx.strokeStyle="#000";
-  ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);
+idBackInput.onchange = (e) => {
+  const file = e.target.files[0];
+  document.getElementById("previewBack").textContent = file ? file.name : '';
 };
-document.getElementById("clearSig").onclick=()=>{
+
+/* SIGNATURE */
+const canvas = document.getElementById('signaturePad');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+
+canvas.addEventListener('mousedown', e => drawing = true);
+canvas.addEventListener('mouseup', e => drawing = false);
+canvas.addEventListener('mouseleave', e => drawing = false);
+canvas.addEventListener('mousemove', draw);
+
+function draw(e) {
+  if (!drawing) return;
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#000";
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+}
+
+document.getElementById("clearSig").onclick = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  hasSigned=false;
 };
 
-/* ================= VERIFICATION ================= */
-document.getElementById("verifyBtn").onclick=()=>{
-  if(!hasSigned){document.getElementById("signatureError").style.display="block";return;}
-  const form=document.getElementById("vantexForm");
-  const data=new FormData(form);
-  let html="";
-  data.forEach((v,k)=>{
-    if(k==="id_front"||k==="id_back"||k==="signature")return;
-    html+=`<div class="verify-line"><strong>${k} :</strong> ${v}</div>`;
+/* VÉRIFICATION AVANT SOUMISSION */
+const labelsFR = {
+  civility: "Civilité",
+  firstname: "Prénom",
+  lastname: "Nom",
+  email: "Adresse e-mail",
+  phone: "Téléphone",
+  profession: "Profession",
+  country: "Pays",
+  region: "Région / Province",
+  street: "Rue",
+  city: "Ville",
+  zip: "Code postal"
+};
+
+document.getElementById("verifyBtn").onclick = () => {
+  const form = document.getElementById("vantexForm");
+  let valid = true;
+
+  form.querySelectorAll("input, select").forEach((el) => {
+    if (!el.checkValidity()) {
+      el.style.borderColor = "red";
+      valid = false;
+    } else {
+      el.style.borderColor = "#dce3e8";
+    }
   });
-  html+=`<div class="verify-line"><strong>Document recto :</strong> ${document.getElementById("fileFrontName").textContent}</div>`;
-  html+=`<div class="verify-line"><strong>Document verso :</strong> ${document.getElementById("fileBackName").textContent}</div>`;
-  html+=`<div class="verify-line"><strong>Signature :</strong><br><img src="${canvas.toDataURL()}" style="border:1px solid #ccc;max-width:300px;"></div>`;
-  document.getElementById("verifyContent").innerHTML=html;
-  form.style.display="none";
-  document.getElementById("verifyBox").style.display="block";
+
+  // Vérifier signature
+  const sigData = canvas.toDataURL();
+  if (sigData === canvas.toDataURL('image/png')) { // vide
+    document.getElementById("sigError").style.display = "inline";
+    valid = false;
+  } else {
+    document.getElementById("sigError").style.display = "none";
+  }
+
+  if (!valid) {
+    alert("Veuillez remplir tous les champs obligatoires et signer.");
+    return;
+  }
+
+  const box = document.getElementById("verifyBox");
+  const content = document.getElementById("verifyContent");
+  const formData = new FormData(form);
+  let html = "";
+
+  formData.forEach((val, key) => {
+    if (key === "id_front" || key === "id_back" || key === "signature") return;
+    if (!labelsFR[key]) return;
+    html += `<div class="verify-line"><strong>${labelsFR[key]} :</strong> ${val}</div>`;
+  });
+
+  // Aperçu fichiers et signature
+  if (idFrontInput.files[0]) html += `<div class="verify-line"><strong>Document recto :</strong> ${idFrontInput.files[0].name}</div>`;
+  if (idBackInput.files[0]) html += `<div class="verify-line"><strong>Document verso :</strong> ${idBackInput.files[0].name}</div>`;
+  html += `<div class="verify-line"><strong>Signature :</strong> <em>Signée</em></div>`;
+
+  content.innerHTML = html;
+  form.style.display = "none";
+  box.style.display = "block";
 };
 
-document.getElementById("editBtn").onclick=()=>{
-  document.getElementById("verifyBox").style.display="none";
-  document.getElementById("vantexForm").style.display="block";
+/* MODIFIER */
+document.getElementById("editBtn").onclick = () => {
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("vantexForm").style.display = "block";
 };
 
-document.getElementById("submitFinalBtn").onclick=()=>{
-  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales.");return;}
-  document.getElementById("signatureInput").value=canvas.toDataURL();
+/* ENVOI FINAL */
+document.getElementById("submitFinalBtn").onclick = () => {
+  const sigData = canvas.toDataURL();
+  document.getElementById("signatureInput").value = sigData;
+
+  if (!document.getElementById("cgu").checked) {
+    alert("Veuillez accepter les conditions générales.");
+    return;
+  }
+
+  if (!sigData || sigData === canvas.toDataURL('image/png')) {
+    alert("Veuillez signer avant de soumettre.");
+    return;
+  }
+
   document.getElementById("vantexForm").submit();
 };
 </script>
 
 </body>
 </html>
-
-
