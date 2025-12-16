@@ -517,16 +517,16 @@ const sendVantexCode = require("../services/sendVantexCode");
 exports.sendVerificationCode = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("💌 Envoi code pour email:", email); // LOG
+
     if (!email) return res.json({ success: false });
 
     let record = await EmailVerification.findOne({ email });
 
-    // Bloqué 2h si trop de tentatives
     if (record?.blockedUntil && record.blockedUntil > new Date()) {
       return res.json({ success: false, blocked: true });
     }
 
-    // Générer code à 6 chiffres
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     record = await EmailVerification.findOneAndUpdate(
@@ -536,14 +536,13 @@ exports.sendVerificationCode = async (req, res) => {
         code,
         attempts: 0,
         blockedUntil: null,
-        expiresAt: new Date(Date.now() + 2 * 60 * 1000) // 2 minutes
+        expiresAt: new Date(Date.now() + 2 * 60 * 1000)
       },
       { upsert: true, new: true }
     );
 
+    console.log("📧 Appel sendVantexCode avec code:", code);
     await sendVantexCode(email, code);
-    console.log("💡 Code généré :", code);
-
 
     return res.json({ success: true });
 
@@ -552,6 +551,7 @@ exports.sendVerificationCode = async (req, res) => {
     return res.json({ success: false });
   }
 };
+
 
 /* ============================= */
 /*  VERIFICATION DU CODE         */
