@@ -475,35 +475,85 @@ function startTimer(duration) {
 /*   SOUMISSION FINALE           */
 /* ============================= */
 
-document.getElementById("submitFinalBtn").onclick=async()=>{
-  if(!isSigned){alert("Veuillez signer avant de soumettre."); return;}
-  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales."); return;}
-  document.getElementById("signatureInput").value=canvas.toDataURL();
-  document.getElementById("verifyBox").style.display="none"; document.getElementById("codeBox").style.display="block";
-  const email=document.vantexForm.email.value;
-  console.log("📤 Envoi code pour email:",email);
-  try{
-    const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
-    const data=await res.json(); console.log("📥 Réponse serveur send-code:",data);
-    if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code envoyé à votre e-mail.";}
-    else{document.getElementById("codeError").textContent="Impossible d'envoyer le code, vérifiez l’e-mail."; document.getElementById("codeBox").style.display="none"; document.getElementById("verifyBox").style.display="block";}
-  } catch(err){console.error(err); document.getElementById("codeError").textContent="Erreur lors de l'envoi du code."; document.getElementById("codeBox").style.display="none"; document.getElementById("verifyBox").style.display="block";}
+document.getElementById("submitFinalBtn").onclick = async () => {
+  if (!isSigned) {
+    alert("Veuillez signer avant de soumettre.");
+    return;
+  }
+
+  if (!document.getElementById("cgu").checked) {
+    alert("Veuillez accepter les conditions générales.");
+    return;
+  }
+
+  document.getElementById("signatureInput").value = canvas.toDataURL();
+
+  // Affichage immédiat
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("codeBox").style.display = "block";
+  document.getElementById("codeError").textContent = "";
+
+  // 🔥 LE TIMER DÉMARRE TOUJOURS
+  startTimer(120);
+
+  const email = document.vantexForm.email.value;
+
+  try {
+    const res = await fetch("/vantex/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById("codeError").textContent =
+        "Le code n’a pas pu être envoyé.";
+    } else {
+      document.getElementById("codeError").textContent =
+        "Code envoyé à votre e-mail.";
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("codeError").textContent =
+      "Erreur réseau.";
+  }
 };
 
 /* ============================= */
 /*     VALIDATION DU CODE        */
 /* ============================= */
 
-document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    const code=document.getElementById("emailCode").value;
-    try{
-      const res=await fetch("/vantex/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.vantexForm.email.value,code})});
-      const data=await res.json();
-      if(data.success){document.getElementById("vantexForm").submit();}
-      else{document.getElementById("codeError").textContent="Code incorrect ou expiré.";}
-    } catch(err){console.error(err); document.getElementById("codeError").textContent="Erreur serveur.";}
+document.getElementById("emailCode").addEventListener("keypress", async (e) => {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const code = document.getElementById("emailCode").value;
+
+  try {
+    const res = await fetch("/vantex/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: document.vantexForm.email.value,
+        code
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("vantexForm").submit();
+    } else {
+      document.getElementById("codeError").textContent =
+        "Code incorrect ou expiré.";
+    }
+  } catch {
+    document.getElementById("codeError").textContent =
+      "Erreur serveur.";
   }
 });
 
@@ -511,14 +561,32 @@ document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
 /*        RENVOYER CODE          */
 /* ============================= */
 
-document.getElementById("resendBtn").onclick=async()=>{
-  const email=document.vantexForm.email.value;
-  try{
-    const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
-    const data=await res.json();
-    if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code renvoyé.";}
-    else{document.getElementById("codeError").textContent="Impossible de renvoyer le code.";}
-  } catch(err){console.error(err); document.getElementById("codeError").textContent="Erreur serveur.";}
+document.getElementById("resendBtn").onclick = async () => {
+  document.getElementById("codeError").textContent = "";
+  startTimer(120);
+
+  const email = document.vantexForm.email.value;
+
+  try {
+    const res = await fetch("/vantex/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("codeError").textContent =
+        "Code renvoyé.";
+    } else {
+      document.getElementById("codeError").textContent =
+        "Impossible de renvoyer le code.";
+    }
+  } catch {
+    document.getElementById("codeError").textContent =
+      "Erreur réseau.";
+  }
 };
 
 /* ============================= */
