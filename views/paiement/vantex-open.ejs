@@ -221,7 +221,7 @@ h1 {
     <!-- FORMULAIRE -->
     <form id="vantexForm" method="POST" action="/paiement/vantex/submit" enctype="multipart/form-data">
       <div class="form-grid grid-2">
-        <!-- … tous tes champs restent inchangés … -->
+
         <div class="field">
           <select name="civility" required>
             <option value="" disabled selected></option>
@@ -269,7 +269,37 @@ h1 {
           <label>Pays</label>
         </div>
 
-        <!-- … les autres champs … -->
+        <div class="field">
+          <input type="text" name="region" placeholder=" " required />
+          <label>Région / Province</label>
+        </div>
+
+        <div class="field" style="grid-column:1/-1;">
+          <input type="text" name="street" placeholder=" " required />
+          <label>Rue</label>
+        </div>
+
+        <div class="field">
+          <input type="text" name="city" placeholder=" " required />
+          <label>Ville</label>
+        </div>
+
+        <div class="field">
+          <input type="text" name="zip" placeholder=" " required />
+          <label>Code postal</label>
+        </div>
+
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_front" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — recto</label>
+          <div id="previewFront"></div>
+        </div>
+
+        <div class="field file" style="grid-column:1/-1;">
+          <input type="file" name="id_back" accept=".jpg,.png,.jpeg,.pdf" required />
+          <label>Document d'identité — verso</label>
+          <div id="previewBack"></div>
+        </div>
 
         <div class="field" style="grid-column:1/-1;">
           <label>Signature <span id="sigError" style="color:red; display:none;">(Signature obligatoire)</span></label>
@@ -318,6 +348,7 @@ h1 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
 
 <script>
+/* --- CODE COMPLET JS --- */
 /* TEL */
 const phone = document.querySelector("#phone");
 window.intlTelInput(phone, {
@@ -351,81 +382,88 @@ idBackInput.onchange = (e) => { document.getElementById("previewBack").textConte
 /* SIGNATURE */
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const sigMobileMsg = document.getElementById("sigMobileMsg");
-if(isMobile) sigMobileMsg.style.display="block";
+if (isMobile) sigMobileMsg.style.display = "block";
+
 const canvas = document.getElementById('signaturePad');
 const ctx = canvas.getContext('2d');
-let drawing=false; let isSigned=false;
-canvas.addEventListener('mousedown', e=>{drawing=true;});
-canvas.addEventListener('mouseup', e=>{drawing=false;ctx.beginPath();});
-canvas.addEventListener('mouseleave', e=>{drawing=false;ctx.beginPath();});
+let drawing = false;
+let isSigned = false;
+canvas.addEventListener('mousedown', e => { drawing = true; });
+canvas.addEventListener('mouseup', e => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener('mouseleave', e => { drawing = false; ctx.beginPath(); });
 canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('touchstart', e=>{e.preventDefault();drawing=true; hideMobileMsg();});
-canvas.addEventListener('touchend', e=>{e.preventDefault();drawing=false;ctx.beginPath();});
-canvas.addEventListener('touchcancel', e=>{e.preventDefault();drawing=false;ctx.beginPath();});
-canvas.addEventListener('touchmove', drawTouch,{passive:false});
-function hideMobileMsg(){if(sigMobileMsg.style.display!=="none")sigMobileMsg.style.display="none";}
-function draw(e){if(!drawing)return;ctx.lineWidth=2;ctx.lineCap="round";ctx.strokeStyle="#000";ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);isSigned=true;hideMobileMsg();}
-function drawTouch(e){if(!drawing)return;const rect=canvas.getBoundingClientRect();const touch=e.touches[0];const x=touch.clientX-rect.left;const y=touch.clientY-rect.top;ctx.lineWidth=2;ctx.lineCap="round";ctx.strokeStyle="#000";ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.moveTo(x,y);isSigned=true;hideMobileMsg();}
-document.getElementById("clearSig").onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);isSigned=false;if(isMobile)sigMobileMsg.style.display="block";};
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; hideMobileMsg(); });
+canvas.addEventListener('touchend', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
+canvas.addEventListener('touchcancel', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
+canvas.addEventListener('touchmove', drawTouch, { passive: false });
+function hideMobileMsg() { if (sigMobileMsg.style.display !== "none") sigMobileMsg.style.display = "none"; }
+function draw(e){ if(!drawing)return; ctx.lineWidth=2; ctx.lineCap="round"; ctx.strokeStyle="#000"; ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.offsetX,e.offsetY); isSigned=true; hideMobileMsg();}
+function drawTouch(e){ if(!drawing)return; const rect=canvas.getBoundingClientRect(); const touch=e.touches[0]; const x=touch.clientX-rect.left; const y=touch.clientY-rect.top; ctx.lineWidth=2; ctx.lineCap="round"; ctx.strokeStyle="#000"; ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); isSigned=true; hideMobileMsg();}
+document.getElementById("clearSig").onclick = () => { ctx.clearRect(0,0,canvas.width,canvas.height); isSigned=false; if(isMobile)sigMobileMsg.style.display="block"; };
 
 /* VÉRIFICATION FORMULAIRE */
-const labelsFR={ civility:"Civilité", firstname:"Prénom", lastname:"Nom", email:"Adresse e-mail", phone:"Téléphone", profession:"Profession", country:"Pays", region:"Région / Province", street:"Rue", city:"Ville", zip:"Code postal" };
-
-document.getElementById("verifyBtn").onclick=async()=>{
-  const form=document.getElementById("vantexForm"); let valid=true;
-  form.querySelectorAll("input, select").forEach(el=>{if(!el.checkValidity()){el.style.borderColor="red";valid=false;}else{el.style.borderColor="#dce3e8";}});
-  if(!isSigned){document.getElementById("sigError").style.display="inline";valid=false;}else{document.getElementById("sigError").style.display="none";}
-  if(!valid){alert("Veuillez remplir tous les champs obligatoires et signer.");return;}
-  const box=document.getElementById("verifyBox"); const content=document.getElementById("verifyContent");
-  const formData=new FormData(form); let html="";
-  formData.forEach((val,key)=>{if(key==="id_front"||key==="id_back"||key==="signature")return;if(!labelsFR[key])return; html+=`<div class="verify-line"><strong>${labelsFR[key]} :</strong> ${val}</div>`;});
+const labelsFR = { civility:"Civilité", firstname:"Prénom", lastname:"Nom", email:"Adresse e-mail", phone:"Téléphone", profession:"Profession", country:"Pays", region:"Région / Province", street:"Rue", city:"Ville", zip:"Code postal" };
+document.getElementById("verifyBtn").onclick = () => {
+  const form = document.getElementById("vantexForm");
+  let valid = true;
+  form.querySelectorAll("input, select").forEach(el=>{ if(!el.checkValidity()){el.style.borderColor="red"; valid=false;} else{el.style.borderColor="#dce3e8";}});
+  if(!isSigned){document.getElementById("sigError").style.display="inline"; valid=false;} else{document.getElementById("sigError").style.display="none";}
+  if(!valid){alert("Veuillez remplir tous les champs obligatoires et signer."); return;}
+  const box = document.getElementById("verifyBox");
+  const content = document.getElementById("verifyContent");
+  const formData = new FormData(form);
+  let html="";
+  formData.forEach((val,key)=>{ if(key==="id_front"||key==="id_back"||key==="signature")return; if(!labelsFR[key])return; html+=`<div class="verify-line"><strong>${labelsFR[key]} :</strong> ${val}</div>`;});
   if(idFrontInput.files[0]) html+=`<div class="verify-line"><strong>Document recto :</strong> ${idFrontInput.files[0].name}</div>`;
   if(idBackInput.files[0]) html+=`<div class="verify-line"><strong>Document verso :</strong> ${idBackInput.files[0].name}</div>`;
   html+=`<div class="verify-line"><strong>Signature :</strong> <em>Signée</em></div>`;
-  content.innerHTML=html; form.style.display="none"; box.style.display="block";
+  content.innerHTML = html;
+  form.style.display="none"; box.style.display="block";
 };
 
 /* MODIFIER */
-document.getElementById("editBtn").onclick=()=>{document.getElementById("verifyBox").style.display="none";document.getElementById("vantexForm").style.display="block";document.getElementById("codeBox").style.display="none";};
+document.getElementById("editBtn").onclick = () => {
+  document.getElementById("verifyBox").style.display="none";
+  document.getElementById("vantexForm").style.display="block";
+  document.getElementById("codeBox").style.display="none";
+};
 
-/* SUBMIT FINAL AVEC CODE E-MAIL */
+/* CODE E-MAIL */
 let countdown;
 function startTimer(seconds){
   clearInterval(countdown);
-  let remaining=seconds;
-  const timerEl=document.getElementById("timer");
-  countdown=setInterval(()=>{
-    const m=String(Math.floor(remaining/60)).padStart(2,'0');
-    const s=String(remaining%60).padStart(2,'0');
-    timerEl.textContent=`${m}:${s}`;
+  let remaining = seconds;
+  const timerEl = document.getElementById("timer");
+  countdown = setInterval(()=>{
+    const m = String(Math.floor(remaining/60)).padStart(2,'0');
+    const s = String(remaining%60).padStart(2,'0');
+    timerEl.textContent = `${m}:${s}`;
     remaining--;
     if(remaining<0){clearInterval(countdown); document.getElementById("codeError").textContent="Le code a expiré.";}
   },1000);
 }
 
-document.getElementById("submitFinalBtn").onclick=async()=>{
-  if(!isSigned){alert("Veuillez signer avant de soumettre.");return;}
-  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales.");return;}
+/* SUBMIT FINAL DANS CODEBOX */
+document.getElementById("submitFinalBtn").onclick = async () => {
+  if(!isSigned){alert("Veuillez signer avant de soumettre."); return;}
+  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales."); return;}
   document.getElementById("signatureInput").value=canvas.toDataURL();
-  // Ouvrir codeBox
+  // Cacher verifyBox, montrer codeBox
   document.getElementById("verifyBox").style.display="none";
   document.getElementById("codeBox").style.display="block";
-
   const email=document.vantexForm.email.value;
   const res=await fetch("/send-verification-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   const data=await res.json();
   if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code envoyé à votre e-mail.";}
-  else{document.getElementById("codeError").textContent="Impossible d'envoyer le code.";document.getElementById("codeBox").style.display="none";document.getElementById("verifyBox").style.display="block";}
+  else{document.getElementById("codeError").textContent="Impossible d'envoyer le code, vérifiez l’e-mail."; document.getElementById("codeBox").style.display="none"; document.getElementById("verifyBox").style.display="block";}
 };
 
-/* BOUTON CODE BOX - VÉRIFICATION */
-document.getElementById("emailCode").addEventListener("keydown", async(e)=>{
+/* VALIDATION CODE */
+document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
   if(e.key==="Enter"){
     e.preventDefault();
     const code=document.getElementById("emailCode").value;
-    const email=document.vantexForm.email.value;
-    if(!code){document.getElementById("codeError").textContent="Veuillez entrer le code.";return;}
-    const res=await fetch("/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,code})});
+    const res=await fetch("/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.vantexForm.email.value,code})});
     const data=await res.json();
     if(data.success){document.getElementById("vantexForm").submit();}
     else{document.getElementById("codeError").textContent="Code incorrect ou expiré.";}
@@ -433,16 +471,17 @@ document.getElementById("emailCode").addEventListener("keydown", async(e)=>{
 });
 
 /* RENVOYER CODE */
-document.getElementById("resendBtn").onclick=async()=>{
+document.getElementById("resendBtn").onclick = async ()=>{
   const email=document.vantexForm.email.value;
   const res=await fetch("/send-verification-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   const data=await res.json();
-  if(data.success){startTimer(120);document.getElementById("codeError").textContent="Code renvoyé.";}
+  if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code renvoyé.";}
   else{document.getElementById("codeError").textContent="Impossible de renvoyer le code.";}
 };
 
-/* MODIFIER E-MAIL */
-document.getElementById("changeEmailBtn").onclick=()=>{
+/* MODIFIER EMAIL */
+document.getElementById("changeEmailBtn").onclick = ()=>{
+  document.getElementById("verifyBox").style.display="none";
   document.getElementById("codeBox").style.display="none";
   document.getElementById("vantexForm").style.display="block";
 };
@@ -450,6 +489,7 @@ document.getElementById("changeEmailBtn").onclick=()=>{
 
 </body>
 </html>
+
 
 
 
