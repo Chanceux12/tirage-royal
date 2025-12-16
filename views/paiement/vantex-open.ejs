@@ -274,6 +274,7 @@ h1 {
 
         <div class="field" style="grid-column:1/-1;">
           <label>Signature <span id="sigError" style="color:red; display:none;">(Signature obligatoire)</span></label>
+          <div id="sigMobileMsg" style="font-size:0.85rem; color:#555; margin-bottom:5px; display:none;">Touchez le canvas pour signer</div>
           <canvas id="signaturePad" width="300" height="100" style="border:1px solid #ccc; border-radius:8px;"></canvas>
           <button type="button" id="clearSig" style="margin-top:5px;">Effacer</button>
           <input type="hidden" name="signature" id="signatureInput" required />
@@ -347,6 +348,10 @@ idBackInput.onchange = (e) => {
 };
 
 /* SIGNATURE PC + MOBILE */
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const sigMobileMsg = document.getElementById("sigMobileMsg");
+if (isMobile) sigMobileMsg.style.display = "block";
+
 const canvas = document.getElementById('signaturePad');
 const ctx = canvas.getContext('2d');
 let drawing = false;
@@ -359,10 +364,15 @@ canvas.addEventListener('mouseleave', e => { drawing = false; ctx.beginPath(); }
 canvas.addEventListener('mousemove', draw);
 
 // Mobile
-canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; hideMobileMsg(); });
 canvas.addEventListener('touchend', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
 canvas.addEventListener('touchcancel', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
 canvas.addEventListener('touchmove', drawTouch, { passive: false });
+
+// Fonction pour cacher le message
+function hideMobileMsg() {
+  if (sigMobileMsg.style.display !== "none") sigMobileMsg.style.display = "none";
+}
 
 function draw(e) {
   if (!drawing) return;
@@ -374,6 +384,7 @@ function draw(e) {
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
   isSigned = true;
+  hideMobileMsg();
 }
 
 function drawTouch(e) {
@@ -390,12 +401,14 @@ function drawTouch(e) {
   ctx.beginPath();
   ctx.moveTo(x, y);
   isSigned = true;
+  hideMobileMsg();
 }
 
 // Effacer
 document.getElementById("clearSig").onclick = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   isSigned = false;
+  if (isMobile) sigMobileMsg.style.display = "block";
 };
 
 /* VÉRIFICATION AVANT SOUMISSION */
@@ -483,4 +496,5 @@ document.getElementById("submitFinalBtn").onclick = () => {
 
 </body>
 </html>
+
 
