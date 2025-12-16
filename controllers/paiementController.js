@@ -542,6 +542,8 @@ exports.sendVerificationCode = async (req, res) => {
     );
 
     await sendVantexCode(email, code);
+    console.log("💡 Code généré :", code);
+
 
     return res.json({ success: true });
 
