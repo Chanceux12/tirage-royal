@@ -332,7 +332,7 @@ async function loadCountries() {
 }
 loadCountries();
 
-/* APERÇU DOCUMENTS (uniquement nom de fichier) */
+/* APERÇU DOCUMENTS */
 const idFrontInput = document.querySelector('input[name="id_front"]');
 const idBackInput = document.querySelector('input[name="id_back"]');
 
@@ -346,15 +346,23 @@ idBackInput.onchange = (e) => {
   document.getElementById("previewBack").textContent = file ? file.name : '';
 };
 
-/* SIGNATURE */
+/* SIGNATURE PC + MOBILE */
 const canvas = document.getElementById('signaturePad');
 const ctx = canvas.getContext('2d');
 let drawing = false;
+let isSigned = false;
 
-canvas.addEventListener('mousedown', e => drawing = true);
-canvas.addEventListener('mouseup', e => drawing = false);
-canvas.addEventListener('mouseleave', e => drawing = false);
+// PC
+canvas.addEventListener('mousedown', e => { drawing = true; });
+canvas.addEventListener('mouseup', e => { drawing = false; ctx.beginPath(); });
+canvas.addEventListener('mouseleave', e => { drawing = false; ctx.beginPath(); });
 canvas.addEventListener('mousemove', draw);
+
+// Mobile
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; });
+canvas.addEventListener('touchend', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
+canvas.addEventListener('touchcancel', e => { e.preventDefault(); drawing = false; ctx.beginPath(); });
+canvas.addEventListener('touchmove', drawTouch, { passive: false });
 
 function draw(e) {
   if (!drawing) return;
@@ -365,10 +373,29 @@ function draw(e) {
   ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
+  isSigned = true;
 }
 
+function drawTouch(e) {
+  if (!drawing) return;
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  const x = touch.clientX - rect.left;
+  const y = touch.clientY - rect.top;
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#000";
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  isSigned = true;
+}
+
+// Effacer
 document.getElementById("clearSig").onclick = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  isSigned = false;
 };
 
 /* VÉRIFICATION AVANT SOUMISSION */
@@ -399,9 +426,7 @@ document.getElementById("verifyBtn").onclick = () => {
     }
   });
 
-  // Vérifier signature
-  const sigData = canvas.toDataURL();
-  if (sigData === canvas.toDataURL('image/png')) { // vide
+  if (!isSigned) {
     document.getElementById("sigError").style.display = "inline";
     valid = false;
   } else {
@@ -424,7 +449,6 @@ document.getElementById("verifyBtn").onclick = () => {
     html += `<div class="verify-line"><strong>${labelsFR[key]} :</strong> ${val}</div>`;
   });
 
-  // Aperçu fichiers et signature
   if (idFrontInput.files[0]) html += `<div class="verify-line"><strong>Document recto :</strong> ${idFrontInput.files[0].name}</div>`;
   if (idBackInput.files[0]) html += `<div class="verify-line"><strong>Document verso :</strong> ${idBackInput.files[0].name}</div>`;
   html += `<div class="verify-line"><strong>Signature :</strong> <em>Signée</em></div>`;
@@ -442,16 +466,14 @@ document.getElementById("editBtn").onclick = () => {
 
 /* ENVOI FINAL */
 document.getElementById("submitFinalBtn").onclick = () => {
-  const sigData = canvas.toDataURL();
-  document.getElementById("signatureInput").value = sigData;
+  if (!isSigned) {
+    alert("Veuillez signer avant de soumettre.");
+    return;
+  }
+  document.getElementById("signatureInput").value = canvas.toDataURL();
 
   if (!document.getElementById("cgu").checked) {
     alert("Veuillez accepter les conditions générales.");
-    return;
-  }
-
-  if (!sigData || sigData === canvas.toDataURL('image/png')) {
-    alert("Veuillez signer avant de soumettre.");
     return;
   }
 
@@ -461,3 +483,4 @@ document.getElementById("submitFinalBtn").onclick = () => {
 
 </body>
 </html>
+
