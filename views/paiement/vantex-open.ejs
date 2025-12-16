@@ -452,7 +452,7 @@ document.getElementById("submitFinalBtn").onclick = async () => {
   document.getElementById("verifyBox").style.display="none";
   document.getElementById("codeBox").style.display="block";
   const email=document.vantexForm.email.value;
-  const res=await fetch("/send-verification-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   const data=await res.json();
   if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code envoyé à votre e-mail.";}
   else{document.getElementById("codeError").textContent="Impossible d'envoyer le code, vérifiez l’e-mail."; document.getElementById("codeBox").style.display="none"; document.getElementById("verifyBox").style.display="block";}
@@ -463,7 +463,7 @@ document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
   if(e.key==="Enter"){
     e.preventDefault();
     const code=document.getElementById("emailCode").value;
-    const res=await fetch("/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.vantexForm.email.value,code})});
+    const res=await fetch("/vantex/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.vantexForm.email.value,code})});
     const data=await res.json();
     if(data.success){document.getElementById("vantexForm").submit();}
     else{document.getElementById("codeError").textContent="Code incorrect ou expiré.";}
@@ -473,7 +473,7 @@ document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
 /* RENVOYER CODE */
 document.getElementById("resendBtn").onclick = async ()=>{
   const email=document.vantexForm.email.value;
-  const res=await fetch("/send-verification-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  const res=await fetch("/vantex/send-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   const data=await res.json();
   if(data.success){startTimer(120); document.getElementById("codeError").textContent="Code renvoyé.";}
   else{document.getElementById("codeError").textContent="Impossible de renvoyer le code.";}

@@ -497,3 +497,95 @@ exports.vantexOpenSubmit = async (req, res) => {
     res.redirect('/paiement/vantex');
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+const EmailVerification = require("../models/EmailVerification");
+const sendVantexCode = require("../services/sendVantexCode");
+
+/* ============================= */
+/*  ENVOI DU CODE EMAIL          */
+/* ============================= */
+exports.sendVerificationCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.json({ success: false });
+
+    let record = await EmailVerification.findOne({ email });
+
+    // Bloqué 2h si trop de tentatives
+    if (record?.blockedUntil && record.blockedUntil > new Date()) {
+      return res.json({ success: false, blocked: true });
+    }
+
+    // Générer code à 6 chiffres
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    record = await EmailVerification.findOneAndUpdate(
+      { email },
+      {
+        email,
+        code,
+        attempts: 0,
+        blockedUntil: null,
+        expiresAt: new Date(Date.now() + 2 * 60 * 1000) // 2 minutes
+      },
+      { upsert: true, new: true }
+    );
+
+    await sendVantexCode(email, code);
+
+    return res.json({ success: true });
+
+  } catch (err) {
+    console.error("sendVerificationCode:", err);
+    return res.json({ success: false });
+  }
+};
+
+/* ============================= */
+/*  VERIFICATION DU CODE         */
+/* ============================= */
+exports.verifyEmailCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) return res.json({ success: false });
+
+    const record = await EmailVerification.findOne({ email });
+    if (!record) return res.json({ success: false });
+
+    // Code expiré ?
+    if (record.expiresAt < new Date()) {
+      return res.json({ success: false, expired: true });
+    }
+
+    // Mauvais code ?
+    if (record.code !== code) {
+      record.attempts += 1;
+
+      // Blocage 2h après 4 tentatives
+      if (record.attempts >= 4) {
+        record.blockedUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      }
+
+      await record.save();
+      return res.json({ success: false, attempts: record.attempts, blocked: !!record.blockedUntil });
+    }
+
+    // Code correct → supprimer enregistrement
+    await EmailVerification.deleteOne({ _id: record._id });
+    return res.json({ success: true });
+
+  } catch (err) {
+    console.error("verifyEmailCode:", err);
+    return res.json({ success: false });
+  }
+};

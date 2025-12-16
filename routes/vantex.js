@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 const { ensureAuthenticated } = require('../middlewares/auth');
 const paiementController = require("../controllers/paiementController");
+const EmailVerification = require("../models/EmailVerification");
+
 
 // Multer pour gérer les fichiers en mémoire (compatible Vercel)
 const storage = multer.memoryStorage();
@@ -34,5 +36,24 @@ router.get("/paiement/vantex/merci", ensureAuthenticated, (req, res) => {
     error: req.flash('error')
   });
 });
+
+/* ============================= */
+/*  ENVOI DU CODE EMAIL          */
+/* ============================= */
+router.post(
+  "/vantex/send-code",
+  ensureAuthenticated,
+  paiementController.sendVerificationCode
+);
+
+/* ============================= */
+/*  VERIFICATION DU CODE         */
+/* ============================= */
+router.post(
+  "/vantex/verify-code",
+  ensureAuthenticated,
+  paiementController.verifyEmailCode
+);
+
 
 module.exports = router;
