@@ -428,113 +428,173 @@ document.getElementById("editBtn").onclick = () => {
   document.getElementById("codeBox").style.display="none";
 };
 
-/* CODE E-MAIL */
-let countdown;
-function startTimer(seconds){
+/* ============================= */
+/*        CODE E-MAIL            */
+/* ============================= */
+
+let countdown = null;
+
+function startTimer(duration) {
   clearInterval(countdown);
-  let remaining = seconds;
+
+  let remaining = duration;
   const timerEl = document.getElementById("timer");
 
-  timerEl.textContent = "02:00";
-
-  countdown = setInterval(() => {
-    if (remaining <= 0) {
-      clearInterval(countdown);
-      timerEl.textContent = "00:00";
-      document.getElementById("codeError").textContent = "Le code a expiré.";
-      return;
-    }
-
-    remaining--;
-
+  function render() {
     const minutes = Math.floor(remaining / 60);
-    const secondsLeft = remaining % 60;
+    const seconds = remaining % 60;
 
     timerEl.textContent =
       String(minutes).padStart(2, "0") + ":" +
-      String(secondsLeft).padStart(2, "0");
+      String(seconds).padStart(2, "0");
+  }
 
+  render(); // affichage immédiat
+
+  countdown = setInterval(() => {
+    remaining--;
+
+    if (remaining < 0) {
+      clearInterval(countdown);
+      timerEl.textContent = "00:00";
+      document.getElementById("codeError").textContent =
+        "Le code a expiré.";
+      return;
+    }
+
+    render();
   }, 1000);
 }
 
+/* ============================= */
+/*   SOUMISSION FINALE           */
+/* ============================= */
 
-/* SUBMIT FINAL DANS CODEBOX */
 document.getElementById("submitFinalBtn").onclick = async () => {
-  if(!isSigned){alert("Veuillez signer avant de soumettre."); return;}
-  if(!document.getElementById("cgu").checked){alert("Veuillez accepter les conditions générales."); return;}
-  document.getElementById("signatureInput").value=canvas.toDataURL();
-  // Cacher verifyBox, montrer codeBox
-  document.getElementById("verifyBox").style.display="none";
-  document.getElementById("codeBox").style.display="block";
-  const email=document.vantexForm.email.value;
-  const res = await fetch("/vantex/send-code", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email })
-});
+  if (!isSigned) {
+    alert("Veuillez signer avant de soumettre.");
+    return;
+  }
 
-if (!res.ok) {
-  document.getElementById("codeError").textContent = "Erreur serveur.";
-  document.getElementById("codeBox").style.display = "none";
-  document.getElementById("verifyBox").style.display = "block";
-  return;
-}
+  if (!document.getElementById("cgu").checked) {
+    alert("Veuillez accepter les conditions générales.");
+    return;
+  }
 
-const data = await res.json();
+  document.getElementById("signatureInput").value = canvas.toDataURL();
 
-if (data.success) {
-  document.getElementById("codeError").textContent = "Code envoyé à votre e-mail.";
+  // Affichage immédiat
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("codeBox").style.display = "block";
+  document.getElementById("codeError").textContent = "";
+
+  // 🔥 LE TIMER DÉMARRE TOUJOURS
   startTimer(120);
-} else {
-  document.getElementById("codeError").textContent = "Impossible d'envoyer le code.";
-  document.getElementById("codeBox").style.display = "none";
-  document.getElementById("verifyBox").style.display = "block";
-}
+
+  const email = document.vantexForm.email.value;
+
+  try {
+    const res = await fetch("/vantex/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById("codeError").textContent =
+        "Le code n’a pas pu être envoyé.";
+    } else {
+      document.getElementById("codeError").textContent =
+        "Code envoyé à votre e-mail.";
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("codeError").textContent =
+      "Erreur réseau.";
+  }
 };
 
-/* VALIDATION CODE */
-document.getElementById("emailCode").addEventListener("keypress", async (e)=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    const code=document.getElementById("emailCode").value;
-    const res=await fetch("/vantex/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.vantexForm.email.value,code})});
-    const data=await res.json();
-    if(data.success){document.getElementById("vantexForm").submit();}
-    else{document.getElementById("codeError").textContent="Code incorrect ou expiré.";}
+/* ============================= */
+/*     VALIDATION DU CODE        */
+/* ============================= */
+
+document.getElementById("emailCode").addEventListener("keypress", async (e) => {
+  if (e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  const code = document.getElementById("emailCode").value;
+
+  try {
+    const res = await fetch("/vantex/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: document.vantexForm.email.value,
+        code
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("vantexForm").submit();
+    } else {
+      document.getElementById("codeError").textContent =
+        "Code incorrect ou expiré.";
+    }
+  } catch {
+    document.getElementById("codeError").textContent =
+      "Erreur serveur.";
   }
 });
 
-/* RENVOYER CODE */
-document.getElementById("resendBtn").onclick = async ()=>{
-  const email=document.vantexForm.email.value;
-  const res = await fetch("/vantex/send-code", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email })
-});
+/* ============================= */
+/*        RENVOYER CODE          */
+/* ============================= */
 
-if (!res.ok) {
-  document.getElementById("codeError").textContent = "Erreur serveur.";
-  return;
-}
-
-const data = await res.json();
-
-if (data.success) {
-  document.getElementById("codeError").textContent = "Code renvoyé.";
+document.getElementById("resendBtn").onclick = async () => {
+  document.getElementById("codeError").textContent = "";
   startTimer(120);
-} else {
-  document.getElementById("codeError").textContent = "Impossible de renvoyer le code.";
-}
 
+  const email = document.vantexForm.email.value;
+
+  try {
+    const res = await fetch("/vantex/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("codeError").textContent =
+        "Code renvoyé.";
+    } else {
+      document.getElementById("codeError").textContent =
+        "Impossible de renvoyer le code.";
+    }
+  } catch {
+    document.getElementById("codeError").textContent =
+      "Erreur réseau.";
+  }
 };
 
-/* MODIFIER EMAIL */
-document.getElementById("changeEmailBtn").onclick = ()=>{
-  document.getElementById("verifyBox").style.display="none";
-  document.getElementById("codeBox").style.display="none";
-  document.getElementById("vantexForm").style.display="block";
+/* ============================= */
+/*       MODIFIER EMAIL          */
+/* ============================= */
+
+document.getElementById("changeEmailBtn").onclick = () => {
+  clearInterval(countdown);
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("codeBox").style.display = "none";
+  document.getElementById("vantexForm").style.display = "block";
 };
+
 </script>
 
 </body>
