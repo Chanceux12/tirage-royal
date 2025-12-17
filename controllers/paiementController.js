@@ -517,20 +517,26 @@ const sendVantexCode = require("../services/sendVantexCode");
 exports.sendVerificationCode = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log("💌 Envoi code pour email:", email); 
 
-    if (!email) return res.json({ success: false });
+    console.log("💌 Demande d’envoi code VANTEX pour :", email);
+
+    if (!email) {
+      console.log("❌ Email manquant");
+      return res.json({ success: false, error: "EMAIL_MISSING" });
+    }
 
     let record = await EmailVerification.findOne({ email });
 
-    // Bloqué 2h si trop de tentatives
+    // 🔒 Bloqué 2h si trop de tentatives
     if (record?.blockedUntil && record.blockedUntil > new Date()) {
+      console.log("⛔ Email bloqué jusqu’à :", record.blockedUntil);
       return res.json({ success: false, blocked: true });
     }
 
-    // Générer code à 6 chiffres
+    // 🔢 Génération code à 6 chiffres
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // 💾 Sauvegarde / mise à jour DB
     record = await EmailVerification.findOneAndUpdate(
       { email },
       {
@@ -542,17 +548,23 @@ exports.sendVerificationCode = async (req, res) => {
       },
       { upsert: true, new: true }
     );
-      console.log("📧 Appel sendVantexCode avec code:", code);
-      
-    await sendVantexCode(email, code);
-    console.log("💡 Code généré :", code);
 
+    console.log("📧 Envoi du code VANTEX :", code, "→", email);
+
+    // 🚀 ENVOI EMAIL (POINT CRITIQUE)
+    const info = await sendVantexCode(email, code);
+
+    console.log("✅ SMTP a accepté le mail :", info?.messageId || "NO_ID");
 
     return res.json({ success: true });
 
   } catch (err) {
-    console.error("sendVerificationCode:", err);
-    return res.json({ success: false });
+    console.error("❌ ERREUR sendVerificationCode :", err);
+
+    return res.json({
+      success: false,
+      error: "EMAIL_SEND_FAILED"
+    });
   }
 };
 

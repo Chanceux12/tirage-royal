@@ -10,7 +10,9 @@ module.exports = async function sendVantexCode(email, code) {
     auth: {
       user: process.env.VANTEX_EMAIL_USER,
       pass: process.env.VANTEX_EMAIL_PASS
-    }
+    },
+    logger: true, // 🔍 IMPORTANT
+    debug: true   // 🔍 IMPORTANT
   });
 
   try {
