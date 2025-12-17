@@ -39,7 +39,7 @@ module.exports = async function sendVantexCode(email, code) {
     });
 
     console.log("✅ Mail envoyé avec succès :", info.messageId);
-
+      return info;
   } catch (err) {
     console.error("❌ Erreur lors de l'envoi du mail :", err);
     throw err; // permet à paiementController.sendVerificationCode de retourner success:false
