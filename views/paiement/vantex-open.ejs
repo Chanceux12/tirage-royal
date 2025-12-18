@@ -501,9 +501,13 @@ document.getElementById("submitFinalBtn").onclick = async () => {
 
   try {
     const res = await fetch("/vantex/send-code", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+       method: "POST",
+       headers: {
+        "Content-Type": "application/json"
+    },
+       body: JSON.stringify({
+       email: userEmail   // ⚠️ PAS depuis le DOM
+     })
     });
 
     const data = await res.json();
