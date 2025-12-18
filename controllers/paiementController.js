@@ -516,14 +516,16 @@ const sendVantexCode = require("../services/sendVantexCode");
 /* ============================= */
 exports.sendVerificationCode = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = req.body?.email;
 
     console.log("💌 Demande d’envoi code VANTEX pour :", email);
 
-    if (!email) {
-      console.log("❌ Email manquant");
-      return res.json({ success: false, error: "EMAIL_MISSING" });
-    }
+  
+  if (!email) {
+   console.error("❌ Email manquant dans req.body :", req.body);
+   return res.status(400).json({ success: false, message: "Email manquant" });
+  }
+
 
     let record = await EmailVerification.findOne({ email });
 
