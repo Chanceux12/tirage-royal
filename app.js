@@ -13,6 +13,10 @@ const User = require('./models/User');
 const { ensureAuthenticated } = require('./middlewares/auth');
 const app = express();
 
+const vantexRoutes = require('./routes/vantex');
+app.use(vantexRoutes);
+
+
 const avisRoutes = require('./routes/avis');
 
 process.on('unhandledRejection', (reason, promise) => {
