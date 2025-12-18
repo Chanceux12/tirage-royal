@@ -454,7 +454,7 @@ function startTimer(duration) {
       String(seconds).padStart(2, "0");
   }
 
-  render();
+  render(); // affichage immédiat
 
   countdown = setInterval(() => {
     remaining--;
@@ -486,18 +486,18 @@ document.getElementById("submitFinalBtn").onclick = async () => {
     return;
   }
 
-  const form = document.getElementById("vantexForm");
-  const emailInput = form.querySelector('input[name="email"]');
-  const email = emailInput?.value?.trim();
-
-  if (!email) {
-    alert("Adresse e-mail invalide.");
-    return;
-  }
-
   document.getElementById("signatureInput").value = canvas.toDataURL();
 
-  document.getElementById("codeError").textContent = "Envoi du code…";
+  // Affichage immédiat
+  document.getElementById("verifyBox").style.display = "none";
+  document.getElementById("codeBox").style.display = "block";
+  document.getElementById("codeError").textContent = "";
+
+  // 🔥 LE TIMER DÉMARRE TOUJOURS
+  startTimer(120);
+
+  const form = document.getElementById("vantexForm");
+  const email = form.querySelector('input[name="email"]').value;
 
   try {
     const res = await fetch("/vantex/send-code", {
@@ -511,16 +511,10 @@ document.getElementById("submitFinalBtn").onclick = async () => {
     if (!data.success) {
       document.getElementById("codeError").textContent =
         "Le code n’a pas pu être envoyé.";
-      return;
+    } else {
+      document.getElementById("codeError").textContent =
+        "Code envoyé à votre e-mail.";
     }
-
-    // ✅ SUCCÈS SEULEMENT ICI
-    document.getElementById("verifyBox").style.display = "none";
-    document.getElementById("codeBox").style.display = "block";
-    document.getElementById("codeError").textContent =
-      "Code envoyé à votre e-mail.";
-
-    startTimer(120);
 
   } catch (err) {
     console.error(err);
@@ -538,27 +532,22 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
 
   e.preventDefault();
 
-  const code = document.getElementById("emailCode").value.trim();
-  const form = document.getElementById("vantexForm");
-  const email = form.querySelector('input[name="email"]')?.value?.trim();
-
-  if (!email || !code) {
-    document.getElementById("codeError").textContent =
-      "Code ou e-mail manquant.";
-    return;
-  }
+  const code = document.getElementById("emailCode").value;
 
   try {
     const res = await fetch("/vantex/verify-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code })
+      body: JSON.stringify({
+        email: document.vantexForm.email.value,
+        code
+      })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      form.submit();
+      document.getElementById("vantexForm").submit();
     } else {
       document.getElementById("codeError").textContent =
         "Code incorrect ou expiré.";
@@ -574,16 +563,11 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
 /* ============================= */
 
 document.getElementById("resendBtn").onclick = async () => {
+  document.getElementById("codeError").textContent = "";
+  startTimer(120);
+
   const form = document.getElementById("vantexForm");
-  const email = form.querySelector('input[name="email"]')?.value?.trim();
-
-  if (!email) {
-    document.getElementById("codeError").textContent =
-      "Adresse e-mail introuvable.";
-    return;
-  }
-
-  document.getElementById("codeError").textContent = "Renvoi du code…";
+  const email = form.querySelector('input[name="email"]').value;
 
   try {
     const res = await fetch("/vantex/send-code", {
@@ -597,7 +581,6 @@ document.getElementById("resendBtn").onclick = async () => {
     if (data.success) {
       document.getElementById("codeError").textContent =
         "Code renvoyé.";
-      startTimer(120);
     } else {
       document.getElementById("codeError").textContent =
         "Impossible de renvoyer le code.";
