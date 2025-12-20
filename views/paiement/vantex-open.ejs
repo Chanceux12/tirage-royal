@@ -446,6 +446,10 @@ function startTimer(duration) {
   let remaining = duration;
   const timerEl = document.getElementById("timer");
 
+  // Cacher les boutons par défaut au début du timer
+  document.getElementById("resendBtn").style.display = "none";
+  document.getElementById("changeEmailBtn").style.display = "none";
+
   function render() {
     const minutes = Math.floor(remaining / 60);
     const seconds = remaining % 60;
@@ -463,8 +467,9 @@ function startTimer(duration) {
     if (remaining < 0) {
       clearInterval(countdown);
       timerEl.textContent = "00:00";
-      document.getElementById("codeError").textContent =
-        "Le code a expiré.";
+      document.getElementById("codeError").textContent = "Le code a expiré.";
+
+      // Afficher les boutons renvoyer et modifier lorsque le code expire
       document.getElementById("resendBtn").style.display = "inline-block";
       document.getElementById("changeEmailBtn").style.display = "inline-block";
 
@@ -474,6 +479,7 @@ function startTimer(duration) {
     render();
   }, 1000);
 }
+
 
 /* ============================= */
 /*   SOUMISSION FINALE           */
