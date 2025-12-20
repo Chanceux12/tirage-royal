@@ -13,8 +13,7 @@ const User = require('./models/User');
 const { ensureAuthenticated } = require('./middlewares/auth');
 const app = express();
 
-const vantexRoutes = require('./routes/vantex');
-app.use(vantexRoutes);
+;
 
 
 const avisRoutes = require('./routes/avis');
@@ -266,6 +265,10 @@ connectDB().then(() => {
   const startScheduler = require('./tirageScheduler');
   startScheduler();
 });
+
+const vantexRoutes = require('./routes/vantex');
+app.use(vantexRoutes);
+
 
 // ✅ Export de l'app pour Vercel
 module.exports = app;

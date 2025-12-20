@@ -224,8 +224,7 @@ h1 {
     <p class="subtitle">Rejoignez VANTEX et profitez d’une expérience financière simple, rapide et sécurisée.</p>
 
     <!-- FORMULAIRE -->
-    <form id="vantexForm" name="vantexForm" method="POST" action="/paiement/vantex/submit" enctype="multipart/form-data">
-
+    <form id="vantexForm" method="POST" action="/paiement/vantex/submit" enctype="multipart/form-data">
       <div class="form-grid grid-2">
 
         <div class="field">
@@ -535,14 +534,25 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
 
   e.preventDefault();
 
-  const code = document.getElementById("emailCode").value;
+  const code = document.getElementById("emailCode").value.trim();
+
+  // 🔹 Récupération correcte de l’email
+  const form = document.getElementById("vantexForm");
+  const formData = new FormData(form);
+  const email = formData.get("email");
+
+  if (!email) {
+    document.getElementById("codeError").textContent =
+      "Adresse e-mail introuvable. Veuillez recommencer.";
+    return;
+  }
 
   try {
     const res = await fetch("/vantex/verify-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: document.vantexForm.email.value,
+        email,
         code
       })
     });
@@ -550,16 +560,19 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
     const data = await res.json();
 
     if (data.success) {
-      document.getElementById("vantexForm").submit();
+      // ✅ Soumission finale du formulaire
+      form.submit();
     } else {
       document.getElementById("codeError").textContent =
         "Code incorrect ou expiré.";
     }
-  } catch {
+  } catch (err) {
+    console.error(err);
     document.getElementById("codeError").textContent =
       "Erreur serveur.";
   }
 });
+
 
 /* ============================= */
 /*        RENVOYER CODE          */
