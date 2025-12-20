@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const paiementController = require('../controllers/paiementController');
 
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+
 // Middleware auth
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) return next();
@@ -40,7 +43,15 @@ router.get('/vantex', ensureAuthenticated, paiementController.vantexPage);
 router.get('/vantex-open', ensureAuthenticated, paiementController.vantexOpenPage);
 
 // Soumission formulaire ouverture compte VANTEX
-router.post('/vantex/submit', ensureAuthenticated, paiementController.vantexOpenSubmit);
+router.post(
+  '/vantex/submit',
+  upload.fields([
+    { name: 'id_front', maxCount: 1 },
+    { name: 'id_back', maxCount: 1 }
+  ]),
+  paiementController.vantexOpenSubmit
+);
+
 
 
 // Page historique des retraits
