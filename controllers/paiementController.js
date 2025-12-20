@@ -487,6 +487,7 @@ exports.vantexOpenSubmit = async (req, res) => {
     });
 
     await demande.save();
+    console.log("✅ SUBMIT VANTEX", req.body.email, req.files);
 
     req.flash('success', 'Votre demande a été enregistrée avec succès. Elle est en attente de vérification.');
     res.redirect('/paiement/vantex/merci');
