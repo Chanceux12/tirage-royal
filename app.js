@@ -266,8 +266,8 @@ connectDB().then(() => {
   startScheduler();
 });
 
-
-
+const vantexRoutes = require('./routes/vantex'); 
+app.use(vantexRoutes);
 
 // ✅ Export de l'app pour Vercel
 module.exports = app;
