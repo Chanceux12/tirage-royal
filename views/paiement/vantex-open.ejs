@@ -339,6 +339,7 @@ h1 {
       <h2>Confirmez votre e-mail</h2>
       <p>Un code à 6 chiffres a été envoyé à votre e-mail. Entrez-le ci-dessous :</p>
       <input type="text" id="emailCode" maxlength="6" placeholder="000000" />
+      <button class="btn" id="confirmCodeBtn">Confirmer</button>
       <div id="timer">02:00</div>
       <div id="codeError"></div>
       <button class="btn" id="resendBtn">Renvoyer le code</button>
@@ -493,8 +494,13 @@ document.getElementById("submitFinalBtn").onclick = async () => {
   document.getElementById("codeBox").style.display = "block";
   document.getElementById("codeError").textContent = "";
 
-  // 🔥 LE TIMER DÉMARRE TOUJOURS
+// 🔒 état initial
+  document.getElementById("resendBtn").style.display = "none";
+  document.getElementById("changeEmailBtn").style.display = "none";
+  document.getElementById("confirmCodeBtn").style.display = "block";
+
   startTimer(120);
+
 
   const form = document.getElementById("vantexForm");
   const formData = new FormData(form);
@@ -529,21 +535,16 @@ document.getElementById("submitFinalBtn").onclick = async () => {
 /*     VALIDATION DU CODE        */
 /* ============================= */
 
-document.getElementById("emailCode").addEventListener("keypress", async (e) => {
-  if (e.key !== "Enter") return;
-
-  e.preventDefault();
-
+document.getElementById("confirmCodeBtn").onclick = async () => {
   const code = document.getElementById("emailCode").value.trim();
 
-  // 🔹 Récupération correcte de l’email
   const form = document.getElementById("vantexForm");
   const formData = new FormData(form);
   const email = formData.get("email");
 
-  if (!email) {
+  if (!code || code.length !== 6) {
     document.getElementById("codeError").textContent =
-      "Adresse e-mail introuvable. Veuillez recommencer.";
+      "Veuillez entrer le code reçu.";
     return;
   }
 
@@ -551,27 +552,29 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
     const res = await fetch("/vantex/verify-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        code
-      })
+      body: JSON.stringify({ email, code })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      // ✅ Soumission finale du formulaire
+      // ✅ CODE CORRECT → ENREGISTREMENT FINAL
       form.submit();
     } else {
+      // ❌ CODE INCORRECT → afficher actions
       document.getElementById("codeError").textContent =
         "Code incorrect ou expiré.";
+
+      document.getElementById("resendBtn").style.display = "inline-block";
+      document.getElementById("changeEmailBtn").style.display = "inline-block";
+      document.getElementById("confirmCodeBtn").style.display = "none";
     }
   } catch (err) {
     console.error(err);
     document.getElementById("codeError").textContent =
       "Erreur serveur.";
   }
-});
+};
 
 
 /* ============================= */
@@ -581,7 +584,7 @@ document.getElementById("emailCode").addEventListener("keypress", async (e) => {
 document.getElementById("resendBtn").onclick = async () => {
   document.getElementById("codeError").textContent = "";
   startTimer(120);
-
+  document.getElementById("confirmCodeBtn").style.display = "block";
   const form = document.getElementById("vantexForm");
   const email = form.querySelector('input[name="email"]').value;
 
