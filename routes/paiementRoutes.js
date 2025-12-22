@@ -52,6 +52,16 @@ router.post(
   paiementController.vantexOpenSubmit
 );
 
+router.get(
+  '/vantex/merci',
+  ensureAuthenticated,
+  (req, res) => {
+    res.render('paiement/merci', {
+      success: req.flash('success'),
+      error: req.flash('error')
+    });
+  }
+);
 
 
 // Page historique des retraits

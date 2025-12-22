@@ -7,15 +7,6 @@ const EmailVerification = require("../models/EmailVerification");
 
 
 
-
-// Page Merci après soumission
-router.get("/paiement/vantex/merci", ensureAuthenticated, (req, res) => {
-  res.render("paiement/merci", {
-    success: req.flash('success'),
-    error: req.flash('error')
-  });
-});
-
 /* ============================= */
 /*  ENVOI DU CODE EMAIL          */
 /* ============================= */
