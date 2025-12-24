@@ -13,7 +13,7 @@ const User = require('./models/User');
 const { ensureAuthenticated } = require('./middlewares/auth');
 const app = express();
 
-;
+
 
 
 const avisRoutes = require('./routes/avis');
