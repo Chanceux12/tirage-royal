@@ -422,10 +422,6 @@ exports.vantexOpenPage = (req, res) => {
 
 
 
-
-
-
-
 exports.vantexOpenSubmit = async (req, res) => {
   try {
     const {
