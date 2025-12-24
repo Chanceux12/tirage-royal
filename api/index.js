@@ -13,3 +13,4 @@ const connectDB = require('../config/db');
 
 // ✅ Export pour Vercel
 module.exports = app;
+
