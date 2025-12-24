@@ -16,6 +16,16 @@ const app = express();
 
 
 
+app.get('/test-users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users); // Devrait afficher tous tes anciens utilisateurs
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
 const avisRoutes = require('./routes/avis');
 
 process.on('unhandledRejection', (reason, promise) => {
