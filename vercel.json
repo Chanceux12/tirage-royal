@@ -3,10 +3,5 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/api/index.js" }
-  ],
-  "env": {
-    "MONGODB_URI": "mongodb+srv://tirage-royal-2:lPGeH4ZaTHh0KCZW@tirage-royal-2.d1ufxak.mongodb.net/tirage-royal-2?retryWrites=true&w=majority&tls=true",
-    "SESSION_SECRET": "ff53b1f167b36883035a7094def2e764556fc9ce175cce775845b1a427b5b70f",
-    "NODE_ENV": "production"
-  }
+  ]
 }
