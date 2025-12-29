@@ -2,6 +2,7 @@ const Retrait = require('../models/Retrait');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const VantexRequest = require('../models/VantexRequest');
+const VantexBankAccount = require('../models/VantexBankAccount');
 
 // =====================
 // Stripe
@@ -269,16 +270,39 @@ exports.retrait = async (req, res) => {
     const bicClean = (bic || '').trim().toUpperCase();
 
     let statut = 'en_attente';
-    let message = null;
+    let raison = null;
 
+    /* ============================
+       1️⃣ SOLDE INSUFFISANT
+    ============================ */
     if (req.user.solde < montant) {
-      statut = 'échoué';
-      message = `Votre demande de retrait de ${montant} ${currency} n’a pas pu être finalisée (solde insuffisant).`;
+      statut = 'echec';
+      raison = 'solde_insuffisant';
     }
 
-    let retrait = new Retrait({
+    /* ============================
+       2️⃣ VÉRIFICATION RIB ADMIN
+    ============================ */
+    if (statut !== 'echec') {
+      const compteAdmin = await VantexBankAccount.findOne({
+        iban: ibanClean,
+        bic: bicClean,
+        actif: true
+      });
+
+      if (!compteAdmin) {
+        statut = 'echec';
+        raison = 'rib_non_reconnu';
+      }
+    }
+
+    /* ============================
+       3️⃣ CRÉATION DU RETRAIT
+       (PAS DE DÉBIT ICI)
+    ============================ */
+    let retrait = await Retrait.create({
       user: req.user._id,
-      date: date || new Date().toLocaleDateString('fr-FR'),
+      date: date ? new Date(date) : new Date(),
       method,
       currency,
       amount: montant,
@@ -287,19 +311,25 @@ exports.retrait = async (req, res) => {
       benef_name,
       bank_name,
       motif,
-      statut
+      statut,
+      raison
     });
 
-    await retrait.save();
     retrait = await retrait.populate('user');
 
-    res.render('paiement/retrait-info', { retrait, message });
+    res.render('paiement/retrait-info', {
+      retrait,
+      delai: '3h à 24h'
+    });
+
   } catch (err) {
     console.error('Erreur retrait:', err);
     req.flash('error', 'Erreur serveur.');
     res.redirect('/paiement/retrait');
   }
 };
+
+
 
 exports.retraitInfo = async (req, res) => {
   try {

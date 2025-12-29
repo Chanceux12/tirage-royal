@@ -6,6 +6,7 @@ const { ensureAuthenticated } = require('../middlewares/auth');
 const { isAdmin } = require('../middlewares/authMiddleware');
 const sendMail = require('../utils/sendMail');
 const VantexRequest = require("../models/VantexRequest");
+const VantexBankAccount = require('../models/VantexBankAccount');
 
 
 // ✅ Route pour afficher la page des utilisateurs à approuver
@@ -223,6 +224,31 @@ router.post("/vantex/refuse/:id", ensureAuthenticated, isAdmin, async (req, res)
 });
 
 
+// Liste des banques partenaires
+router.get('/banks', ensureAuthenticated, isAdmin, async (req, res) => {
+  const banks = await VantexBankAccount.find().sort({ createdAt: -1 });
+  res.render('admin/banks', { banks, success: req.flash('success'), error: req.flash('error') });
+});
+
+// Ajouter un nouveau RIB/BIC partenaire
+router.post('/banks/add', ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { bank_name, benef_name, iban, bic } = req.body;
+
+    await VantexBankAccount.create({
+      bank_name,
+      benef_name,
+      iban: iban.replace(/\s+/g, '').toUpperCase(),
+      bic: bic.trim().toUpperCase()
+    });
+
+    req.flash('success', 'Banque partenaire ajoutée');
+    res.redirect('/admin/banks');
+  } catch (err) {
+    req.flash('error', 'IBAN déjà existant ou erreur');
+    res.redirect('/admin/banks');
+  }
+});
 
 
 module.exports = router; 

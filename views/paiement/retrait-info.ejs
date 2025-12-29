@@ -95,13 +95,15 @@
 </style>
 
 <section>
-    <% if (retrait.statut === 'réussi') { %>
+    <% if (retrait.statut === 'reussi') { %>
       <div class="icon icon-success">✅</div>
       <h2>Transfert réussi</h2>
-    <% } else if (retrait.statut === 'échoué') { %>
+
+    <% } else if (retrait.statut === 'echec') { %>
       <div class="icon icon-fail">❌</div>
       <h2>Retrait échoué</h2>
-    <% } else { %>
+
+    <% } else if (retrait.statut === 'en_attente') { %>
       <div class="icon icon-pending">⏳</div>
       <h2>Transfert en attente</h2>
     <% } %>
@@ -109,9 +111,16 @@
     <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>
 
     <% if (retrait.statut === 'en_attente') { %>
-      <p>Votre demande de retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> est en attente car vous ne disposez pas d’un compte bancaire partenaire lié à notre entreprise.</p>
+  <p>
+    Votre demande de retrait de
+    <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
+    est en cours de traitement.
+  </p>
 
-      <p>Nous vous invitons à créer votre compte bancaire partenaire afin de permettre le transfert sécurisé de vos fonds.</p>
+  <p>
+    Délai estimé : <strong>3h à 24h</strong>.<br>
+    Après 24h, contactez le support.
+  </p>
 
       <!-- ⭐ CADRE PREMIUM VANTEX -->
       <div style="
@@ -154,13 +163,34 @@
 
       </div>
 
-    <% } else if (retrait.statut === 'réussi') { %>
+    <% } else if (retrait.statut === 'reussi') { %>
       <p>Votre retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> a été validé et sera prochainement transféré sur votre compte bancaire partenaire.</p>
 
-    <% } else if (retrait.statut === 'échoué') { %>
-      <p>Votre demande de retrait de <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong> n’a pas pu être finalisée car votre solde est insuffisant.</p>
-      <p>Veuillez vérifier votre solde avant de soumettre une nouvelle demande.</p>
-    <% } %>
+    
+    <% } else if (retrait.statut === 'echec') { %>
+
+  <% if (retrait.raison === 'solde_insuffisant') { %>
+    <p>
+      Votre demande de retrait de
+      <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
+      a été refusée car votre solde est insuffisant.
+    </p>
+    <p>
+      Veuillez recharger votre compte avant de soumettre une nouvelle demande.
+    </p>
+
+  <% } else if (retrait.raison === 'rib_non_reconnu') { %>
+    <p>
+      Votre demande de retrait de
+      <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
+      est échouée car vous ne disposez pas d’un compte bancaire partenaire lié à notre entreprise.
+    </p>
+
+    <p>
+      Nous vous invitons à créer votre compte bancaire partenaire afin de permettre le transfert sécurisé de vos fonds.
+    </p>
+  <% } %>
+
 
     <hr>
 
