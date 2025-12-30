@@ -322,8 +322,8 @@ let retrait = await Retrait.create({
   bank_name,
   motif,
   statut,
-  raison, // <-- important
-  message         
+  raison // <-- important
+           
 });
 
     retrait = await retrait.populate('user');

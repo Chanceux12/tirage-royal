@@ -108,14 +108,37 @@
     <p>
       Votre demande de retrait de
       <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
-      est en cours de traitement.
+      est en cours de traitement et sera prochainement transféré sur votre compte bancaire partenaire..
     </p>
     <p>
       Délai estimé : <strong>3h à 24h</strong>.<br>
       Après 24h, contactez le support.
     </p>
 
-    <!-- ⭐ CADRE PREMIUM VANTEX -->
+  <% } else if (retrait.statut === 'échoué') { %>
+    <div class="icon icon-fail">❌</div>
+    <h2>Retrait échoué</h2>
+    <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>
+
+    <% if (retrait.raison === 'solde_insuffisant') { %>
+      <p>
+        Votre demande de retrait de
+        <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
+        a été refusée car votre solde est insuffisant.
+      </p>
+      <p>Veuillez recharger votre compte avant de soumettre une nouvelle demande.</p>
+
+    <% } else if (retrait.raison === 'rib_non_reconnu') { %>
+      <p>
+        Votre demande de retrait de
+        <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
+        est échouée car vous ne disposez pas d’un compte bancaire partenaire lié à notre entreprise.
+      </p>
+      <p>Nous vous invitons à créer votre compte bancaire partenaire afin de permettre le transfert sécurisé de vos fonds.</p>
+    <% } %>
+  <% } %>
+     
+   <!-- ⭐ CADRE PREMIUM VANTEX -->
     <div style="
       background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
       border: 1px solid rgba(255,255,255,0.15);
@@ -142,29 +165,6 @@
         ✔ Ouvrir un compte VANTEX
       </a>
     </div>
-
-  <% } else if (retrait.statut === 'échoué') { %>
-    <div class="icon icon-fail">❌</div>
-    <h2>Retrait échoué</h2>
-    <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>
-
-    <% if (retrait.raison === 'solde_insuffisant') { %>
-      <p>
-        Votre demande de retrait de
-        <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
-        a été refusée car votre solde est insuffisant.
-      </p>
-      <p>Veuillez recharger votre compte avant de soumettre une nouvelle demande.</p>
-
-    <% } else if (retrait.raison === 'rib_non_reconnu') { %>
-      <p>
-        Votre demande de retrait de
-        <strong><%= retrait.amount.toFixed(2) %> <%= retrait.currency %></strong>
-        est échouée car vous ne disposez pas d’un compte bancaire partenaire lié à notre entreprise.
-      </p>
-      <p>Nous vous invitons à créer votre compte bancaire partenaire afin de permettre le transfert sécurisé de vos fonds.</p>
-    <% } %>
-  <% } %>
 
   <hr>
 

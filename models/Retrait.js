@@ -63,11 +63,6 @@ const retraitSchema = new mongoose.Schema({
     type: String,  // 🔹 ajouter ce champ pour stocker la raison d'échec
     default: null
   },
-  
-  message: {
-    type: String,  
-    default: null
-  },
 
   // 🔹 NOUVEAU – Ordre de virement bancaire (VANTEX)
   ordreVirement: {
