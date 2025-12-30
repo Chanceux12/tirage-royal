@@ -58,6 +58,11 @@ const retraitSchema = new mongoose.Schema({
     enum: ['en_attente', 'échoué', 'réussi'],
     default: 'en_attente'
   },
+  
+  raison: {
+    type: String,  // 🔹 ajouter ce champ pour stocker la raison d'échec
+    default: null
+  },
 
   // 🔹 NOUVEAU – Ordre de virement bancaire (VANTEX)
   ordreVirement: {
