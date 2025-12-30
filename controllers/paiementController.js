@@ -278,57 +278,54 @@ exports.retrait = async (req, res) => {
     const bicClean = (bic || '').trim().toUpperCase();
 
     let statut = 'en_attente';
-let raison = null;
-let message = null;
+    let raison = null;
 
-// 1️⃣ Solde insuffisant
-if (req.user.solde < montant) {
-  statut = 'échoué';
-  raison = 'solde_insuffisant';
-  message = `Solde insuffisant pour un retrait de ${montant} ${currency}.`;
-}
+    /* 1️⃣ SOLDE INSUFFISANT */
+    if (req.user.solde < montant) {
+      statut = 'échoué';
+      raison = 'solde_insuffisant';
+    }
 
-// 2️⃣ Vérification compte VANTEX
-const compteVantex = await VantexBankAccount.findOne({
-  iban: ibanClean,
-  bic: bicClean,
-  actif: true
-});
+    /* 2️⃣ VÉRIFICATION RIB/BIC PARTENAIRE */
+    const compteVantex = await VantexBankAccount.findOne({
+      iban: ibanClean,
+      bic: bicClean,
+      actif: true
+    });
 
-// 3️⃣ IBAN non présent → échec rib_non_reconnu
-if (!compteVantex && statut === 'en_attente') {
+    /* 3️⃣ RIB NON PARTENAIRE */
+    if (!compteVantex && statut === 'en_attente') {
       statut = 'échoué';
       raison = 'rib_non_reconnu';
-  message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
-}
+    }
 
-// 4️⃣ Virement interne VANTEX → validé automatiquement
-if (compteVantex && statut === 'en_attente') {
+    /* 4️⃣ RIB PARTENAIRE → SUCCÈS */
+    if (compteVantex && statut === 'en_attente') {
       statut = 'réussi';
       req.user.solde -= montant;
       await req.user.save();
     }
 
-// Création du retrait
-let retrait = await Retrait.create({
-  user: req.user._id,
-  date: date ? new Date(date) : new Date(),
-  method,
-  currency,
-  amount: montant,
-  iban: ibanClean,
-  bic: bicClean,
-  benef_name,
-  bank_name,
-  motif,
-  statut,
-  raison         // <-- important
-});
+    /* 5️⃣ CRÉATION DU RETRAIT */
+    const retrait = await Retrait.create({
+      user: req.user._id,
+      date: date ? new Date(date) : new Date(),
+      method,
+      currency,
+      amount: montant,
+      iban: ibanClean,
+      bic: bicClean,
+      benef_name,
+      bank_name,
+      motif,
+      statut,
+      raison
+    });
 
-    retrait = await retrait.populate('user');
+    const retraitPopulated = await retrait.populate('user');
 
     res.render('paiement/retrait-info', {
-      retrait,
+      retrait: retraitPopulated,
       delai: '3h à 24h'
     });
 
@@ -338,6 +335,7 @@ let retrait = await Retrait.create({
     res.redirect('/paiement/retrait');
   }
 };
+
 
 
 
