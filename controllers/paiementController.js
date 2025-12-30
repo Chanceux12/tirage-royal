@@ -269,7 +269,7 @@ exports.retrait = async (req, res) => {
     const ibanClean = (iban || '').replace(/\s+/g, '').toUpperCase();
     const bicClean = (bic || '').trim().toUpperCase();
 
-    let statut;
+    let statut = 'en_attente';
     let raison = null;
 
     // 1️⃣ Solde insuffisant
@@ -277,7 +277,7 @@ exports.retrait = async (req, res) => {
       statut = 'échoué';
       raison = 'solde_insuffisant';
     } else {
-      // 2️⃣ Vérification IBAN/BIC exact
+      // 2️⃣ Vérification IBAN + BIC exacts
       const compteVantex = await VantexBankAccount.findOne({
         iban: ibanClean,
         bic: bicClean,
@@ -288,7 +288,7 @@ exports.retrait = async (req, res) => {
         statut = 'échoué';
         raison = 'rib_non_reconnu';
       } else {
-        // 3️⃣ Réussi → débit du solde
+        // 3️⃣ IBAN/BIC exact → succès
         statut = 'réussi';
         req.user.solde -= montant;
         await req.user.save();
@@ -313,7 +313,11 @@ exports.retrait = async (req, res) => {
 
     await retrait.populate('user');
 
-    res.render('paiement/retrait-info', { retrait, delai: '3h à 24h' });
+    // Envoi au front
+    res.render('paiement/retrait-info', {
+      retrait,
+      delai: '3h à 24h'
+    });
 
   } catch (err) {
     console.error('Erreur retrait:', err);
@@ -321,7 +325,6 @@ exports.retrait = async (req, res) => {
     res.redirect('/paiement/retrait');
   }
 };
-
 
 
 
