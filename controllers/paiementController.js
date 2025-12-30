@@ -249,8 +249,6 @@ function generateOrder() {
 
 
 
-
-
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -258,9 +256,19 @@ exports.retrait = async (req, res) => {
       return res.redirect('/auth/login');
     }
 
-    const { date, method, currency, amount, iban, bic, benef_name, bank_name, motif } = req.body;
-    const montant = parseFloat(amount);
+    const {
+      date,
+      method,
+      currency,
+      amount,
+      iban,
+      bic,
+      benef_name,
+      bank_name,
+      motif
+    } = req.body;
 
+    const montant = parseFloat(amount);
     if (isNaN(montant) || montant <= 0) {
       req.flash('error', 'Montant invalide.');
       return res.redirect('/paiement/retrait');
@@ -270,50 +278,56 @@ exports.retrait = async (req, res) => {
     const bicClean = (bic || '').trim().toUpperCase();
 
     let statut = 'en_attente';
-    let raison = null;
+let raison = null;
+let message = null;
 
-    // 1️⃣ Solde insuffisant
-    if (req.user.solde < montant) {
+// 1️⃣ Solde insuffisant
+if (req.user.solde < montant) {
+  statut = 'échoué';
+  raison = 'solde_insuffisant';
+  message = `Solde insuffisant pour un retrait de ${montant} ${currency}.`;
+}
+
+// 2️⃣ Vérification compte VANTEX
+const compteVantex = await VantexBankAccount.findOne({
+  iban: ibanClean,
+  bic: bicClean,
+  actif: true
+});
+
+// 3️⃣ IBAN non présent → échec rib_non_reconnu
+if (!compteVantex && statut === 'en_attente') {
       statut = 'échoué';
-      raison = 'solde_insuffisant';
-    } else {
-      // 2️⃣ Vérification IBAN + BIC exacts
-      const compteVantex = await VantexBankAccount.findOne({
-        iban: ibanClean,
-        bic: bicClean,
-        actif: true
-      });
+      raison = 'rib_non_reconnu';
+  message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
+}
 
-      if (!compteVantex) {
-        statut = 'échoué';
-        raison = 'rib_non_reconnu';
-      } else {
-        // 3️⃣ IBAN/BIC exact → succès
-        statut = 'réussi';
-        req.user.solde -= montant;
-        await req.user.save();
-      }
+// 4️⃣ Virement interne VANTEX → validé automatiquement
+if (compteVantex && statut === 'en_attente') {
+      statut = 'réussi';
+      req.user.solde -= montant;
+      await req.user.save();
     }
 
-    // Création du retrait
-    const retrait = await Retrait.create({
-      user: req.user._id,
-      date: date ? new Date(date) : new Date(),
-      method,
-      currency,
-      amount: montant,
-      iban: ibanClean,
-      bic: bicClean,
-      benef_name,
-      bank_name,
-      motif,
-      statut,
-      raison
-    });
+// Création du retrait
+let retrait = await Retrait.create({
+  user: req.user._id,
+  date: date ? new Date(date) : new Date(),
+  method,
+  currency,
+  amount: montant,
+  iban: ibanClean,
+  bic: bicClean,
+  benef_name,
+  bank_name,
+  motif,
+  statut,
+  raison, // <-- important
+  message         
+});
 
-    await retrait.populate('user');
+    retrait = await retrait.populate('user');
 
-    // Envoi au front
     res.render('paiement/retrait-info', {
       retrait,
       delai: '3h à 24h'
