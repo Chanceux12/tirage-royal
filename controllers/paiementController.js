@@ -249,6 +249,8 @@ function generateOrder() {
 
 
 
+
+
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -256,19 +258,9 @@ exports.retrait = async (req, res) => {
       return res.redirect('/auth/login');
     }
 
-    const {
-      date,
-      method,
-      currency,
-      amount,
-      iban,
-      bic,
-      benef_name,
-      bank_name,
-      motif
-    } = req.body;
-
+    const { date, method, currency, amount, iban, bic, benef_name, bank_name, motif } = req.body;
     const montant = parseFloat(amount);
+
     if (isNaN(montant) || montant <= 0) {
       req.flash('error', 'Montant invalide.');
       return res.redirect('/paiement/retrait');
@@ -277,36 +269,33 @@ exports.retrait = async (req, res) => {
     const ibanClean = (iban || '').replace(/\s+/g, '').toUpperCase();
     const bicClean = (bic || '').trim().toUpperCase();
 
-    let statut = 'en_attente';
+    let statut;
     let raison = null;
 
-    /* 1️⃣ SOLDE INSUFFISANT */
+    // 1️⃣ Solde insuffisant
     if (req.user.solde < montant) {
       statut = 'échoué';
       raison = 'solde_insuffisant';
+    } else {
+      // 2️⃣ Vérification IBAN/BIC exact
+      const compteVantex = await VantexBankAccount.findOne({
+        iban: ibanClean,
+        bic: bicClean,
+        actif: true
+      });
+
+      if (!compteVantex) {
+        statut = 'échoué';
+        raison = 'rib_non_reconnu';
+      } else {
+        // 3️⃣ Réussi → débit du solde
+        statut = 'réussi';
+        req.user.solde -= montant;
+        await req.user.save();
+      }
     }
 
-    /* 2️⃣ VÉRIFICATION RIB/BIC PARTENAIRE */
-    const compteVantex = await VantexBankAccount.findOne({
-      iban: ibanClean,
-      bic: bicClean,
-      actif: true
-    });
-
-    /* 3️⃣ RIB NON PARTENAIRE */
-    if (!compteVantex && statut === 'en_attente') {
-      statut = 'échoué';
-      raison = 'rib_non_reconnu';
-    }
-
-    /* 4️⃣ RIB PARTENAIRE → SUCCÈS */
-    if (compteVantex && statut === 'en_attente') {
-      statut = 'réussi';
-      req.user.solde -= montant;
-      await req.user.save();
-    }
-
-    /* 5️⃣ CRÉATION DU RETRAIT */
+    // Création du retrait
     const retrait = await Retrait.create({
       user: req.user._id,
       date: date ? new Date(date) : new Date(),
@@ -322,12 +311,9 @@ exports.retrait = async (req, res) => {
       raison
     });
 
-    const retraitPopulated = await retrait.populate('user');
+    await retrait.populate('user');
 
-    res.render('paiement/retrait-info', {
-      retrait: retraitPopulated,
-      delai: '3h à 24h'
-    });
+    res.render('paiement/retrait-info', { retrait, delai: '3h à 24h' });
 
   } catch (err) {
     console.error('Erreur retrait:', err);
