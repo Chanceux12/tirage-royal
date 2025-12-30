@@ -296,18 +296,18 @@ const compteVantex = await VantexBankAccount.findOne({
 });
 
 // 3️⃣ IBAN non présent → échec rib_non_reconnu
-if (!compteVantex && statut !== 'en_attente') {
-  statut = 'échoué';
-  raison = 'rib_non_reconnu';
+if (!compteVantex && statut === 'en_attente') {
+      statut = 'échoué';
+      raison = 'rib_non_reconnu';
   message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
 }
 
 // 4️⃣ Virement interne VANTEX → validé automatiquement
 if (compteVantex && statut === 'en_attente') {
-  statut = 'reussi';
-  req.user.solde -= montant;
-  await req.user.save();
-}
+      statut = 'réussi';
+      req.user.solde -= montant;
+      await req.user.save();
+    }
 
 // Création du retrait
 let retrait = await Retrait.create({
