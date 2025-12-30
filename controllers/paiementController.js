@@ -241,6 +241,14 @@ exports.demanderRetrait = async (req, res) => {
   }
 };
 
+
+
+function generateOrder() {
+  return 'TR-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+}
+
+
+
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -314,8 +322,7 @@ let retrait = await Retrait.create({
   bank_name,
   motif,
   statut,
-  raison,         // <-- important
-  ordreVirement: generateOrder()
+  raison         // <-- important
 });
 
     retrait = await retrait.populate('user');
