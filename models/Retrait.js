@@ -9,9 +9,10 @@ const retraitSchema = new mongoose.Schema({
   },
 
   date: {
-  type: Date,
-  required: true
-},
+    type: Date,
+    required: true
+  },
+
 
   method: {
     type: String,
