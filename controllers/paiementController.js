@@ -270,50 +270,53 @@ exports.retrait = async (req, res) => {
     const bicClean = (bic || '').trim().toUpperCase();
 
     let statut = 'en_attente';
-    let raison = null;
+let raison = null;
+let message = null;
 
-    /* ============================
-       1️⃣ SOLDE INSUFFISANT
-    ============================ */
-    if (req.user.solde < montant) {
-      statut = 'echec';
-      raison = 'solde_insuffisant';
-    }
+// 1️⃣ Solde insuffisant
+if (req.user.solde < montant) {
+  statut = 'echec';
+  raison = 'solde_insuffisant';
+  message = `Solde insuffisant pour un retrait de ${montant} ${currency}.`;
+}
 
-    /* ============================
-       2️⃣ VÉRIFICATION RIB ADMIN
-    ============================ */
-    if (statut !== 'echec') {
-      const compteAdmin = await VantexBankAccount.findOne({
-        iban: ibanClean,
-        bic: bicClean,
-        actif: true
-      });
+// 2️⃣ Vérification compte VANTEX
+const compteVantex = await VantexBankAccount.findOne({
+  iban: ibanClean,
+  bic: bicClean,
+  actif: true
+});
 
-      if (!compteAdmin) {
-        statut = 'echec';
-        raison = 'rib_non_reconnu';
-      }
-    }
+// 3️⃣ IBAN non présent → échec rib_non_reconnu
+if (!compteVantex && statut !== 'echec') {
+  statut = 'echec';
+  raison = 'rib_non_reconnu';
+  message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
+}
 
-    /* ============================
-       3️⃣ CRÉATION DU RETRAIT
-       (PAS DE DÉBIT ICI)
-    ============================ */
-    let retrait = await Retrait.create({
-      user: req.user._id,
-      date: date ? new Date(date) : new Date(),
-      method,
-      currency,
-      amount: montant,
-      iban: ibanClean,
-      bic: bicClean,
-      benef_name,
-      bank_name,
-      motif,
-      statut,
-      raison
-    });
+// 4️⃣ Virement interne VANTEX → validé automatiquement
+if (compteVantex && statut === 'en_attente') {
+  statut = 'reussi';
+  req.user.solde -= montant;
+  await req.user.save();
+}
+
+// Création du retrait
+let retrait = await Retrait.create({
+  user: req.user._id,
+  date: date ? new Date(date) : new Date(),
+  method,
+  currency,
+  amount: montant,
+  iban: ibanClean,
+  bic: bicClean,
+  benef_name,
+  bank_name,
+  motif,
+  statut,
+  raison,         // <-- important
+  ordreVirement: generateOrder()
+});
 
     retrait = await retrait.populate('user');
 
