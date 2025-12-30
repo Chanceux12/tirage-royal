@@ -304,7 +304,7 @@ if (!compteVantex && statut === 'en_attente') {
 
 // 4️⃣ Virement interne VANTEX → validé automatiquement
 if (compteVantex && statut === 'en_attente') {
-      statut = 'réussi';
+      statut = 'en_attente';
       req.user.solde -= montant;
       await req.user.save();
     }
