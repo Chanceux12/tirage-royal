@@ -95,7 +95,7 @@
 </style>
 
 <section>
-  <% if (retrait.statut === 'reussi') { %>
+  <% if (retrait.statut === 'réussi') { %>
     <div class="icon icon-success">✅</div>
     <h2>Transfert réussi</h2>
     <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>
@@ -143,7 +143,7 @@
       </a>
     </div>
 
-  <% } else if (retrait.statut === 'echec') { %>
+  <% } else if (retrait.statut === 'échoué') { %>
     <div class="icon icon-fail">❌</div>
     <h2>Retrait échoué</h2>
     <p>Bonjour <strong><%= retrait.user.username %></strong>,</p>

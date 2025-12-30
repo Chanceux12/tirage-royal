@@ -283,7 +283,7 @@ let message = null;
 
 // 1️⃣ Solde insuffisant
 if (req.user.solde < montant) {
-  statut = 'echec';
+  statut = 'échoué';
   raison = 'solde_insuffisant';
   message = `Solde insuffisant pour un retrait de ${montant} ${currency}.`;
 }
@@ -296,8 +296,8 @@ const compteVantex = await VantexBankAccount.findOne({
 });
 
 // 3️⃣ IBAN non présent → échec rib_non_reconnu
-if (!compteVantex && statut !== 'echec') {
-  statut = 'echec';
+if (!compteVantex && statut !== 'échoué') {
+  statut = 'échoué';
   raison = 'rib_non_reconnu';
   message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
 }
