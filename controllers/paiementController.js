@@ -300,6 +300,17 @@ const compteVantex = await VantexBankAccount.findOne({
   actif: true
 });
 
+// 🔴 3️⃣ IBAN existe MAIS BIC incorrect
+    const ibanExiste = await VantexBankAccount.findOne({
+      iban: ibanClean,
+      actif: true
+    });
+
+    if (ibanExiste && !banqueAdmin) {
+      req.flash('error', 'Code SWIFT / BIC incorrect pour cet IBAN.');
+      return res.redirect('/paiement/retrait');
+    }
+
 // 3️⃣ IBAN non partenaire → échec
 if (!compteVantex && statut === 'en_attente') {
   statut = 'échoué';
@@ -336,14 +347,6 @@ let retrait = await Retrait.create({
       retrait,
       delai: '3h à 24h'
     });
-  
-   if (ibanAdmin && ibanAdmin.bic !== bicClean) {
-  req.flash(
-    'error',
-    'Code SWIFT / BIC incorrect pour le compte bancaire sélectionné.'
-  );
-  return res.redirect('/paiement/retrait');
-}
 
   } catch (err) {
     console.error('Erreur retrait:', err);
