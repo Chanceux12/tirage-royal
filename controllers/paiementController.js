@@ -336,6 +336,14 @@ let retrait = await Retrait.create({
       retrait,
       delai: '3h à 24h'
     });
+  
+   if (ibanAdmin && ibanAdmin.bic !== bicClean) {
+  req.flash(
+    'error',
+    'Code SWIFT / BIC incorrect pour le compte bancaire sélectionné.'
+  );
+  return res.redirect('/paiement/retrait');
+}
 
   } catch (err) {
     console.error('Erreur retrait:', err);
