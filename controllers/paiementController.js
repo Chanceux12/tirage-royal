@@ -306,7 +306,8 @@ const compteVantex = await VantexBankAccount.findOne({
       actif: true
     });
 
-    if (ibanExiste && !banqueAdmin) {
+    // ❌ IBAN existe MAIS BIC incorrect
+if (ibanExiste && !compteVantex) {
   req.flash('error', 'Code SWIFT / BIC incorrect pour cet IBAN.');
   return res.redirect('/paiement/retrait');
 }
