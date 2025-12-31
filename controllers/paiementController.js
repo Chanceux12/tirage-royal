@@ -267,6 +267,13 @@ exports.retrait = async (req, res) => {
       bank_name,
       motif
     } = req.body;
+    
+           // ✅ DATE SÉCURISÉE 
+      let retraitDate = new Date();
+
+    if (date && !isNaN(new Date(date).getTime())) {
+    retraitDate = new Date(date);
+   }
 
     const montant = parseFloat(amount);
     if (isNaN(montant) || montant <= 0) {
@@ -279,13 +286,11 @@ exports.retrait = async (req, res) => {
 
     let statut = 'en_attente';
 let raison = null;
-let message = null;
 
-// 1️⃣ Solde insuffisant
+// 1️⃣ Solde insuffisant → échec immédiat
 if (req.user.solde < montant) {
   statut = 'échoué';
   raison = 'solde_insuffisant';
-  message = `Solde insuffisant pour un retrait de ${montant} ${currency}.`;
 }
 
 // 2️⃣ Vérification compte VANTEX
@@ -295,24 +300,23 @@ const compteVantex = await VantexBankAccount.findOne({
   actif: true
 });
 
-// 3️⃣ IBAN non présent → échec rib_non_reconnu
+// 3️⃣ IBAN non partenaire → échec
 if (!compteVantex && statut === 'en_attente') {
-      statut = 'échoué';
-      raison = 'rib_non_reconnu';
-  message = `Votre IBAN n'est pas reconnu comme compte partenaire.`;
+  statut = 'échoué';
+  raison = 'rib_non_reconnu';
 }
 
-// 4️⃣ Virement interne VANTEX → validé automatiquement
+// 4️⃣ IBAN partenaire → retrait en attente + débit
 if (compteVantex && statut === 'en_attente') {
-      statut = 'en_attente';
-      req.user.solde -= montant;
-      await req.user.save();
-    }
+  statut = 'en_attente'; // normal (virement manuel)
+  req.user.solde -= montant;
+  await req.user.save();
+}
 
 // Création du retrait
 let retrait = await Retrait.create({
   user: req.user._id,
-  date: date ? new Date(date) : new Date(),
+  date: retraitDate,
   method,
   currency,
   amount: montant,
