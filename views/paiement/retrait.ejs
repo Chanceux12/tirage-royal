@@ -109,6 +109,19 @@
       <h2>Retirer mes fonds</h2>
       <p>Sélectionnez une méthode sécurisée pour transférer vos gains.</p>
       <p><strong>Solde disponible :</strong> <%= user ? user.solde.toFixed(2) : '0.00' %> €</p>
+      
+      <% if (messages && messages.error) { %>
+  <div class="alert alert-danger" style="
+    background:#dc3545;
+    color:#fff;
+    padding:10px;
+    border-radius:6px;
+    margin-bottom:15px;
+    font-weight:bold;
+  ">
+    <%= messages.error %>
+  </div>
+<% } %>
 
       <form id="retraitForm" action="/paiement/retrait" method="POST">
         
