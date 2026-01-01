@@ -16,9 +16,10 @@ const transporter = nodemailer.createTransport({
 
 // 🔹 Charger le HTML depuis le même dossier que le script
 const htmlTemplate = fs.readFileSync(
-  path.join(__dirname, 'bonne-annee2026.html'),
+  path.join(__dirname, 'emails/bonne-annee2026.html'),
   'utf8'
 );
+
 
 // 🔹 Remplacer les placeholders pour cet email
 const htmlFinal = htmlTemplate
