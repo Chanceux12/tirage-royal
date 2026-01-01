@@ -292,7 +292,7 @@ try {
     <body>
       <div class="container">
         <div class="header">
-          <img src="https://tirage-royal.com/image/logo.png" alt="Tirage Royal">
+          <img src="https://tirageroyale.com/image/logo.png" alt="Tirage Royal">
         </div>
         <h2>Participation confirmée 🎟️</h2>
         <p>Bonjour ${user.nom || user.username},</p>
@@ -351,7 +351,7 @@ try {
         <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
         <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
         <p>Vous pouvez consulter vos participations ici :</p>
-        <p><a href="https://tirage-royal.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
+        <p><a href="https://tirageroyale.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
         <p class="footer">Cet e-mail est automatique — ne pas répondre à ce message.</p>
       </div>
     </body>

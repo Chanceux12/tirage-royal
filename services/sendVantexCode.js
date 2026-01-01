@@ -17,9 +17,9 @@ module.exports = async function sendVantexCode(email, code) {
 
   try {
     const info = await transporter.sendMail({
-      from: `"VANTEX – Tirage Royal" <${process.env.VANTEX_EMAIL_USER}>`,
+      from: `"VANTEX FINANCE – Tirage Royal" <${process.env.VANTEX_EMAIL_USER}>`,
       to: email,
-      subject: "Code de confirmation VANTEX",
+      subject: "Code de confirmation VANTEX FINANCE",
       html: `
         <div style="font-family:Arial;max-width:600px;margin:auto">
           <h2 style="color:#0A9999">Confirmation de votre e-mail</h2>

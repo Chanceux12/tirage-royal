@@ -56,7 +56,7 @@ if (!tickets.length) {
         ? `🏆 Félicitations ${user.username} ! Tirage ${tirage.jeu.nom}`
         : `🎯 Résultats du tirage ${tirage.jeu.nom}`;
 
-      const logoUrl = "https://tirage-royal.com/image/logo.png";
+      const logoUrl = "https://tirageroyale.com/image/logo.png";
 
       const formatBulle = (nums, color="#080032") => {
         return nums.map(n => `
@@ -114,21 +114,21 @@ if (!tickets.length) {
                  🎉 Félicitations ! 💰 Gain potentiel : ${ticket.gainPotentiel.toLocaleString()} €
                </p>
                <div style="text-align:center; margin-top:15px;">
-                 <a href="https://tirage-royal.com/jeu/mes-participations"
+                 <a href="https://tirageroyale.com/jeu/mes-participations"
                     style="display:inline-block; background:#080032; color:white; padding:14px 26px; border-radius:8px; text-decoration:none; font-weight:bold;">
                     🔗 Mes tickets
                  </a>
                </div>
                <p style="margin-top:20px; font-size:13px; color:#555;">
                  Pour plus d'infos, contactez l'administrateur : 
-                 <a href="mailto:contact@tirage-royal.com">Email</a> | 
+                 <a href="mailto:contact@tirageroyale.com">Email</a> | 
                  <a href="https://wa.me/+33774137061">WhatsApp</a>
                </p>`
             : `<p style="margin-top:20px; color:#555;">
                  La chance vous échappe cette fois, mais elle vous tend déjà la main à nouveau.
                </p>
                <div style="text-align:center; margin-top:15px;">
-                 <a href="https://tirage-royal.com/jeu/jouer"
+                 <a href="https://tirageroyale.com/jeu/jouer"
                     style="display:inline-block; background:#008000B3; color:#080032; padding:14px 26px; border-radius:8px; text-decoration:none; font-weight:bold;">
                     🎟️ Tentez à nouveau
                  </a>

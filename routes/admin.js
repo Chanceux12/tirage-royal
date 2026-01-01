@@ -55,12 +55,12 @@ router.post('/approve/:id', ensureAuthenticated, isAdmin, async (req, res) => {
       <body>
         <div class="container">
           <div class="header">
-            <img src="https://tirage-royal.com/image/logo.png" alt="Tirage Royal">
+            <img src="https://tirageroyale.com/image/logo.png" alt="Tirage Royal">
           </div>
           <h2>Votre compte a été approuvé 🎉</h2>
           <p>Bonjour ${user.nom || user.username},</p>
           <p>Bonne nouvelle ! Votre compte sur <strong>Tirage Royal</strong> vient d’être validé. Vous pouvez désormais vous connecter et participer à nos tirages exclusifs.</p>
-          <p><a href="https://tirage-royal.com/login" class="button">Se connecter</a></p>
+          <p><a href="https://tirageroyale.com/login" class="button">Se connecter</a></p>
           <p class="footer">Cet e-mail est envoyé automatiquement par Tirage Royal — ne pas répondre.</p>
         </div>
       </body>

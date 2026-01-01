@@ -2,12 +2,12 @@ const nodemailer = require('nodemailer');
 
 // Transporteur SMTP pour les e-mails "ticket"
 const transporter = nodemailer.createTransport({
-  host: 'mail.privateemail.com',
+  host: 'smtp.zoho.com',
   port: 465,
   secure: true, // ✅ true pour SSL sur le port 465
   auth: {
-    user: 'validation@tirage-royal.com', // ta nouvelle adresse
-    pass: 'Chanceux@',       // mot de passe SMTP exact
+    user: 'support@tirageroyale.com', // ta nouvelle adresse
+    pass: 'Chanceux12@',       // mot de passe SMTP exact
   },
 });
 
@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 async function sendTicketMail(to, subject, html) {
   try {
     await transporter.sendMail({
-      from: '"Tirage Royal - Tickets de Jeu" <validation@tirage-royal.com>',
+      from: '"Tirage Royal - Tickets de Jeu" <support@tirageroyale.com>',
       to,
       subject,
       html,
