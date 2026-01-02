@@ -44,7 +44,7 @@ async function sendResetPasswordCode({ to, code }) {
         <table width="600" style="background:#ffffff;border-radius:8px;overflow:hidden;">
           <tr>
             <td style="background:#111;color:#d4af37;padding:20px;text-align:center;">
-              <h2 style="margin:0;">Tirage Royale</h2>
+              <h2 style="margin:0;">Tirage Royal</h2>
               <p style="margin:5px 0 0;font-size:13px;">Sécurité du compte</p>
             </td>
           </tr>
@@ -55,7 +55,7 @@ async function sendResetPasswordCode({ to, code }) {
 
               <p>
                 Une demande de <strong>réinitialisation de mot de passe</strong>
-                a été effectuée pour votre compte Tirage Royale.
+                a été effectuée pour votre compte Tirage Royal.
               </p>
 
               <p style="margin:30px 0;text-align:center;">
@@ -84,14 +84,14 @@ async function sendResetPasswordCode({ to, code }) {
 
               <p style="margin-top:40px;">
                 Cordialement,<br>
-                <strong>L’équipe Tirage Royale</strong>
+                <strong>L’équipe Tirage Royal</strong>
               </p>
             </td>
           </tr>
         </table>
 
         <p style="color:#999;font-size:12px;margin-top:20px;">
-          © 2026 Tirage Royale – Sécurité & confidentialité
+          © 2026 Tirage Royal – Sécurité & confidentialité
         </p>
       </td>
     </tr>
