@@ -5,7 +5,7 @@ const User = require('../models/User');
 const authController = require('../controllers/authController');
 const fs = require('fs');
 const path = require('path');
-const nodemailer = require('nodemailer');
+const { sendResetPasswordCode } = require('../services/emailService');
 const upload = require('../middlewares/uploadCloudinary');
 const bcrypt = require('bcryptjs');
 
@@ -149,20 +149,6 @@ router.get('/logout', (req, res, next) => {
   });
 });
 
-// ---------------------
-// 🔐 Réinitialisation mot de passe par code à 6 chiffres
-// ---------------------
-
-const resetPasswordTransporter = nodemailer.createTransport({
-  host: process.env.VALIDATION_EMAIL_HOST,
-  port: process.env.VALIDATION_EMAIL_PORT,
-  secure: true,
-  auth: {
-    user: process.env.VALIDATION_EMAIL_USER,
-    pass: process.env.VALIDATION_EMAIL_PASS
-  }
-});
-
 
 
 // 1. Formulaire mot de passe oublié
@@ -189,12 +175,11 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
     user.resetCodeExpiration = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    await resetPasswordTransporter.sendMail({
-  from: `"Tirage Royal – Sécurité" <${process.env.VALIDATION_EMAIL_USER}>`,
+    await sendResetPasswordCode({
   to: email,
-  subject: 'Code de réinitialisation',
-  html: `<p>Voici votre code : <strong>${code}</strong></p>`
+  code
 });
+
 
 
 
