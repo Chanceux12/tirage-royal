@@ -13,6 +13,9 @@ const User = require('./models/User');
 const { ensureAuthenticated } = require('./middlewares/auth');
 const app = express();
 
+const publicRoutes = require('./routes/public');
+
+app.use('/', publicRoutes);
 
 
 
