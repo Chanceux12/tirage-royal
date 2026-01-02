@@ -155,14 +155,11 @@ router.get('/logout', (req, res, next) => {
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: true, // true pour le port 465
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
   }
 });
 
@@ -192,11 +189,12 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
     await user.save();
 
     await transporter.sendMail({
-      from: 'tirage royal <no-reply@tirageroyal033.com>',
-      to: email,
-      subject: 'Code de réinitialisation',
-      html: `<p>Voici votre code : <strong>${code}</strong> (valide 10 minutes)</p>`
-    });
+  from: `"Tirage Royal" <support@tirageroyale.com>`,
+  to: email,
+  subject: 'Code de réinitialisation',
+  html: `<p>Voici votre code : <strong>${code}</strong> (valide 10 minutes)</p>`
+});
+
 
     res.render('auth/verify_code', {
       email,
