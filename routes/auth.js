@@ -153,15 +153,16 @@ router.get('/logout', (req, res, next) => {
 // 🔐 Réinitialisation mot de passe par code à 6 chiffres
 // ---------------------
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: 465,
+const resetPasswordTransporter = nodemailer.createTransport({
+  host: process.env.VALIDATION_EMAIL_HOST,
+  port: process.env.VALIDATION_EMAIL_PORT,
   secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.VALIDATION_EMAIL_USER,
+    pass: process.env.VALIDATION_EMAIL_PASS
   }
 });
+
 
 
 // 1. Formulaire mot de passe oublié
@@ -188,12 +189,13 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
     user.resetCodeExpiration = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    await transporter.sendMail({
-  from: `"Tirage Royal" <support@tirageroyale.com>`,
+    await resetPasswordTransporter.sendMail({
+  from: `"Tirage Royal – Sécurité" <${process.env.VALIDATION_EMAIL_USER}>`,
   to: email,
   subject: 'Code de réinitialisation',
-  html: `<p>Voici votre code : <strong>${code}</strong> (valide 10 minutes)</p>`
+  html: `<p>Voici votre code : <strong>${code}</strong></p>`
 });
+
 
 
     res.render('auth/verify_code', {
