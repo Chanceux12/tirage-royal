@@ -16,6 +16,7 @@ const app = express();
 const publicRoutes = require('./routes/public');
 
 app.use('/', publicRoutes);
+app.use('/paiement', require('./routes/vantex'));
 
 
 
