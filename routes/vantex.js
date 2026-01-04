@@ -24,10 +24,10 @@ router.post(
    paiementController.verifyEmailCode
 );
 
-router.post('/vantex/debug', (req, res) => {
+router.get('/vantex/debug', (req, res) => {
   res.json({
-    user: req.user || null,
-    session: !!req.session
+    ok: true,
+    message: 'VANTEX ROUTES LOADED'
   });
 });
 
