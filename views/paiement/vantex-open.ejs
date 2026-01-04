@@ -518,8 +518,9 @@ document.getElementById("submitFinalBtn").onclick = async () => {
 
 
   try {
-    const res = await fetch("/vantex/send-code", {
+    const res = await fetch("/paiement/vantex/send-code", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
@@ -559,8 +560,9 @@ document.getElementById("confirmCodeBtn").onclick = async () => {
   }
 
   try {
-    const res = await fetch("/vantex/verify-code", {
+    const res = await fetch("/paiement/vantex/verify-code", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, code })
     });
@@ -599,8 +601,9 @@ document.getElementById("resendBtn").onclick = async () => {
   const email = form.querySelector('input[name="email"]').value;
 
   try {
-    const res = await fetch("/vantex/send-code", {
+    const res = await fetch("/paiement/vantex/send-code", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
