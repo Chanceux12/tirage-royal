@@ -177,8 +177,6 @@ app.set('layout', 'layout');
 app.use(express.json());
 
 
-const pageRoutes = require('./routes/pageRoutes');
-app.use('/', pageRoutes);
 
 app.get('/profil', (req, res) => {
     res.redirect('/auth/profil'); // redirige vers la route existante
@@ -241,7 +239,9 @@ const vantexRoutes = require('./routes/vantex');
 const paiementRoutes = require('./routes/paiementRoutes');
 const userRoutes = require('./routes/userRoutes');
 const publicRoutes = require('./routes/public');
+const pageRoutes = require('./routes/pageRoutes');
 
+app.use('/', pageRoutes);
 
 app.use('/', publicRoutes);
 app.use('/paiement', paiementRoutes);
