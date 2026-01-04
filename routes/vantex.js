@@ -24,10 +24,7 @@ router.post(
    paiementController.verifyEmailCode
 );
 
-router.post('/vantex/submit', ensureAuthenticated, (req, res) => {
-  console.log('USER SUBMIT:', req.user);
-  res.send('OK');
-});
+
 
 
 module.exports = router;
