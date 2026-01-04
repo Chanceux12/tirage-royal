@@ -24,4 +24,11 @@ router.post(
    paiementController.verifyEmailCode
 );
 
+router.post('/vantex/debug', (req, res) => {
+  res.json({
+    user: req.user || null,
+    session: !!req.session
+  });
+});
+
 module.exports = router;
