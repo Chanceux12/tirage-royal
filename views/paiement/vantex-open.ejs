@@ -518,7 +518,7 @@ document.getElementById("submitFinalBtn").onclick = async () => {
 
 
   try {
-    const res = await fetch("/paiement/vantex/send-code", {
+    const res = await fetch("/vantex/send-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -559,7 +559,7 @@ document.getElementById("confirmCodeBtn").onclick = async () => {
   }
 
   try {
-    const res = await fetch("/paiement/vantex/verify-code", {
+    const res = await fetch("/vantex/verify-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, code })

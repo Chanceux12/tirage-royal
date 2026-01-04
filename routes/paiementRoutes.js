@@ -64,9 +64,6 @@ router.get(
   }
 );
 
-router.post("/vantex/submit-test", (req, res) => {
-  res.send("SUBMIT TEST OK");
-});
 
 
 // Page historique des retraits
