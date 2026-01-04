@@ -24,11 +24,10 @@ router.post(
    paiementController.verifyEmailCode
 );
 
-router.get('/vantex/debug', (req, res) => {
-  res.json({
-    ok: true,
-    message: 'VANTEX ROUTES LOADED'
-  });
+router.post('/vantex/submit', ensureAuthenticated, (req, res) => {
+  console.log('USER SUBMIT:', req.user);
+  res.send('OK');
 });
+
 
 module.exports = router;
