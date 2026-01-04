@@ -186,20 +186,20 @@ app.get('/profil', (req, res) => {
 // 🔐 Session
 app.set('trust proxy', 1);
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'votre_secret_ultra_long_et_complexe',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 60 * 60 * 2
   }),
   cookie: {
     httpOnly: true,
-    secure: true,          // 🔒 HTTPS (Vercel)
-    sameSite: 'lax',       // ⭐⭐⭐ OBLIGATOIRE
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 1000 * 60 * 60 * 2
   }
 }));
-
 
 // ✅ Injection de l'utilisateur dans toutes les vues
 app.use((req, res, next) => {
