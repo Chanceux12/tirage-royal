@@ -488,12 +488,18 @@ exports.vantexOpenSubmit = async (req, res) => {
       req.flash('error', 'Veuillez télécharger les documents d\'identité.');
       return res.redirect('/paiement/vantex');
     }
+
+    console.log("🧪 USER =", req.user);
+
+  if (!req.user) {
+    return res.status(403).send("FORBIDDEN - USER NOT LOGGED");
+  }
     
     console.log("🟢 VANTEX SUBMIT APPELÉ");
   console.log("👤 USER :", req.user?._id);
   console.log("📦 BODY :", req.body);
   console.log("📂 FILES :", req.files);
-  
+
     // Vérification d'une demande en attente pour le même email ou téléphone
     const existing = await VantexRequest.findOne({
       $or: [{ email }, { phone }],
