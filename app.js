@@ -14,6 +14,7 @@ const { ensureAuthenticated } = require('./middlewares/auth');
 const app = express();
 
 const publicRoutes = require('./routes/public');
+app.use('/', publicRoutes);
 
 
 
@@ -248,6 +249,7 @@ app.use('/auth', authRoutes);
 app.use('/', mainRoutes);
 app.use('/jeu', jeuRoutes);
 app.use('/user', userRoutes);
+
 
 app.use('/avis', avisRoutes);
 
