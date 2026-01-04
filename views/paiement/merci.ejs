@@ -4,8 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Demande VANTEX en attente</title>
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Inter", sans-serif; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+}
+
 body {
   background: linear-gradient(135deg, #11998e, #0575e6);
   min-height: 100vh;
@@ -15,66 +22,105 @@ body {
   padding: 20px;
 }
 
+/* Carte principale */
 .card {
   background: #fff;
   border-radius: 16px;
-  max-width: 600px;
   width: 100%;
+  max-width: 600px;
   padding: 40px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.08);
   text-align: center;
 }
 
+/* Titre */
 h1 {
   color: #0A9999;
   font-size: 2rem;
   margin-bottom: 20px;
 }
 
+/* Texte */
 p {
   color: #333;
   font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  line-height: 1.6;
+  margin-bottom: 16px;
 }
 
+/* Alerte */
 .alert {
   background: #f0f8ff;
   border-left: 5px solid #0A9999;
   padding: 15px 20px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   border-radius: 8px;
   text-align: left;
+  font-size: 0.95rem;
 }
 
+/* Bouton */
 .btn {
   display: inline-block;
   background: #0A9999;
   color: #fff;
-  padding: 12px 25px;
+  padding: 14px 28px;
   text-decoration: none;
   border-radius: 10px;
   font-size: 1rem;
   transition: 0.3s;
+  margin-top: 10px;
 }
 
 .btn:hover {
   background: #087a7a;
 }
+
+/* ===== Responsive Mobile ===== */
+@media (max-width: 480px) {
+  .card {
+    padding: 25px 20px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+
+  .alert {
+    font-size: 0.9rem;
+    padding: 14px;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    font-size: 1rem;
+  }
+}
 </style>
 </head>
+
 <body>
 
 <div class="card">
   <h1>Merci pour votre demande ! 🎉</h1>
 
   <div class="alert">
-    Votre demande d’ouverture de compte VANTEX a été enregistrée avec succès et est <strong>en attente de vérification</strong>.
+    Votre demande d’ouverture de compte VANTEX a été enregistrée avec succès et est
+    <strong>en attente de vérification</strong>.
   </div>
 
   <p>Veuillez vérifier votre email dans les prochaines heures pour confirmer votre demande.</p>
   <p>Si votre demande est approuvée, vous pourrez commencer à utiliser votre compte VANTEX.</p>
-  <p>Note : Une seule demande par email et numéro de téléphone est autorisée tant que la précédente est en attente.</p>
+  <p>
+    <strong>Note :</strong> Une seule demande par email et numéro de téléphone est autorisée
+    tant que la précédente est en attente.
+  </p>
 
   <a href="/" class="btn">Retour à l'accueil</a>
 </div>
