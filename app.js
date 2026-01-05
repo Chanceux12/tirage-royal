@@ -184,8 +184,10 @@ app.get('/profil', (req, res) => {
 
 
 // 🔐 Session
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // OBLIGATOIRE (Vercel / HTTPS)
+
 app.use(session({
+  name: 'tirage-royal.sid',
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -193,12 +195,16 @@ app.use(session({
     mongoUrl: process.env.MONGODB_URI
   }),
   cookie: {
-    secure: false   // IMPORTANT (true = bug en local)
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 1000 * 60 * 60 * 24
   }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 
 // ✅ Injection de l'utilisateur dans toutes les vues

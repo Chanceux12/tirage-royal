@@ -45,7 +45,7 @@ router.get('/vantex-open', ensureAuthenticated, paiementController.vantexOpenPag
 // Soumission formulaire ouverture compte VANTEX
 router.post(
   '/vantex/submit',
-   // 🔥 OBLIGATOIRE SUR VERCEL
+  ensureAuthenticated, // 🔥 OBLIGATOIRE SUR VERCEL
   upload.fields([
     { name: 'id_front', maxCount: 1 },
     { name: 'id_back', maxCount: 1 }
