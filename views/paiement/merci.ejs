@@ -8,6 +8,19 @@
   padding: 60px 16px;
 }
 
+.vantex-status-badge {
+  display: inline-block;
+  margin: 14px auto 6px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0A9999;
+  background: rgba(10, 153, 153, 0.12);
+  border: 1px solid rgba(10, 153, 153, 0.35);
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
 /* Carte */
 .vantex-merci-card {
   background: #fff;
@@ -67,12 +80,28 @@
 .vantex-merci-btn:hover {
   background: #087a7a;
 }
+
+@keyframes softPulse {
+  0% { box-shadow: 0 0 0 0 rgba(10,153,153,0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(10,153,153,0); }
+  100% { box-shadow: 0 0 0 0 rgba(10,153,153,0); }
+}
+
+.vantex-status-badge {
+  animation: softPulse 2.5s infinite;
+}
+
 </style>
 
 <div class="vantex-merci-wrapper">
   <div class="vantex-merci-card">
 
-    <h1>Merci pour votre demande ! 🎉</h1>
+    <h1>Merci pour votre demande !</h1>
+
+    <div class="vantex-status-badge">
+      En attente de validation
+    </div>
+
 
     <div class="vantex-merci-alert">
       Votre demande d’ouverture de compte VANTEX a été enregistrée avec succès et est
