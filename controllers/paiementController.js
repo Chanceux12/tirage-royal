@@ -491,7 +491,10 @@ exports.vantexOpenSubmit = async (req, res) => {
 
     console.log("🧪 USER =", req.user);
 
-  
+  if (!req.user) {
+    return res.status(403).send("FORBIDDEN - USER NOT LOGGED");
+  }
+    
     console.log("🟢 VANTEX SUBMIT APPELÉ");
   console.log("👤 USER :", req.user?._id);
   console.log("📦 BODY :", req.body);
