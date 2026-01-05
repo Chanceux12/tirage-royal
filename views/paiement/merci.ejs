@@ -1,50 +1,33 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demande VANTEX en attente</title>
-
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  background: linear-gradient(135deg, #11998e, #0575e6);
+/* Conteneur principal de la page */
+.vantex-merci-wrapper {
+  min-height: calc(100vh - 200px); /* header + footer */
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 16px;
+  align-items: flex-start;
+  padding: 60px 16px;
 }
 
-/* Carte principale */
-.card {
+/* Carte */
+.vantex-merci-card {
   background: #fff;
   width: 100%;
-  max-width: 420px; /* largeur parfaite mobile */
-  padding: 32px 24px;
+  max-width: 520px;
+  padding: 32px 26px;
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   text-align: center;
 }
 
 /* Titre */
-h1 {
+.vantex-merci-card h1 {
   color: #0A9999;
   font-size: 1.6rem;
   margin-bottom: 18px;
 }
 
 /* Alerte */
-.alert {
+.vantex-merci-alert {
   background: #f0f8ff;
   border-left: 5px solid #0A9999;
   padding: 16px;
@@ -55,7 +38,7 @@ h1 {
 }
 
 /* Texte */
-p {
+.vantex-merci-card p {
   color: #333;
   font-size: 0.95rem;
   line-height: 1.6;
@@ -63,7 +46,7 @@ p {
 }
 
 /* Bouton */
-.btn {
+.vantex-merci-btn {
   display: block;
   width: 100%;
   background: #0A9999;
@@ -76,89 +59,31 @@ p {
   transition: 0.3s;
 }
 
-.btn:hover {
+.vantex-merci-btn:hover {
   background: #087a7a;
 }
-
-
-/* STRUCTURE GLOBALE */
-.page-wrapper {
-  min-height: calc(100vh - 160px); /* header + footer */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px 15px;
-  box-sizing: border-box;
-}
-
-/* CONTENU CENTRAL */
-.page-container {
-  width: 100%;
-  max-width: 720px;
-  background: #fff; /* déjà blanc chez toi */
-  border-radius: 14px;
-  padding: 30px 25px;
-  box-sizing: border-box;
-}
-
-/* TITRE */
-.page-container h1,
-.page-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* TEXTE */
-.page-container p {
-  text-align: center;
-  line-height: 1.6;
-}
-
-/* BOUTON */
-.page-container .btn,
-.page-container button {
-  display: block;
-  margin: 30px auto 0;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-  .page-container {
-    padding: 22px 18px;
-  }
-}
-
-
-footer {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-footer .footer-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 40px 20px;
-}
-
 </style>
-</head>
 
-<body>
+<div class="vantex-merci-wrapper">
+  <div class="vantex-merci-card">
 
-<div class="card">
-  <h1>Merci pour votre demande ! 🎉</h1>
+    <h1>Merci pour votre demande ! 🎉</h1>
 
-  <div class="alert">
-    Votre demande d’ouverture de compte VANTEX a été enregistrée avec succès et est
-    <strong>en attente de vérification</strong>.
+    <div class="vantex-merci-alert">
+      Votre demande d’ouverture de compte VANTEX a été enregistrée avec succès et est
+      <strong>en attente de vérification</strong>.
+    </div>
+
+    <p>Veuillez vérifier votre email dans les prochaines heures pour confirmer votre demande.</p>
+
+    <p>Si votre demande est approuvée, vous pourrez commencer à utiliser votre compte VANTEX.</p>
+
+    <p>
+      <strong>Note :</strong>
+      Une seule demande par email et numéro de téléphone est autorisée tant que la précédente est en attente.
+    </p>
+
+    <a href="/" class="vantex-merci-btn">Retour à l'accueil</a>
+
   </div>
-
-  <p>Veuillez vérifier votre email dans les prochaines heures pour confirmer votre demande.</p>
-  <p>Si votre demande est approuvée, vous pourrez commencer à utiliser votre compte VANTEX.</p>
-  <p><strong>Note :</strong> Une seule demande par email et numéro de téléphone est autorisée tant que la précédente est en attente.</p>
-
-  <a href="/" class="btn">Retour à l'accueil</a>
 </div>
-
-</body>
-</html>
