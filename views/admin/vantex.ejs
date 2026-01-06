@@ -94,10 +94,11 @@ button {
         <td><%= d.street %></td>
         <td><%= d.zip %> / <%= d.city %></td>
         <td>
-          <a href="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>"
-   download="vantex_<%= d._id %>_verso">
-  <img src="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>" alt="Verso">
+          <a href="data:<%= d.id_front_mime %>;base64,<%= d.id_front %>"
+   download="vantex_<%= d._id %>_recto">
+  <img src="data:<%= d.id_front_mime %>;base64,<%= d.id_front %>" alt="Recto">
 </a>
+
 
           <a href="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>"
    download="vantex_<%= d._id %>_verso">
