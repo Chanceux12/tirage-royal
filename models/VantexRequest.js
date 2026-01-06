@@ -18,6 +18,9 @@ const VantexRequestSchema = new mongoose.Schema({
   id_front_mime: { type: String },
   id_back: { type: String },
   id_back_mime: { type: String },
+  
+  signature: { type: String },
+  signature_mime: { type: String },
 
   status: { type: String, default: "en attente" }, // en attente / approuvé / refusé
   createdAt: { type: Date, default: Date.now }

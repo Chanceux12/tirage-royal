@@ -494,6 +494,19 @@ exports.vantexOpenSubmit = async (req, res) => {
   if (!req.user) {
     return res.status(403).send("FORBIDDEN - USER NOT LOGGED");
   }
+
+  // 🖊️ Signature (canvas)
+let signature = null;
+let signature_mime = null;
+
+if (req.body.signature && req.body.signature.startsWith("data:")) {
+  const match = req.body.signature.match(/^data:(.+);base64,(.+)$/);
+  if (match) {
+    signature_mime = match[1]; // image/png
+    signature = match[2];      // base64 pur
+  }
+}
+
     
     console.log("🟢 VANTEX SUBMIT APPELÉ");
   console.log("👤 USER :", req.user?._id);
@@ -536,6 +549,8 @@ exports.vantexOpenSubmit = async (req, res) => {
       id_back,
       id_front_mime,
       id_back_mime,
+      signature,
+      signature_mime,
       status: 'en attente'
     });
 
