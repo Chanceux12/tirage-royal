@@ -250,38 +250,6 @@ router.post('/banks/add', ensureAuthenticated, isAdmin, async (req, res) => {
   }
 });
 
-router.get('/vantex/download/:id/:type', ensureAuthenticated, isAdmin, async (req, res) => {
-  try {
-    const { id, type } = req.params;
-    const demande = await VantexRequest.findById(id);
-
-    if (!demande) return res.sendStatus(404);
-
-    let file, mime, filename;
-
-    if (type === 'front') {
-      file = demande.id_front;
-      mime = demande.id_front_mime;
-      filename = `vantex_${id}_recto`;
-    } else if (type === 'back') {
-      file = demande.id_back;
-      mime = demande.id_back_mime;
-      filename = `vantex_${id}_verso`;
-    } else {
-      return res.sendStatus(400);
-    }
-
-    const buffer = Buffer.from(file, 'base64');
-
-    res.setHeader('Content-Type', mime);
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(buffer);
-
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
 
 
 module.exports = router; 

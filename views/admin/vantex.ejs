@@ -94,19 +94,16 @@ button {
         <td><%= d.street %></td>
         <td><%= d.zip %> / <%= d.city %></td>
         <td>
-          <% if(d.id_front) { %>
-  <a href="/admin/vantex/download/<%= d._id %>/front">
-    <i class="fa fa-download"></i> Recto
-  </a>
-<% } %>
+          <a href="data:<%= d.id_front_mime %>;base64,<%= d.id_front %>"
+   download="vantex_<%= d._id %>_recto">
+  <img src="data:<%= d.id_front_mime %>;base64,<%= d.id_front %>" alt="Recto">
+</a>
 
-<% if(d.id_back) { %>
-  <br>
-  <a href="/admin/vantex/download/<%= d._id %>/back">
-    <i class="fa fa-download"></i> Verso
-  </a>
-<% } %>
 
+          <a href="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>"
+   download="vantex_<%= d._id %>_verso">
+  <img src="data:<%= d.id_back_mime %>;base64,<%= d.id_back %>" alt="Verso">
+</a>
 
         </td>
         <td><%= d.status %></td>
