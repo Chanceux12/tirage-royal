@@ -6,7 +6,7 @@ const transactionSchema = new mongoose.Schema({
   // Type de transaction
   type: { 
     type: String, 
-    enum: ['recharge', 'jeu', 'gain'], 
+    enum: ['recharge', 'jeu', 'gain', 'retrait'], 
     required: true 
   },
 
