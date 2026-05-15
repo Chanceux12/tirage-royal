@@ -18,3 +18,5 @@ temp/
 # Uploads locaux (si tu en as)
 uploads/
 .vercel
+
+.vercel

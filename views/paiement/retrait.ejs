@@ -94,12 +94,10 @@
 </head>
 <body>
   <section class="retrait-section">
-    <!-- Image pro -->
     <div class="retrait-image">
       <img src="/image/retrait.png" alt="Retrait sécurisé">
     </div>
 
-    <!-- Formulaire -->
     <div class="retrait-form">
       <h2>Retirer mes fonds</h2>
       <p>Sélectionnez une méthode sécurisée pour transférer vos gains.</p>
@@ -118,7 +116,7 @@
 
         <label for="method">Méthode de retrait</label>
         <select name="method" id="method" required>
-          <option value="iban">Virement bancaire</option>
+          <option value="iban">Virement bancaire International (SEPA & SWIFT)</option>
         </select>
 
         <label for="currency">Devise de transfert</label>
@@ -131,9 +129,9 @@
         <label for="amount">Montant du transfert</label>
         <input type="number" name="amount" id="amount" min="10" step="0.01" placeholder="Ex: 250.00" required>
 
-        <label for="iban">IBAN</label>
-        <input type="text" name="iban" id="iban" placeholder="Ex: FR76 3000 6000 0112 3456 7890 189" required>
-        <div id="ibanError" class="error">IBAN invalide (ex: FR76 suivi de chiffres).</div>
+        <label for="iban">IBAN International</label>
+        <input type="text" name="iban" id="iban" placeholder="Saisissez votre IBAN" required>
+        <div id="ibanError" class="error">Format d'IBAN invalide (doit commencer par 2 lettres suivies de 12 à 32 caractères).</div>
 
         <label for="bic">Code SWIFT/BIC</label>
         <input type="text" name="bic" id="bic" placeholder="Ex: AGRIFRPPXXX" required>
@@ -157,7 +155,7 @@
     const ibanInput = document.getElementById("iban");
     const bicInput = document.getElementById("bic");
 
-    // Auto-format IBAN (majuscule + espace chaque 4 caractères)
+    // Formatage dynamique de l'IBAN (Majuscules + espaces tous les 4 caractères pour le confort visuel)
     ibanInput.addEventListener("input", function() {
       let value = this.value.replace(/\s+/g, "").toUpperCase();
       this.value = value.replace(/(.{4})/g, "$1 ").trim();
@@ -168,10 +166,10 @@
       this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     });
 
-    // Validation en temps réel
+    // Validation internationale au changement de focus (Regex mondiale : 2 lettres + entre 12 et 32 caractères)
     ibanInput.addEventListener("blur", function() {
       const iban = this.value.replace(/\s+/g, "");
-      const ibanRegex = /^[A-Z]{2}[0-9]{10,30}$/;
+      const ibanRegex = /^[A-Z]{2}[A-Z0-9]{12,32}$/;
       document.getElementById("ibanError").style.display = ibanRegex.test(iban) ? "none" : "block";
     });
 
@@ -181,12 +179,12 @@
       document.getElementById("bicError").style.display = bicRegex.test(bic) ? "none" : "block";
     });
 
-    // Vérif finale à l'envoi
+    // Vérification bloquante avant soumission
     document.getElementById("retraitForm").addEventListener("submit", function(e) {
       let valid = true;
 
       const iban = ibanInput.value.replace(/\s+/g, "");
-      const ibanRegex = /^[A-Z]{2}[0-9]{10,30}$/;
+      const ibanRegex = /^[A-Z]{2}[A-Z0-9]{12,32}$/;
       if (!ibanRegex.test(iban)) {
         document.getElementById("ibanError").style.display = "block";
         valid = false;
