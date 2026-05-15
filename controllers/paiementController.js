@@ -203,7 +203,7 @@ function generateOrder() {
   return 'TR-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
 }
 
-// 🔄 NOUVELLE LOGIQUE DE RETRAIT PAR INTERCONNEXION API 
+// 🔄 LOGIQUE DE RETRAIT CORRIGÉE ET SÉCURISÉE
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -234,8 +234,9 @@ exports.retrait = async (req, res) => {
       return res.redirect('/paiement/retrait');
     }
 
-    const ibanClean = (iban || '').replace(/\s+/g, '').toUpperCase();
-    const bicClean = (bic || '').trim().toUpperCase();
+    // Nettoyage strict des données pour la comparaison en Base de Données
+    const ibanClean = (iban || '').replace(/\s+/g, '').trim().toUpperCase();
+    const bicClean = (bic || '').replace(/\s+/g, '').trim().toUpperCase();
 
     let statut = 'en_attente';
     let raison = null;
@@ -249,19 +250,23 @@ exports.retrait = async (req, res) => {
     // 2️⃣ Interrogation du 2ème PC (Banque BPER) si le solde est OK
     if (statut === 'en_attente') {
       try {
-        // Remplace par l'IP de ton second PC ou l'URL finale (ex: https://banque-pro.vercel.app)
+        console.log(`📡 Envoi requête BPER pour IBAN: ${ibanClean} et BIC: ${bicClean}`);
+        
         const checkBper = await axios.post("https://banque-pro.vercel.app/api/internal/verify-iban", {
-          apiKey: "bper_secret_99d8b7a6c5e4d3", // La clé secrète configurée
+          apiKey: "bper_secret_99d8b7a6c5e4d3",
           iban: ibanClean,
           bic: bicClean
         });
 
-        // 3️⃣ Si le compte existe, on valide l'état "en attente" et on débite l'utilisateur
-        if (checkBper.data.valid) {
+        console.log("📥 Réponse reçue de BPER BANCA :", checkBper.data);
+
+        // 3️⃣ Vérification stricte du retour de l'API
+        if (checkBper.data && (checkBper.data.valid === true || checkBper.data.success === true)) {
+          // L'IBAN existe et est validé sur le 2ème PC
           req.user.solde -= montant;
           await req.user.save();
           
-          // Création d'une transaction locale pour l'historique de solde
+          // Création de la transaction de débit
           await Transaction.create({
             user: req.user._id,
             type: 'retrait',
@@ -269,15 +274,24 @@ exports.retrait = async (req, res) => {
             status: 'en_attente',
             description: `Retrait vers banque BPER (${ibanClean})`,
           });
+          
+          statut = 'en_attente';
+          raison = null;
+        } else {
+          // L'API a répondu, mais indique que le compte n'est pas valide/n'existe pas
+          statut = 'échoué';
+          raison = 'rib_non_reconnu';
         }
+
       } catch (apiError) {
-        // Si l'API renvoie 404 ou une erreur : le RIB n'existe pas ou serveur injoignable
+        // En cas d'erreur réseau, de mauvaise clé API ou de statut HTTP 404/500
+        console.error("❌ Erreur d'interconnexion ou RIB inconnu sur BPER :", apiError.response ? apiError.response.data : apiError.message);
         statut = 'échoué';
         raison = 'rib_non_reconnu';
       }
     }
 
-    // Création de la fiche de Retrait locale
+    // Création de la fiche de Retrait locale finale
     let retrait = await Retrait.create({
       user: req.user._id,
       date: retraitDate,
