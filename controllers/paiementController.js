@@ -1,8 +1,7 @@
 const Retrait = require('../models/Retrait'); 
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
-const VantexRequest = require('../models/VantexRequest');
-const VantexBankAccount = require('../models/VantexBankAccount');
+const axios = require('axios'); // 🚀 AJOUTÉ pour l'interconnexion API
 
 // =====================
 // Stripe
@@ -200,55 +199,11 @@ exports.showRetraitPage = (req, res) => {
   res.render('paiement/retrait', { user: req.user, messages: req.flash() });
 };
 
-exports.demanderRetrait = async (req, res) => {
-  const { montant, methode, info } = req.body;
-  const euros = parseFloat(montant);
-
-  if (!req.user) {
-    req.flash('error', 'Connectez-vous pour faire un retrait.');
-    return res.redirect('/auth/login');
-  }
-
-  if (isNaN(euros) || euros <= 0) {
-    req.flash('error', 'Montant invalide.');
-    return res.redirect('/paiement/retrait');
-  }
-
-  if (euros > req.user.solde) {
-    req.flash('error', 'Solde insuffisant.');
-    return res.redirect('/paiement/retrait');
-  }
-
-  try {
-    const user = await User.findById(req.user._id);
-    user.solde -= euros;
-    await user.save();
-
-    await Transaction.create({
-      user: user._id,
-      type: 'retrait',
-      amount: euros,
-      status: 'en attente',
-      description: `Retrait via ${methode} (${info})`,
-    });
-
-    req.flash('success', 'Votre demande de retrait est en attente de validation.');
-    res.redirect('/paiement/retrait');
-  } catch (err) {
-    console.error('Erreur retrait:', err);
-    req.flash('error', 'Erreur serveur, contactez l\'administrateur.');
-    res.redirect('/paiement/retrait');
-  }
-};
-
-
-
 function generateOrder() {
   return 'TR-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
 }
 
-
-
+// 🔄 NOUVELLE LOGIQUE DE RETRAIT PAR INTERCONNEXION API 
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -268,12 +223,10 @@ exports.retrait = async (req, res) => {
       motif
     } = req.body;
     
-           // ✅ DATE SÉCURISÉE 
-      let retraitDate = new Date();
-
+    let retraitDate = new Date();
     if (date && !isNaN(new Date(date).getTime())) {
-    retraitDate = new Date(date);
-   }
+      retraitDate = new Date(date);
+    }
 
     const montant = parseFloat(amount);
     if (isNaN(montant) || montant <= 0) {
@@ -285,51 +238,60 @@ exports.retrait = async (req, res) => {
     const bicClean = (bic || '').trim().toUpperCase();
 
     let statut = 'en_attente';
-let raison = null;
+    let raison = null;
 
-// 1️⃣ Solde insuffisant → échec immédiat
-if (req.user.solde < montant) {
-  statut = 'échoué';
-  raison = 'solde_insuffisant';
-}
+    // 1️⃣ Vérification Solde local
+    if (req.user.solde < montant) {
+      statut = 'échoué';
+      raison = 'solde_insuffisant';
+    }
 
-// 2️⃣ Vérification compte VANTEX
-const compteVantex = await VantexBankAccount.findOne({
-  iban: ibanClean,
-  bic: bicClean,
-  actif: true
-});
+    // 2️⃣ Interrogation du 2ème PC (Banque BPER) si le solde est OK
+    if (statut === 'en_attente') {
+      try {
+        // Remplace par l'IP de ton second PC ou l'URL finale (ex: https://banque-pro.vercel.app)
+        const checkBper = await axios.post("https://banque-pro.vercel.app/api/internal/verify-iban", {
+          apiKey: "bper_secret_99d8b7a6c5e4d3", // La clé secrète configurée
+          iban: ibanClean,
+          bic: bicClean
+        });
 
+        // 3️⃣ Si le compte existe, on valide l'état "en attente" et on débite l'utilisateur
+        if (checkBper.data.valid) {
+          req.user.solde -= montant;
+          await req.user.save();
+          
+          // Création d'une transaction locale pour l'historique de solde
+          await Transaction.create({
+            user: req.user._id,
+            type: 'retrait',
+            amount: montant,
+            status: 'en_attente',
+            description: `Retrait vers banque BPER (${ibanClean})`,
+          });
+        }
+      } catch (apiError) {
+        // Si l'API renvoie 404 ou une erreur : le RIB n'existe pas ou serveur injoignable
+        statut = 'échoué';
+        raison = 'rib_non_reconnu';
+      }
+    }
 
-// 3️⃣ IBAN non partenaire → échec
-if (!compteVantex && statut === 'en_attente') {
-  statut = 'échoué';
-  raison = 'rib_non_reconnu';
-}
-
-// 4️⃣ IBAN partenaire → retrait en attente + débit
-if (compteVantex && statut === 'en_attente') {
-  statut = 'en_attente'; // normal (virement manuel)
-  req.user.solde -= montant;
-  await req.user.save();
-}
-
-// Création du retrait
-let retrait = await Retrait.create({
-  user: req.user._id,
-  date: retraitDate,
-  method,
-  currency,
-  amount: montant,
-  iban: ibanClean,
-  bic: bicClean,
-  benef_name,
-  bank_name,
-  motif,
-  statut,
-  raison // <-- important
-           
-});
+    // Création de la fiche de Retrait locale
+    let retrait = await Retrait.create({
+      user: req.user._id,
+      date: retraitDate,
+      method,
+      currency,
+      amount: montant,
+      iban: ibanClean,
+      bic: bicClean,
+      benef_name,
+      bank_name,
+      motif,
+      statut,
+      raison           
+    });
 
     retrait = await retrait.populate('user');
 
@@ -339,13 +301,11 @@ let retrait = await Retrait.create({
     });
 
   } catch (err) {
-    console.error('Erreur retrait:', err);
-    req.flash('error', 'Erreur serveur.');
+    console.error('Erreur retrait général:', err);
+    req.flash('error', 'Erreur serveur lors de l\'enregistrement.');
     res.redirect('/paiement/retrait');
   }
 };
-
-
 
 exports.retraitInfo = async (req, res) => {
   try {
@@ -377,8 +337,6 @@ exports.mesRetraits = async (req, res) => {
   }
 };
 
-
-
 // Historique des recharges
 exports.mesRecharges = async (req, res) => {
   try {
@@ -394,54 +352,33 @@ exports.mesRecharges = async (req, res) => {
   }
 };
 
-
-
-
 exports.showSoldePage = async (req, res) => {
   try {
     const user = req.user;
 
-    // ================================
-    // 1. Récupération des TRANSACTIONS
-    // ================================
     let transactions = await Transaction.find({ user: user._id }).lean();
-
     transactions = transactions.map(t => ({
-      type: t.type,                         // recharge, jeu, gain
+      type: t.type,
       amount: t.amount,
-      status: t.status,                     // en_attente, réussi, échoué
+      status: t.status,
       description: t.description || '',
-      date: t.date || t.createdAt,          // sécurité
+      date: t.date || t.createdAt,
       motif: t.description || 'N/A'
     }));
 
-    // ============================
-    // 2. Récupération des RETRAITS
-    // ============================
     let retraits = await Retrait.find({ user: user._id }).lean();
-
     retraits = retraits.map(r => ({
       type: 'retrait',
       amount: r.amount,
-      status: r.statut,                     // en_attente, réussi, échoué
+      status: r.statut,
       description: `Retrait via ${r.method}`,
-      date: r.createdAt,                    // date réelle
+      date: r.createdAt,
       motif: r.motif
     }));
 
-    // =======================
-    // 3. Fusion des mouvements
-    // =======================
     const mouvements = [...transactions, ...retraits];
-
-    // ============================
-    // 4. Tri par date DESC (pro)
-    // ============================
     mouvements.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // =======================
-    // 5. Rendu
-    // =======================
     res.render('paiement/solde', {
       title: 'Mon Solde',
       user,
@@ -451,228 +388,5 @@ exports.showSoldePage = async (req, res) => {
   } catch (error) {
     console.error("Erreur solde :", error);
     res.status(500).send('Erreur lors du chargement du solde');
-  }
-};
-
-
-exports.vantexPage = (req, res) => {
-  res.render('paiement/vantex', { user: req.user, messages: req.flash() });
-};
-
-
-exports.vantexOpenPage = (req, res) => {
-  res.render('paiement/vantex-open', { user: req.user, messages: req.flash() });
-};
-
-
-
-
-
-exports.vantexOpenSubmit = async (req, res) => {
-  try {
-    const {
-      civility,
-      firstname,
-      lastname,
-      email,
-      phone,
-      profession,
-      country,
-      region,
-      street,
-      city,
-      zip
-    } = req.body;
-
-    if (!req.files || !req.files.id_front || !req.files.id_back) {
-      req.flash('error', 'Veuillez télécharger les documents d\'identité.');
-      return res.redirect('/paiement/vantex');
-    }
-
-    console.log("🧪 USER =", req.user);
-
-  if (!req.user) {
-    return res.status(403).send("FORBIDDEN - USER NOT LOGGED");
-  }
-
-  // 🖊️ Signature (canvas)
-let signature = null;
-let signature_mime = null;
-
-if (req.body.signature && req.body.signature.startsWith("data:")) {
-  const match = req.body.signature.match(/^data:(.+);base64,(.+)$/);
-  if (match) {
-    signature_mime = match[1]; // image/png
-    signature = match[2];      // base64 pur
-  }
-}
-
-    
-    console.log("🟢 VANTEX SUBMIT APPELÉ");
-  console.log("👤 USER :", req.user?._id);
-  console.log("📦 BODY :", req.body);
-  console.log("📂 FILES :", req.files);
-
-    // Vérification d'une demande en attente pour le même email ou téléphone
-    const existing = await VantexRequest.findOne({
-      $or: [{ email }, { phone }],
-      status: 'en attente'
-    });
-    if (existing) {
-      req.flash('error', 'Vous avez déjà une demande en attente avec cet email ou téléphone.');
-      return res.redirect('/paiement/vantex');
-    }
-
-    const id_front_file = req.files.id_front[0];
-    const id_back_file = req.files.id_back[0];
-
-    // Conversion en base64
-    const id_front = id_front_file.buffer.toString('base64');
-    const id_back = id_back_file.buffer.toString('base64');
-
-    const id_front_mime = id_front_file.mimetype;
-    const id_back_mime = id_back_file.mimetype;
-
-    const demande = new VantexRequest({
-      civility,
-      firstname,
-      lastname,
-      email,
-      phone,
-      profession,
-      country,
-      region,
-      street,
-      city,
-      zip,
-      id_front,
-      id_back,
-      id_front_mime,
-      id_back_mime,
-      signature,
-      signature_mime,
-      status: 'en attente'
-    });
-
-    await demande.save();
-
-    req.flash('success', 'Votre demande a été enregistrée avec succès. Elle est en attente de vérification.');
-    res.redirect('/paiement/vantex/merci');
-
-  } catch (err) {
-    console.error('Erreur ouverture compte VANTEX:', err);
-    req.flash('error', 'Une erreur est survenue, veuillez réessayer.');
-    res.redirect('/paiement/vantex');
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-const EmailVerification = require("../models/EmailVerification");
-const sendVantexCode = require("../services/sendVantexCode");
-
-/* ============================= */
-/*  ENVOI DU CODE EMAIL          */
-/* ============================= */
-exports.sendVerificationCode = async (req, res) => {
-  try {
-    const email = req.body?.email;
-
-    console.log("💌 Demande d’envoi code VANTEX pour :", email);
-
-  
-  if (!email) {
-   console.error("❌ Email manquant dans req.body :", req.body);
-   return res.status(400).json({ success: false, message: "Email manquant" });
-  }
-
-
-    let record = await EmailVerification.findOne({ email });
-
-    // 🔒 Bloqué 2h si trop de tentatives
-    if (record?.blockedUntil && record.blockedUntil > new Date()) {
-      console.log("⛔ Email bloqué jusqu’à :", record.blockedUntil);
-      return res.json({ success: false, blocked: true });
-    }
-
-    // 🔢 Génération code à 6 chiffres
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // 💾 Sauvegarde / mise à jour DB
-    record = await EmailVerification.findOneAndUpdate(
-      { email },
-      {
-        email,
-        code,
-        attempts: 0,
-        blockedUntil: null,
-        expiresAt: new Date(Date.now() + 2 * 60 * 1000) // 2 minutes
-      },
-      { upsert: true, new: true }
-    );
-
-    console.log("📧 Envoi du code VANTEX :", code, "→", email);
-
-    // 🚀 ENVOI EMAIL (POINT CRITIQUE)
-    const info = await sendVantexCode(email, code);
-
-    console.log("✅ SMTP a accepté le mail :", info?.messageId || "NO_ID");
-
-    return res.json({ success: true });
-
-  } catch (err) {
-    console.error("❌ ERREUR sendVerificationCode :", err);
-
-    return res.json({
-      success: false,
-      error: "EMAIL_SEND_FAILED"
-    });
-  }
-};
-
-/* ============================= */
-/*  VERIFICATION DU CODE         */
-/* ============================= */
-exports.verifyEmailCode = async (req, res) => {
-  try {
-    const { email, code } = req.body;
-    if (!email || !code) return res.json({ success: false });
-
-    const record = await EmailVerification.findOne({ email });
-    if (!record) return res.json({ success: false });
-
-    // Code expiré ?
-    if (record.expiresAt < new Date()) {
-      return res.json({ success: false, expired: true });
-    }
-
-    // Mauvais code ?
-    if (record.code !== code) {
-      record.attempts += 1;
-
-      // Blocage 2h après 4 tentatives
-      if (record.attempts >= 4) {
-        record.blockedUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
-      }
-
-      await record.save();
-      return res.json({ success: false, attempts: record.attempts, blocked: !!record.blockedUntil });
-    }
-
-    // Code correct → supprimer enregistrement
-    await EmailVerification.deleteOne({ _id: record._id });
-    return res.json({ success: true });
-
-  } catch (err) {
-    console.error("verifyEmailCode:", err);
-    return res.json({ success: false });
   }
 };

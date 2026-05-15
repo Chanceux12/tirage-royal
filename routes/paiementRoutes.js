@@ -37,34 +37,6 @@ router.get('/retrait', ensureAuthenticated, paiementController.showRetraitPage);
 router.post('/retrait', ensureAuthenticated, paiementController.retrait);
 router.get('/retrait-info/:id', ensureAuthenticated, paiementController.retraitInfo);
 
-router.get('/vantex', ensureAuthenticated, paiementController.vantexPage); 
-
-// Page formulaire ouverture compte VANTEX
-router.get('/vantex-open', ensureAuthenticated, paiementController.vantexOpenPage);
-
-// Soumission formulaire ouverture compte VANTEX
-router.post(
-  '/vantex/submit',
-  ensureAuthenticated, // 🔥 OBLIGATOIRE SUR VERCEL
-  upload.fields([
-    { name: 'id_front', maxCount: 1 },
-    { name: 'id_back', maxCount: 1 }
-  ]),
-  paiementController.vantexOpenSubmit
-);
-
-router.get(
-  '/vantex/merci',
-  ensureAuthenticated,
-  (req, res) => {
-    res.render('paiement/merci', {
-      success: req.flash('success'),
-      error: req.flash('error')
-    });
-  }
-);
-
-
 
 // Page historique des retraits
 router.get('/mes-retraits', ensureAuthenticated, paiementController.mesRetraits);

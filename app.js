@@ -241,7 +241,7 @@ const adminRoutes = require('./routes/admin');
 const mainRoutes = require('./routes/index');
 const authRoutes = require('./routes/auth');
 const jeuRoutes = require('./routes/jeuRoutes');
-const vantexRoutes = require('./routes/vantex');
+
 const paiementRoutes = require('./routes/paiementRoutes');
 const userRoutes = require('./routes/userRoutes');
 const publicRoutes = require('./routes/public');
@@ -251,7 +251,7 @@ app.use('/', pageRoutes);
 
 app.use('/', publicRoutes);
 app.use('/paiement', paiementRoutes);
-app.use('/paiement', vantexRoutes);
+
 app.use('/admin', adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/', mainRoutes);
