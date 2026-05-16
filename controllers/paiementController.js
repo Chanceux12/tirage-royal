@@ -267,14 +267,6 @@ exports.retrait = async (req, res) => {
           req.user.solde -= montant;
           await req.user.save();
           
-          // Création de la transaction de débit (avec l'enum 'retrait' maintenant corrigé)
-          await Transaction.create({
-            user: req.user._id,
-            type: 'retrait',
-            amount: montant,
-            status: 'en_attente',
-            description: `Retrait vers banque BPER (${ibanClean})`,
-          });
           
           statut = 'en_attente';
           raison = null;
