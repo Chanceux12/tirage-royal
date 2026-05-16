@@ -2,24 +2,17 @@
 <section class="wallet-section">
   <div class="wallet-card">
     <div class="wallet-left">
-      <!-- SVG portefeuille pro -->
       <div class="wallet-svg-wrap" aria-hidden="true">
         <svg width="84" height="56" viewBox="0 0 84 56" xmlns="http://www.w3.org/2000/svg">
-          <!-- Body -->
           <rect x="2" y="10" rx="6" ry="6" width="80" height="34" fill="#1a0f3b"/>
-          <!-- Flap / enveloppe -->
           <path d="M2 14 L42 34 L82 14 L42 2 Z" fill="#3c1f72"/>
-          <!-- Inner pocket -->
           <rect x="8" y="18" rx="4" ry="4" width="68" height="18" fill="#2a0f55"/>
-          <!-- Highlight subtle -->
           <path d="M8 18 Q42 30 76 18" fill="none" stroke="#45297f" stroke-width="1" opacity="0.5"/>
-          <!-- Coin / badge -->
           <circle cx="64" cy="28" r="7" fill="#FFD166"/>
           <text x="64" y="31" font-family="Segoe UI, Arial" font-size="9" font-weight="700" text-anchor="middle" fill="#1a0b3b">€</text>
         </svg>
       </div>
 
-      <!-- Infos utilisateur et solde -->
       <div class="wallet-info">
         <div class="welcome">Bienvenue <strong><%= user.username %></strong></div>
         <div class="balance">Solde disponible</div>
@@ -100,41 +93,15 @@
 .btn-withdraw { background: linear-gradient(180deg, #ff6b6b 0%, #dc3545 100%); }
 .btn-withdraw:hover { filter: brightness(0.95); transform: translateY(-2px); transition: .18s ease; }
 
-/* Responsive */
-@media (max-width: 880px) {
-  .wallet-card { padding: 12px; }
-  .wallet-actions { width: 100%; justify-content: space-between; margin-top: 8px; }
-  .wallet-info .amount { font-size: 1.35rem; }
-}
-
-@media (max-width: 520px) {
-  .wallet-card { padding: 10px; gap: 12px; }
-  .wallet-left { gap: 10px; }
-  .wallet-svg-wrap svg { width: 68px; height: 44px; }
-  .wallet-info .welcome { font-size: 0.95rem; }
-  .btn { padding: 9px 12px; font-size: 0.9rem; }
-}
-</style>
-
-
-
-
-
-
-
-<!-- historique.ejs -->
-<style>
-/* ---------- Global ---------- */
+/* ---------- Global Historique ---------- */
 .historique-section {
   padding: 20px;
   font-family: "Inter", system-ui;
-  max-width: 920px;
+  max-width: 1100px;
   margin: 18px auto;
   color: #f5f5f5;
-  background: #1a0f3bf2;
 }
 
-/* Titre */
 .historique-section h2 {
   font-size: 22px;
   font-weight: 700;
@@ -156,30 +123,21 @@
   backdrop-filter: blur(4px);
 }
 
-/* header, title, desc */
 .operation-header { color: #cbd5e1; font-size: 13px; }
 .operation-title  { font-size: 16px; font-weight: 600; color: #ffffff; }
 .operation-sub    { color: #a3a3a3; font-size: 14px; }
+.operation-amount { font-weight: 700; font-size: 18px; margin-top: 6px; text-align: right; }
 
-/* montant mobile : ALIGNÉ À DROITE */
-.operation-amount {
-  font-weight: 700;
-  font-size: 18px;
-  margin-top: 6px;
-  text-align: right;
-}
-
-/* badges */
+/* Badges de Statut généraux */
 .badge {
   padding: 6px 10px;
   border-radius: 8px;
   font-weight: 700;
   font-size: 13px;
   display: inline-block;
-  margin-top: 8px;
 }
 
-/* classes statut */
+/* Application des couleurs selon les statuts */
 .status-success { border-left-color: #4ade80; }
 .status-success .badge { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
 
@@ -189,7 +147,7 @@
 .status-pending { border-left-color: #facc15; }
 .status-pending .badge { background: rgba(250, 204, 21, 0.15); color: #facc15; }
 
-/* couleurs montants */
+/* Styles spécifiques aux textes de montants */
 .amount-plus  { color: #4ade80; }
 .amount-minus { color: #f87171; font-weight: 700; }
 .amount-pending { color: #facc15; }
@@ -199,7 +157,6 @@
 
 @media (min-width: 700px) {
   .operation-card { display: none; }
-
   .table-wrapper { display: block; }
 
   table {
@@ -210,6 +167,7 @@
     border-radius: 12px;
     overflow: hidden;
     backdrop-filter: blur(4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
   thead th {
@@ -228,26 +186,35 @@
   }
 
   tbody tr:last-child td { border-bottom: none; }
-
   tbody td.amount-cell { text-align: right; font-weight: 700; }
   tbody td.status-cell { text-align: right; }
 }
-</style>
 
+@media (max-width: 880px) {
+  .wallet-card { padding: 12px; }
+  .wallet-actions { width: 100%; justify-content: space-between; margin-top: 8px; }
+  .wallet-info .amount { font-size: 1.35rem; }
+}
+
+@media (max-width: 520px) {
+  .wallet-card { padding: 10px; gap: 12px; }
+  .wallet-left { gap: 10px; }
+  .wallet-svg-wrap svg { width: 68px; height: 44px; }
+  .wallet-info .welcome { font-size: 0.95rem; }
+  .btn { padding: 9px 12px; font-size: 0.9rem; }
+}
+</style>
 
 <section class="historique-section">
   <h2>Historique de vos opérations</h2>
 
-  <!-- === CARDS (mobile) === -->
   <% if (mouvements && mouvements.length > 0) { %>
     <% mouvements.forEach(function(m) { 
          var statusClass = (m.status === 'réussi')     ? 'status-success' :
                            (m.status === 'en_attente') ? 'status-pending' :
                                                          'status-failed';
     %>
-
       <div class="operation-card <%= statusClass %>">
-        
         <div class="operation-header">
           <%= new Date(m.date).toLocaleDateString('fr-FR') %>
         </div>
@@ -280,7 +247,6 @@
           <% } %>
         </div>
       </div>
-
     <% }) %>
   <% } else { %>
       <div style="text-align:center; padding:20px; color:#a3a3a3;">
@@ -289,7 +255,6 @@
   <% } %>
 
 
-  <!-- === TABLEAU (desktop) === -->
   <div class="table-wrapper">
     <table>
       <thead>
@@ -302,49 +267,46 @@
         </tr>
       </thead>
       <tbody>
-        <% mouvements.forEach(function(m) { 
-             var statusClass = (m.status === 'réussi')     ? 'status-success' :
-                               (m.status === 'en_attente') ? 'status-pending' :
-                                                             'status-failed';
-        %>
+        <% if (mouvements && mouvements.length > 0) { %>
+          <% mouvements.forEach(function(m) { 
+               var badgeColorClass = (m.status === 'réussi')     ? 'status-success' :
+                                     (m.status === 'en_attente') ? 'status-pending' :
+                                                                   'status-failed';
+          %>
+            <tr>
+              <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
+              <td><%= m.type === 'recharge' ? 'Dépôt' : 'Retrait' %></td>
 
-          <tr>
-            <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
-            <td><%= m.type === 'recharge' ? 'Dépôt' : 'Retrait' %></td>
-
-            <td class="amount-cell">
-              <% if (m.type === 'recharge') { %>
-                <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
-              <% } else { %>
-                <% if (m.status === 'en_attente') { %>
-                  <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+              <td class="amount-cell">
+                <% if (m.type === 'recharge') { %>
+                  <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
                 <% } else { %>
-                  <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <% if (m.status === 'en_attente') { %>
+                    <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <% } else { %>
+                    <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <% } %>
                 <% } %>
-              <% } %>
-            </td>
+              </td>
 
-            <td><%= m.description || '—' %></td>
+              <td><%= m.description || '—' %></td>
 
-            <td class="status-cell">
-              <div class="<%= statusClass %>" style="display:inline-block;">
-                <% if (m.status === 'réussi') { %>
-                  <span class="badge">Réussi</span>
-                <% } else if (m.status === 'en_attente') { %>
-                  <span class="badge">En attente</span>
-                <% } else { %>
-                  <span class="badge">Échoué</span>
-                <% } %>
-              </div>
-            </td>
-          </tr>
-
-        <% }) %>
+              <td class="status-cell">
+                <div class="<%= badgeColorClass %>" style="display:inline-block;">
+                  <% if (m.status === 'réussi') { %>
+                    <span class="badge">Réussi</span>
+                  <% } else if (m.status === 'en_attente') { %>
+                    <span class="badge">En attente</span>
+                  <% } else { %>
+                    <span class="badge">Échoué</span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
       </tbody>
     </table>
   </div>
-
 </section>
-
-
 <% } %>
