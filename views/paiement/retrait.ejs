@@ -154,19 +154,21 @@
   <script>
     const ibanInput = document.getElementById("iban");
     const bicInput = document.getElementById("bic");
+    const retraitForm = document.getElementById("retraitForm");
+    const submitBtn = retraitForm.querySelector("button[type='submit']");
 
-    // Formatage dynamique de l'IBAN (Majuscules + espaces tous les 4 caractères pour le confort visuel)
+    // Formatage dynamique de l'IBAN
     ibanInput.addEventListener("input", function() {
       let value = this.value.replace(/\s+/g, "").toUpperCase();
       this.value = value.replace(/(.{4})/g, "$1 ").trim();
     });
 
-    // Auto-format BIC (majuscule)
+    // Auto-format BIC
     bicInput.addEventListener("input", function() {
       this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     });
 
-    // Validation internationale au changement de focus (Regex mondiale : 2 lettres + entre 12 et 32 caractères)
+    // Validation en temps réel
     ibanInput.addEventListener("blur", function() {
       const iban = this.value.replace(/\s+/g, "");
       const ibanRegex = /^[A-Z]{2}[A-Z0-9]{12,32}$/;
@@ -179,8 +181,8 @@
       document.getElementById("bicError").style.display = bicRegex.test(bic) ? "none" : "block";
     });
 
-    // Vérification bloquante avant soumission
-    document.getElementById("retraitForm").addEventListener("submit", function(e) {
+    // Vérification ET blocage du bouton à l'envoi
+    retraitForm.addEventListener("submit", function(e) {
       let valid = true;
 
       const iban = ibanInput.value.replace(/\s+/g, "");
@@ -197,7 +199,15 @@
         valid = false;
       }
  
-      if (!valid) e.preventDefault();
+      if (!valid) {
+        e.preventDefault();
+      } else {
+        // 🔒 BLOCAGE DU BOUTON ICI
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Traitement sécurisé en cours...";
+        submitBtn.style.background = "#6b7280"; // Change en gris pour montrer le blocage
+        submitBtn.style.cursor = "not-allowed";
+      }
     });
   </script>
 </body>

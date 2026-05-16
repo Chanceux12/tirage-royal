@@ -204,6 +204,7 @@ function generateOrder() {
 }
 
 // 🔄 LOGIQUE DE RETRAIT CORRIGÉE ET SÉCURISÉE
+// 🔄 LOGIQUE DE RETRAIT CORRIGÉE (AVEC SÉCURITÉ ANTI-F5 & REDIRECTION)
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -262,11 +263,11 @@ exports.retrait = async (req, res) => {
 
         // 3️⃣ Vérification stricte du retour de l'API
         if (checkBper.data && (checkBper.data.valid === true || checkBper.data.success === true)) {
-          // L'IBAN existe et est validé sur le 2ème PC
+          // L'IBAN existe et est validé sur le 2ème PC, on procède au débit local
           req.user.solde -= montant;
           await req.user.save();
           
-          // Création de la transaction de débit
+          // Création de la transaction de débit (avec l'enum 'retrait' maintenant corrigé)
           await Transaction.create({
             user: req.user._id,
             type: 'retrait',
@@ -307,12 +308,9 @@ exports.retrait = async (req, res) => {
       raison           
     });
 
-    retrait = await retrait.populate('user');
-
-    res.render('paiement/retrait-info', {
-      retrait,
-      delai: '3h à 24h'
-    });
+    // 🔒 ANCHOR PATTERN ANTI-F5 : Au lieu de res.render, on redirige l'utilisateur !
+    // Cela change l'URL dans son navigateur. S'il actualise, il rechargera juste les infos sans ré-exécuter le formulaire.
+    res.redirect(`/paiement/retrait-info/${retrait._id}`);
 
   } catch (err) {
     console.error('Erreur retrait général:', err);
@@ -321,6 +319,7 @@ exports.retrait = async (req, res) => {
   }
 };
 
+// 💾 ROUTE SECURISEE POUR L'AFFICHAGE DU RETRAIT (POST-REDIRECTION)
 exports.retraitInfo = async (req, res) => {
   try {
     const retrait = await Retrait.findById(req.params.id).populate('user');
@@ -328,6 +327,8 @@ exports.retraitInfo = async (req, res) => {
       req.flash('error', 'Retrait introuvable.');
       return res.redirect('/paiement/retrait');
     }
+    
+    // C'est ici qu'on render la page finale en toute sécurité
     res.render('paiement/retrait-info', { retrait });
   } catch (err) {
     console.error('Erreur retraitInfo:', err);
