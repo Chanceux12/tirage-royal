@@ -208,13 +208,291 @@
       background-color: #0e0038;
       border-radius: 0 0 8px 8px;
       max-height: 0;
-      overflow: hidden;
+      /* 🛠️ CORRECTION PROFESSIONNELLE : overflow-y: auto permet le scroll si le menu est trop grand */
+      overflow-y: auto; 
       transition: max-height 0.4s ease;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       z-index: 999;
     }
-    /* 🛠️ AJUSTEMENT : Augmentation de max-height pour éviter que Déconnexion soit coupé */
-    .mobile-menu.open { max-height: 680px; }
+    /* ✅ Ajustement de max-height pour donner de l'espace */
+    .mobile-menu.open { max-height: 80vh; }
+    
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .mobile-menu a:hover { background: rgba(255,255,255,0.15); }
+    .mobile-menu .user-info { margin: 10px 20px; font-weight: 600; color: #fecd1a; }
+
+    @media (max-width: 768px){
+      nav.navbar-menu, .navbar-right { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: block; }
+      .user-info { text-align: left; min-width: auto; }
+    }
+
+    .logo-img {
+      height: 85px;
+      width: auto;
+      display: block;
+    }
+
+    @media (max-width: 1024px) { .logo-img { height: 75px; } }
+    @media (max-width: 768px) { .logo-img { height: 65px; } }
+    @media (max-width: 480px) { .logo-img { height: 55px; } }
+
+    /* Loader overlay */
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(8,0,50,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      backdrop-filter: blur(3px);
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    /* Anneau rond animé */
+    .loader-ring {
+      width: 120px;
+      height: 120px;
+      border: 6px solid rgba(255,255,255,0.1);
+      border-top: 6px solid #FFD166; /* doré */
+      border-radius: 50%;
+      animation: spin 1.5s linear infinite;
+      box-shadow: 0 0 20px #FFD166;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Texte centré dans le cercle<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "Tirage Royal" %></title>
+
+  <meta name="description" content="Tirage Royal - Plateforme de jeux de tirage en ligne. Jouez, gagnez et suivez vos résultats en toute transparence.">
+  <meta name="keywords" content="tirage, loterie, jeux en ligne, tirage royal, gagner de l'argent, tirage au sort">
+  <meta name="author" content="Tirage Royal">
+
+  <link rel="icon" type="image/png" href="/image/favicon.png">
+  <link rel="apple-touch-icon" href="/image/favicon.png">
+  <meta name="theme-color" content="#080032">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Tirage Royal",
+    "url": "https://www.tirageroyale.com",
+    "logo": "https://www.tirageroyale.com/image/favicon.png"
+  }
+  </script>
+
+  <meta property="og:title" content="Tirage Royal - Jeux de tirage en ligne">
+  <meta property="og:description" content="Participez aux meilleurs tirages et découvrez les résultats instantanément.">
+  <meta property="og:url" content="https://tirageroyale.com">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://tirageroyale.com/image/preview.png">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ----- STYLE DU SITE EXISTANT ----- */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #080032;
+      color: #fff;
+    }
+
+    header.navbar {
+      background: linear-gradient(90deg, #0e0038, #20006a);
+      padding: 12px 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .navbar-left .logo {
+      font-size: 1.7em;
+      font-weight: 700;
+      color: #fecd1a;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .navbar-left .logo:hover { color: #ffdd4a; }
+
+    nav.navbar-menu {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    nav.navbar-menu a {
+      font-weight: 500;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+    nav.navbar-menu a:hover { background: rgba(255,255,255,0.15); }
+
+    .dropdown-container { position: relative; display: inline-block; }
+    .dropdown-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    .dropdown-btn:hover { background: rgba(255,255,255,0.15); }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #0e0038;
+      min-width: 180px;
+      border-radius: 6px;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 14px;
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .dropdown-menu a:hover { background: rgba(255,255,255,0.15); }
+
+    .dropdown-container:hover .dropdown-menu { display: block; }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      min-width: 220px;
+      justify-content: flex-end;
+    }
+    .navbar-right a {
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .navbar-right a:hover { background: rgba(255,255,255,0.15); }
+
+    .btn-orange {
+      background-color: #f97316;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .btn-orange:hover { background-color: #ff8c3f; }
+
+    /* 🆕 BOUTON BPER BANCA PRO */
+    .btn-bper {
+      background-color: #0c1a30; /* Bleu BPER */
+      color: #ffffff !important;
+      border: 1px solid rgba(0, 150, 136, 0.5); /* Bordure discrète */
+      font-weight: 700;
+      animation: bperPulse 2.5s infinite; /* Animation de pulsation */
+    }
+    .btn-bper:hover {
+      background-color: #009688; /* Changement au survol vers le vert BPER */
+      box-shadow: 0 0 15px rgba(0, 150, 136, 0.6);
+    }
+
+    @keyframes bperPulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 150, 136, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0); }
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      line-height: 1.2;
+      min-width: 150px;
+      font-weight: 600;
+      font-size: 0.95em;
+      color: #fecd1a;
+    }
+    .user-info .username { font-weight: 700; margin-bottom: 2px; color: white; }
+    .user-info .solde { font-weight: 600; font-size: 0.9em; color: #fecd1a; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 26px;
+      height: 22px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .hamburger span {
+      width: 100%;
+      height: 3px;
+      background-color: white;
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background-color: #0e0038;
+      border-radius: 0 0 8px 8px;
+      max-height: 0;
+      /* 🛠️ CORRECTION PROFESSIONNELLE : overflow-y: auto permet le scroll si le menu est trop grand */
+      overflow-y: auto; 
+      transition: max-height 0.4s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    /* ✅ Ajustement de max-height pour donner de l'espace */
+    .mobile-menu.open { max-height: 80vh; }
     
     .mobile-menu a {
       display: flex;
@@ -569,7 +847,7 @@ setTimeout(() => {
     transform: rotate(-90deg); /* fait commencer le cercle en haut */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease; /* ✅ transition fluide ajoutée */
   }
 
   #scrollRoyal.visible {
@@ -624,6 +902,7 @@ setTimeout(() => {
     // fait tourner le cercle selon la progression
     scrollRoyal.style.transform = `rotate(${progress * 360 - 90}deg)`;
 
+    // ✅ Ajout : apparition/disparition fluide
     if (scrollTop > 100) {
       scrollRoyal.classList.add('visible');
     } else {
@@ -633,15 +912,20 @@ setTimeout(() => {
 </script>
 
 <script>
+  // On ajoute la logique de fermeture du loader quand la page est complètement chargée
   window.addEventListener('load', () => {
+    // ajoute la classe pour transition fade-out et fade-in du main
     document.body.classList.add('loaded');
 
+    // retirer complètement l'élément loader du DOM après la transition
     setTimeout(() => {
       const l = document.getElementById('loader');
       if (l && l.parentNode) l.parentNode.removeChild(l);
-    }, 1000);
+    }, 1000); // délai légèrement supérieur à la transition CSS
   });
 
+  // En cas d'erreur ou si 'load' ne se déclenche pas (ex: ressources lentes),
+  // fallback pour enlever loader au bout de 8s
   setTimeout(() => {
     if (!document.body.classList.contains('loaded')) {
       document.body.classList.add('loaded');
