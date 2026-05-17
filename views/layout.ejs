@@ -9,10 +9,12 @@
   <meta name="keywords" content="tirage, loterie, jeux en ligne, tirage royal, gagner de l'argent, tirage au sort">
   <meta name="author" content="Tirage Royal">
 
+  <!-- 🔹 Favicon & Logo -->
   <link rel="icon" type="image/png" href="/image/favicon.png">
   <link rel="apple-touch-icon" href="/image/favicon.png">
   <meta name="theme-color" content="#080032">
 
+  <!-- 🔹 Informations pour Google -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -23,12 +25,14 @@
   }
   </script>
 
+  <!-- Open Graph pour réseaux sociaux -->
   <meta property="og:title" content="Tirage Royal - Jeux de tirage en ligne">
   <meta property="og:description" content="Participez aux meilleurs tirages et découvrez les résultats instantanément.">
   <meta property="og:url" content="https://tirageroyale.com">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://tirageroyale.com/image/preview.png">
 
+  <!-- 🔹 Librairie des icônes Lucide (pour mobile uniquement) -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -147,25 +151,6 @@
     }
     .btn-orange:hover { background-color: #ff8c3f; }
 
-    /* 🆕 BOUTON BPER BANCA PRO */
-    .btn-bper {
-      background-color: #0c1a30; /* Bleu BPER */
-      color: #ffffff !important;
-      border: 1px solid rgba(0, 150, 136, 0.5); /* Bordure discrète */
-      font-weight: 700;
-      animation: bperPulse 2.5s infinite; /* Animation de pulsation */
-    }
-    .btn-bper:hover {
-      background-color: #009688; /* Changement au survol vers le vert BPER */
-      box-shadow: 0 0 15px rgba(0, 150, 136, 0.6);
-    }
-
-    @keyframes bperPulse {
-      0% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(0, 150, 136, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0); }
-    }
-
     .user-info {
       display: flex;
       flex-direction: column;
@@ -213,9 +198,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       z-index: 999;
     }
-    /* 🛠️ AJUSTEMENT : Augmentation de max-height pour éviter que Déconnexion soit coupé */
-    .mobile-menu.open { max-height: 680px; }
-    
+    .mobile-menu.open { max-height: 600px; }
     .mobile-menu a {
       display: flex;
       align-items: center;
@@ -246,68 +229,76 @@
     @media (max-width: 480px) { .logo-img { height: 55px; } }
 
     /* Loader overlay */
-    #loader {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(8,0,50,0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      backdrop-filter: blur(3px);
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
+#loader {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(8,0,50,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  backdrop-filter: blur(3px);
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
 
-    /* Anneau rond animé */
-    .loader-ring {
-      width: 120px;
-      height: 120px;
-      border: 6px solid rgba(255,255,255,0.1);
-      border-top: 6px solid #FFD166; /* doré */
-      border-radius: 50%;
-      animation: spin 1.5s linear infinite;
-      box-shadow: 0 0 20px #FFD166;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
+/* Anneau rond animé */
+.loader-ring {
+  width: 120px;
+  height: 120px;
+  border: 6px solid rgba(255,255,255,0.1);
+  border-top: 6px solid #FFD166; /* doré */
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  box-shadow: 0 0 20px #FFD166;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
 
-    /* Texte centré dans le cercle */
-    .loader-text {
-      position: absolute;
-      color: #FFD166;
-      font-size: 1rem;
-      font-weight: 700;
-      text-align: center;
-      animation: pulse 1.2s ease-in-out infinite;
-    }
+/* Texte centré dans le cercle */
+.loader-text {
+  position: absolute;
+  color: #FFD166;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  animation: pulse 1.2s ease-in-out infinite;
+}
 
-    /* Animations */
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+/* Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
-    /* Disparition fluide */
-    body.loaded #loader {
-      opacity: 0;
-      visibility: hidden;
-    }
+/* Disparition fluide */
+body.loaded #loader {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+
+
+
+
   </style>
 </head>
 
 <body>
-  <div id="loader">
+  <!-- LOADER PRO ROND -->
+<div id="loader">
   <div class="loader-ring"></div>
   <div class="loader-text">🎲</div>
 </div>
+      
 
   <header class="navbar">
     <div class="navbar-container">
@@ -317,6 +308,7 @@
         </a>
       </div>
 
+      <!-- ✅ Menu Desktop (sans icônes) -->
       <nav class="navbar-menu">
         <a href="/">Accueil</a>
         <div class="dropdown-container">
@@ -341,20 +333,25 @@
         <a href="/paiement/solde">Mon Solde</a>
       </nav>
 
+      
       <div class="navbar-right">
   <% if(user){ %>
-    <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper">BPER Banca</a>
     <a href="/auth/logout">Déconnexion</a>
   <% } else { %>
     <a href="/auth/login" class="btn-orange">Connexion</a>
   <% } %>
       </div>
 
+
+
+      <!-- Hamburger -->
       <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 
+    <!-- ✅ Menu Mobile (avec icônes) -->
     <div class="mobile-menu" id="mobile-menu">
       <% if(user){ %>
+        
         <a href="/"><i data-lucide="home"></i> Accueil</a>
         <a href="/jouer"><i data-lucide="dice-6"></i> Jouer</a>
         <a href="/jeu/mes-participations"><i data-lucide="ticket"></i> Mes tickets</a>
@@ -366,7 +363,6 @@
         <a href="/contact"><i data-lucide="mail"></i> Contact</a>
         <a href="/profil"><i data-lucide="user"></i> Mon Profil</a>
         <a href="/paiement/solde"><i data-lucide="credit-card"></i> Mon Solde</a>
-        <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper"><i data-lucide="landmark"></i> BPER Banca</a>
         <a href="/auth/logout"><i data-lucide="log-out"></i> Déconnexion</a>
       <% } else { %>
         <a href="/"><i data-lucide="home"></i> Accueil</a>
@@ -413,7 +409,25 @@ setTimeout(() => {
 }, 8000);
 </script>
 
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
 <footer>
+  <!-- Version Bureau/Tablette : Colonnes -->
   <div class="footer-columns">
     <div class="footer-col">
       <h4>Liens utiles</h4>
@@ -466,6 +480,7 @@ setTimeout(() => {
     </div>
   </div>
 
+  <!-- Version Mobile : Accordéons -->
   <div class="footer-accordeon">
     <div class="footer-acc-item">
       <button class="acc-btn">Liens utiles ▾</button>
@@ -516,6 +531,7 @@ setTimeout(() => {
       </ul>
     </div>
   </div>
+
 </footer>
 
 <script>
@@ -550,6 +566,13 @@ setTimeout(() => {
   }
 </style>
 
+
+
+
+
+
+
+<!-- Cercle Royal animé avec rotation et remplissage --> 
 <div id="scrollRoyal">
   <svg width="70" height="70" viewBox="0 0 70 70">
     <circle class="track" cx="35" cy="35" r="30" />
@@ -569,7 +592,7 @@ setTimeout(() => {
     transform: rotate(-90deg); /* fait commencer le cercle en haut */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease; /* ✅ transition fluide ajoutée */
   }
 
   #scrollRoyal.visible {
@@ -603,8 +626,12 @@ setTimeout(() => {
 
   /* Lueur “royale” */
   @keyframes rotateRing {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
 
@@ -624,6 +651,7 @@ setTimeout(() => {
     // fait tourner le cercle selon la progression
     scrollRoyal.style.transform = `rotate(${progress * 360 - 90}deg)`;
 
+    // ✅ Ajout : apparition/disparition fluide
     if (scrollTop > 100) {
       scrollRoyal.classList.add('visible');
     } else {
@@ -632,16 +660,35 @@ setTimeout(() => {
   });
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+<!-- SCRIPT: supprimer loader après chargement + fallback -->
 <script>
+  // navigation hamburger (déjà présent)
+  // (conserver l'existant)
+  // On ajoute la logique de fermeture du loader quand la page est complètement chargée
   window.addEventListener('load', () => {
+    // ajoute la classe pour transition fade-out et fade-in du main
     document.body.classList.add('loaded');
 
+    // retirer complètement l'élément loader du DOM après la transition
     setTimeout(() => {
       const l = document.getElementById('loader');
       if (l && l.parentNode) l.parentNode.removeChild(l);
-    }, 1000);
+    }, 1000); // délai légèrement supérieur à la transition CSS
   });
 
+  // En cas d'erreur ou si 'load' ne se déclenche pas (ex: ressources lentes),
+  // fallback pour enlever loader au bout de 8s
   setTimeout(() => {
     if (!document.body.classList.contains('loaded')) {
       document.body.classList.add('loaded');
