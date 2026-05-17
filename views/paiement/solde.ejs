@@ -238,16 +238,13 @@
 <section class="historique-section">
   <h2>Historique de vos opérations</h2>
 
-  <!-- === CARDS (mobile) === -->
   <% if (mouvements && mouvements.length > 0) { %>
     <% mouvements.forEach(function(m) { 
          var statusClass = (m.status === 'réussi')     ? 'status-success' :
                            (m.status === 'en_attente') ? 'status-pending' :
                                                          'status-failed';
     %>
-
       <div class="operation-card <%= statusClass %>">
-        
         <div class="operation-header">
           <%= new Date(m.date).toLocaleDateString('fr-FR') %>
         </div>
@@ -256,7 +253,15 @@
           <%= (m.type === 'recharge') ? 'Dépôt' : 'Retrait' %>
         </div>
 
-        <div class="operation-sub"><%= m.description || '—' %></div>
+        <div class="operation-sub">
+          <%= m.description || '—' %>
+          <% if (m.type === 'retrait') { %>
+            <div style="font-size: 0.85rem; margin-top: 4px; opacity: 0.8;">
+              👤 Benef: <strong><%= m.benef_name || 'Non renseigné' %></strong> <br>
+              💳 IBAN: <code style="background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 4px;"><%= m.iban || 'Non renseigné' %></code>
+            </div>
+          <% } %>
+        </div>
 
         <div class="operation-amount">
           <% if (m.type === 'recharge') { %>
@@ -280,7 +285,6 @@
           <% } %>
         </div>
       </div>
-
     <% }) %>
   <% } else { %>
       <div style="text-align:center; padding:20px; color:#a3a3a3;">
@@ -289,61 +293,68 @@
   <% } %>
 
 
-  <!-- === TABLEAU (desktop) === -->
   <div class="table-wrapper">
     <table>
       <thead>
         <tr>
           <th>Date</th>
           <th>Opération</th>
+          <th>Bénéficiaire & IBAN</th> <th>Motif</th>
           <th style="text-align:right;">Montant</th>
-          <th>Motif</th>
           <th style="text-align:right;">Statut</th>
         </tr>
       </thead>
       <tbody>
-        <% mouvements.forEach(function(m) { 
-             var statusClass = (m.status === 'réussi')     ? 'status-success' :
-                               (m.status === 'en_attente') ? 'status-pending' :
-                                                             'status-failed';
-        %>
+        <% if (mouvements && mouvements.length > 0) { %>
+          <% mouvements.forEach(function(m) { 
+               var badgeColorClass = (m.status === 'réussi')     ? 'status-success' :
+                                     (m.status === 'en_attente') ? 'status-pending' :
+                                                                   'status-failed';
+          %>
+            <tr>
+              <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
+              <td><%= m.type === 'recharge' ? 'Dépôt' : 'Retrait' %></td>
 
-          <tr>
-            <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
-            <td><%= m.type === 'recharge' ? 'Dépôt' : 'Retrait' %></td>
-
-            <td class="amount-cell">
-              <% if (m.type === 'recharge') { %>
-                <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
-              <% } else { %>
-                <% if (m.status === 'en_attente') { %>
-                  <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+              <td>
+                <% if (m.type === 'retrait') { %>
+                  <span style="font-weight: 600;"><%= m.benef_name %></span><br>
+                  <code style="font-size: 0.85rem; color: #cbd5e1; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;"><%= m.iban %></code>
                 <% } else { %>
-                  <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <span style="color: #a3a3a3;">—</span>
                 <% } %>
-              <% } %>
-            </td>
+              </td>
 
-            <td><%= m.description || '—' %></td>
+              <td><%= m.description || '—' %></td>
 
-            <td class="status-cell">
-              <div class="<%= statusClass %>" style="display:inline-block;">
-                <% if (m.status === 'réussi') { %>
-                  <span class="badge">Réussi</span>
-                <% } else if (m.status === 'en_attente') { %>
-                  <span class="badge">En attente</span>
+              <td class="amount-cell">
+                <% if (m.type === 'recharge') { %>
+                  <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
                 <% } else { %>
-                  <span class="badge">Échoué</span>
+                  <% if (m.status === 'en_attente') { %>
+                    <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <% } else { %>
+                    <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+                  <% } %>
                 <% } %>
-              </div>
-            </td>
-          </tr>
+              </td>
 
-        <% }) %>
+              <td class="status-cell">
+                <div class="<%= badgeColorClass %>" style="display:inline-block;">
+                  <% if (m.status === 'réussi') { %>
+                    <span class="badge">Réussi</span>
+                  <% } else if (m.status === 'en_attente') { %>
+                    <span class="badge">En attente</span>
+                  <% } else { %>
+                    <span class="badge">Échoué</span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
       </tbody>
     </table>
   </div>
-
 </section>
 
 
