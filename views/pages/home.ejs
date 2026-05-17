@@ -606,8 +606,11 @@
   }
   
   .credit-card-luxury {
-    height: 190px;
-    padding: 18px;
+    width: 90%;          /* S'assure que la carte ne touche pas les bords physiques du téléphone */
+    height: 200px;        /* Hauteur réduite pour un rendu mobile plus élégant */
+    padding: 15px;        /* Réduit l'espace intérieur pour compenser la taille plus petite */
+    margin-left: auto;    /* Centre la carte si width < 100% */
+    margin-right: auto;
   }
   
   .card-logo-text {
