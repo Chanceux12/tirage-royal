@@ -371,22 +371,37 @@ exports.showSoldePage = async (req, res) => {
   try {
     const user = req.user;
 
+    // 1️⃣ Récupération des dépôts uniquement (Transaction)
     let transactions = await Transaction.find({ 
       user: user._id,
-      type: 'recharge' // 👈 IMPORTANT : évite de doubler le retrait s'il y a une transaction de type 'retrait'
+      type: 'recharge'
     }).lean();
 
+    const rechargesFormatees = transactions.map(t => ({
+      type: 'recharge',
+      amount: t.amount,
+      status: t.status,
+      description: t.description || 'Recharge de compte',
+      date: t.date || t.createdAt,
+      iban: null,         // Pas d'IBAN pour une recharge
+      benef_name: null    // Pas de bénéficiaire pour une recharge
+    }));
+
+    // 2️⃣ Récupération des retraits (Retrait) avec l'IBAN et le bénéficiaire
     let retraits = await Retrait.find({ user: user._id }).lean();
-    retraits = retraits.map(r => ({
+    
+    const retraitsFormates = retraits.map(r => ({
       type: 'retrait',
       amount: r.amount,
       status: r.statut,
-      description: `Retrait via ${r.method}`,
+      description: r.motif || `Retrait vers banque ${r.bank_name || 'BPER'}`,
       date: r.createdAt,
-      motif: r.motif
+      iban: r.iban,               // 👈 Transmis à la vue
+      benef_name: r.benef_name    // 👈 Transmis à la vue
     }));
 
-    const mouvements = [...transactions, ...retraits];
+    // 3️⃣ Fusion et tri
+    const mouvements = [...rechargesFormatees, ...retraitsFormates];
     mouvements.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.render('paiement/solde', {
