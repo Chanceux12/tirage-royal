@@ -250,30 +250,34 @@
         </div>
 
         <div class="operation-title">
-          <%= (m.type === 'recharge') ? 'Dépôt' : 'Retrait' %>
-        </div>
+  <% if (m.type === 'recharge') { %> Dépôt
+  <% } else if (m.type === 'retrait') { %> Retrait
+  <% } else if (m.type === 'jeu') { %> Mise Jeu
+  <% } else if (m.type === 'gain') { %> Gain
+  <% } %>
+</div>
 
-        <div class="operation-sub">
-          <%= m.description || '—' %>
-          <% if (m.type === 'retrait') { %>
-            <div style="font-size: 0.85rem; margin-top: 4px; opacity: 0.8;">
-              👤 Benef: <strong><%= m.benef_name || 'Non renseigné' %></strong> <br>
-              💳 IBAN: <code style="background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 4px;"><%= m.iban || 'Non renseigné' %></code>
-            </div>
-          <% } %>
-        </div>
+<div class="operation-sub">
+  <%= m.description || '—' %>
+  <% if (m.type === 'retrait') { %>
+    <div style="font-size: 0.85rem; margin-top: 4px; opacity: 0.8;">
+      👤 Benef: <strong><%= m.benef_name || 'Non renseigné' %></strong> <br>
+      💳 IBAN: <code style="background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 4px;"><%= m.iban || 'Non renseigné' %></code>
+    </div>
+  <% } %>
+</div>
 
-        <div class="operation-amount">
-          <% if (m.type === 'recharge') { %>
-              <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
-          <% } else { %>
-              <% if (m.status === 'en_attente') { %>
-                <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
-              <% } else { %>
-                <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
-              <% } %>
-          <% } %>
-        </div>
+<div class="operation-amount">
+  <% if (m.type === 'recharge' || m.type === 'gain') { %>
+      <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
+  <% } else { %>
+      <% if (m.status === 'en_attente') { %>
+        <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+      <% } else { %>
+        <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+      <% } %>
+  <% } %>
+</div>
 
         <div>
           <% if (m.status === 'réussi') { %>
@@ -312,31 +316,40 @@
                                                                    'status-failed';
           %>
             <tr>
-              <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
-              <td><%= m.type === 'recharge' ? 'Dépôt' : 'Retrait' %></td>
+  <td><%= new Date(m.date).toLocaleDateString('fr-FR') %></td>
+  
+  <td>
+    <% if (m.type === 'recharge') { %> Dépôt
+    <% } else if (m.type === 'retrait') { %> Retrait
+    <% } else if (m.type === 'jeu') { %> Mise Jeu
+    <% } else if (m.type === 'gain') { %> Gain
+    <% } %>
+  </td>
 
-              <td>
-                <% if (m.type === 'retrait') { %>
-                  <span style="font-weight: 600;"><%= m.benef_name %></span><br>
-                  <code style="font-size: 0.85rem; color: #cbd5e1; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;"><%= m.iban %></code>
-                <% } else { %>
-                  <span style="color: #a3a3a3;">—</span>
-                <% } %>
-              </td>
+  <td>
+    <% if (m.type === 'retrait') { %>
+      <span style="font-weight: 600;"><%= m.benef_name %></span><br>
+      <code style="font-size: 0.85rem; color: #cbd5e1; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;"><%= m.iban %></code>
+    <% } else { %>
+      <span style="color: #a3a3a3;">—</span>
+    <% } %>
+  </td>
 
-              <td><%= m.description || '—' %></td>
+  <td><%= m.description || '—' %></td>
 
-              <td class="amount-cell">
-                <% if (m.type === 'recharge') { %>
-                  <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
-                <% } else { %>
-                  <% if (m.status === 'en_attente') { %>
-                    <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
-                  <% } else { %>
-                    <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
-                  <% } %>
-                <% } %>
-              </td>
+  <td class="amount-cell">
+    <% if (m.type === 'recharge' || m.type === 'gain') { %>
+      <span class="amount-plus">+ <%= Number(m.amount).toFixed(2) %> €</span>
+    <% } else { %>
+      <% if (m.status === 'en_attente') { %>
+        <span class="amount-pending">- <%= Number(m.amount).toFixed(2) %> €</span>
+      <% } else { %>
+        <span class="amount-minus">- <%= Number(m.amount).toFixed(2) %> €</span>
+      <% } %>
+    <% } %>
+  </td>
+  
+  
 
               <td class="status-cell">
                 <div class="<%= badgeColorClass %>" style="display:inline-block;">

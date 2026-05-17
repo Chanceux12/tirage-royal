@@ -371,23 +371,34 @@ exports.showSoldePage = async (req, res) => {
   try {
     const user = req.user;
 
-    // 1️⃣ Récupération des dépôts uniquement (Transaction)
+    // 1️⃣ On récupère les recharges (Dépôts), les jeux (Mises) et les gains
     let transactions = await Transaction.find({ 
       user: user._id,
-      type: 'recharge'
+      type: { $in: ['recharge', 'jeu', 'gain'] } // 👈 Accepte désormais les trois types
     }).lean();
 
-    const rechargesFormatees = transactions.map(t => ({
-      type: 'recharge',
-      amount: t.amount,
-      status: t.status,
-      description: t.description || 'Recharge de compte',
-      date: t.date || t.createdAt,
-      iban: null,         // Pas d'IBAN pour une recharge
-      benef_name: null    // Pas de bénéficiaire pour une recharge
-    }));
+    const transactionsFormatees = transactions.map(t => {
+      let descriptionAction = t.description;
+      
+      // Sécurisation de la description selon le type si elle est vide
+      if (!descriptionAction) {
+        if (t.type === 'recharge') descriptionAction = 'Recharge de compte';
+        if (t.type === 'jeu') descriptionAction = 'Mise sur un jeu';
+        if (t.type === 'gain') descriptionAction = 'Gain de tirage';
+      }
 
-    // 2️⃣ Récupération des retraits (Retrait) avec l'IBAN et le bénéficiaire
+      return {
+        type: t.type, // Conserve le type original ('recharge', 'jeu', 'gain')
+        amount: t.amount,
+        status: t.status,
+        description: descriptionAction,
+        date: t.date || t.createdAt,
+        iban: null,
+        benef_name: null
+      };
+    });
+
+    // 2️⃣ On récupère tous les retraits depuis la collection Retrait
     let retraits = await Retrait.find({ user: user._id }).lean();
     
     const retraitsFormates = retraits.map(r => ({
@@ -396,12 +407,12 @@ exports.showSoldePage = async (req, res) => {
       status: r.statut,
       description: r.motif || `Retrait vers banque ${r.bank_name || 'BPER'}`,
       date: r.createdAt,
-      iban: r.iban,               // 👈 Transmis à la vue
-      benef_name: r.benef_name    // 👈 Transmis à la vue
+      iban: r.iban,
+      benef_name: r.benef_name
     }));
 
-    // 3️⃣ Fusion et tri
-    const mouvements = [...rechargesFormatees, ...retraitsFormates];
+    // 3️⃣ Fusion globale de tous les mouvements et tri chronologique
+    const mouvements = [...transactionsFormatees, ...retraitsFormates];
     mouvements.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.render('paiement/solde', {
