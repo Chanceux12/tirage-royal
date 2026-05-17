@@ -5,7 +5,7 @@ const Retrait = require('../models/Retrait');
 const { ensureAuthenticated } = require('../middlewares/auth');
 const { isAdmin } = require('../middlewares/authMiddleware');
 const sendMail = require('../utils/sendMail');
-
+const axios = require('axios'); 
 
 
 // ✅ Route pour afficher la page des utilisateurs à approuver
@@ -128,54 +128,95 @@ router.get('/retraits', ensureAuthenticated,isAdmin, async (req, res) => {
 });
 
 
-// Valider un retrait
-router.post('/retraits/valider/:id', ensureAuthenticated,isAdmin, async (req, res) => {
+// Valider un retrait (SITE DE JEUX -> Transmet l'argent au PC BANQUE)
+router.post('/retraits/valider/:id', ensureAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const retrait = await Retrait.findById(req.params.id).populate('user');
+    if (!retrait) {
+      req.flash('error', 'Retrait introuvable.');
+      return res.redirect('/admin/retraits');
+    }
+
+    if (retrait.statut !== 'en_attente') {
+      req.flash('error', 'Ce retrait a déjà été traité.');
+      return res.redirect('/admin/retraits');
+    }
+
+    // 📡 Envoi de l'ordre de virement vers le PC Banque BPER
+    try {
+      console.log(`📡 Admin valide : Envoi des fonds (${retrait.amount}€) vers l'IBAN BPER: ${retrait.iban}`);
+      
+      const responseBper = await axios.post("https://banque-pro.vercel.app/api/internal/credit-account", {
+        apiKey: "bper_secret_99d8b7a6c5e4d3",
+        iban: retrait.iban,
+        bic: retrait.bic,
+        amount: retrait.amount
+      });
+
+      if (responseBper.data && responseBper.data.success === true) {
+        // Le PC Banque a bien reçu l'argent et mis à jour le compte !
+        retrait.statut = 'réussi';
+        await retrait.save();
+
+        // Optionnel : Mettre à jour également le statut de la Transaction pour l'historique de solde
+        const Transaction = require('../models/Transaction');
+        await Transaction.findOneAndUpdate(
+          { user: retrait.user._id, amount: retrait.amount, type: 'retrait', status: 'en_attente' },
+          { status: 'réussi' }
+        );
+
+        req.flash('success', `✅ Retrait de ${retrait.user.username} validé. Les ${retrait.amount}€ ont été versés sur le compte BPER !`);
+      } else {
+        req.flash('error', 'La banque a refusé la transaction.');
+      }
+
+    } catch (apiError) {
+      console.error("❌ Échec du virement inter-ordinateur :", apiError.response ? apiError.response.data : apiError.message);
+      req.flash('error', "Impossible de joindre la banque BPER. Le compte n'a pas été crédité.");
+    }
+
+    res.redirect('/admin/retraits');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Erreur serveur lors de la validation.');
+    res.redirect('/admin/retraits');
+  }
+});
+
+// Refuser un retrait (SITE DE JEUX -> Rembourse l'utilisateur)
+router.post('/retraits/refuser/:id', ensureAuthenticated, isAdmin, async (req, res) => {
   try {
     const retrait = await Retrait.findById(req.params.id).populate('user');
     if (!retrait) return res.redirect('/admin/retraits');
 
-    // Vérifie que l'utilisateur a le solde suffisant
-    if (retrait.user.solde < retrait.amount) {
-      retrait.statut = 'échoué';
-      await retrait.save();
-      req.flash('error', `Solde insuffisant pour ${retrait.user.username}. Retrait refusé.`);
+    if (retrait.statut !== 'en_attente') {
+      req.flash('error', 'Ce retrait a déjà été traité.');
       return res.redirect('/admin/retraits');
     }
 
-    // Déduire le solde
-    retrait.user.solde -= retrait.amount;
+    // 🔄 REBOURSEMENT : Comme on lui avait retiré son argent au départ, on lui réinjecte sur son solde
+    retrait.user.solde += retrait.amount;
     await retrait.user.save();
 
-    // Statut réussi
-    retrait.statut = 'réussi';
+    // Passage en échoué
+    retrait.statut = 'échoué';
     await retrait.save();
 
-    req.flash('success', `Retrait de ${retrait.user.username} validé.`);
+    // Mise à jour de l'historique également
+    const Transaction = require('../models/Transaction');
+    await Transaction.findOneAndUpdate(
+      { user: retrait.user._id, amount: retrait.amount, type: 'retrait', status: 'en_attente' },
+      { status: 'échoué' }
+    );
+
+    req.flash('success', `❌ Retrait refusé. L'utilisateur ${retrait.user.username} a été remboursé de ses ${retrait.amount}€.`);
     res.redirect('/admin/retraits');
   } catch (err) {
     console.error(err);
-    req.flash('error', 'Erreur serveur.');
+    req.flash('error', 'Erreur serveur lors du refus.');
     res.redirect('/admin/retraits');
   }
 });
-
-// Refuser un retrait
-router.post('/retraits/refuser/:id', ensureAuthenticated,isAdmin, async (req, res) => {
-  try {
-    await Retrait.findByIdAndUpdate(req.params.id, { statut: 'échoué' });
-    req.flash('success', 'Retrait refusé avec succès.');
-    res.redirect('/admin/retraits');
-  } catch (err) {
-    console.error(err);
-    req.flash('error', 'Erreur serveur.');
-    res.redirect('/admin/retraits');
-  }
-});
-
-
-
-
-
 
 
 
