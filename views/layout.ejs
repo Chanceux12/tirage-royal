@@ -123,8 +123,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      flex-wrap: wrap;
-      min-width: 220px;
+      flex-wrap: nowrap; /* 🛠️ Empêche le bouton Déconnexion d'être coupé ou écrasé */
+      min-width: auto;   /* 🛠️ S'adapte dynamiquement à la taille des boutons */
       justify-content: flex-end;
     }
     .navbar-right a {
@@ -151,12 +151,12 @@
     .btn-bper {
       background-color: #0c1a30; /* Bleu BPER */
       color: #ffffff !important;
-      border: 1px solid rgba(0, 150, 136, 0.5); /* Bordure discrète */
+      border: 1px solid rgba(0, 150, 136, 0.5);
       font-weight: 700;
-      animation: bperPulse 2.5s infinite; /* Animation de pulsation */
+      animation: bperPulse 2.5s infinite;
     }
     .btn-bper:hover {
-      background-color: #009688; /* Changement au survol vers le vert BPER */
+      background-color: #009688;
       box-shadow: 0 0 15px rgba(0, 150, 136, 0.6);
     }
 
@@ -391,17 +391,13 @@
 
   <script>
 window.addEventListener('load', () => {
-  // Ajoute classe pour transition
   document.body.classList.add('loaded');
-
-  // Supprime le loader du DOM après transition
   setTimeout(() => {
     const l = document.getElementById('loader');
     if (l && l.parentNode) l.parentNode.removeChild(l);
-  }, 600); // correspond à la transition CSS
+  }, 600);
 });
 
-// Fallback si load ne se déclenche pas
 setTimeout(() => {
   if (!document.body.classList.contains('loaded')) {
     document.body.classList.add('loaded');
@@ -564,10 +560,10 @@ setTimeout(() => {
     width: 40px;
     height: 40px;
     cursor: pointer;
-    transform: rotate(-90deg); /* fait commencer le cercle en haut */
+    transform: rotate(-90deg);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease; /* ✅ transition fluide ajoutée */
+    transition: opacity 0.4s ease, visibility 0.4s ease;
   }
 
   #scrollRoyal.visible {
@@ -580,14 +576,12 @@ setTimeout(() => {
     height: 100%;
   }
 
-  /* Cercle de fond */
   .track {
     fill: none;
     stroke: rgba(255, 255, 255, 0.1);
     stroke-width: 6;
   }
 
-  /* Cercle de progression */
   .progress {
     fill: none;
     stroke: #f97316;
@@ -599,7 +593,6 @@ setTimeout(() => {
     filter: drop-shadow(0 0 8px #ff8c3f);
   }
 
-  /* Lueur “royale” */
   @keyframes rotateRing {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -616,13 +609,9 @@ setTimeout(() => {
     const progress = scrollTop / docHeight;
     const offset = 188.4 - progress * 188.4;
 
-    // remplit le cercle selon le scroll
     progressRing.style.strokeDashoffset = offset;
-
-    // fait tourner le cercle selon la progression
     scrollRoyal.style.transform = `rotate(${progress * 360 - 90}deg)`;
 
-    // ✅ Ajout : apparition/disparition fluide
     if (scrollTop > 100) {
       scrollRoyal.classList.add('visible');
     } else {
@@ -632,20 +621,14 @@ setTimeout(() => {
 </script>
 
 <script>
-  // On ajoute la logique de fermeture du loader quand la page est complètement chargée
   window.addEventListener('load', () => {
-    // ajoute la classe pour transition fade-out et fade-in du main
     document.body.classList.add('loaded');
-
-    // retirer complètement l'élément loader du DOM après la transition
     setTimeout(() => {
       const l = document.getElementById('loader');
       if (l && l.parentNode) l.parentNode.removeChild(l);
-    }, 1000); // délai légèrement supérieur à la transition CSS
+    }, 1000);
   });
 
-  // En cas d'erreur ou si 'load' ne se déclenche pas (ex: ressources lentes),
-  // fallback pour enlever loader au bout de 8s
   setTimeout(() => {
     if (!document.body.classList.contains('loaded')) {
       document.body.classList.add('loaded');
@@ -656,7 +639,6 @@ setTimeout(() => {
 </script>
 
 <script>
-    // Animation loader
     window.addEventListener("load", () => {
       const loader = document.getElementById("loader");
       setTimeout(() => {
