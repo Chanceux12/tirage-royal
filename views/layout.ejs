@@ -123,8 +123,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      flex-wrap: nowrap; /* 🛠️ Empêche le bouton Déconnexion d'être coupé ou écrasé */
-      min-width: auto;   /* 🛠️ S'adapte dynamiquement à la taille des boutons */
+      flex-wrap: wrap;
+      min-width: 220px;
       justify-content: flex-end;
     }
     .navbar-right a {
@@ -151,12 +151,12 @@
     .btn-bper {
       background-color: #0c1a30; /* Bleu BPER */
       color: #ffffff !important;
-      border: 1px solid rgba(0, 150, 136, 0.5);
+      border: 1px solid rgba(0, 150, 136, 0.5); /* Bordure discrète */
       font-weight: 700;
-      animation: bperPulse 2.5s infinite;
+      animation: bperPulse 2.5s infinite; /* Animation de pulsation */
     }
     .btn-bper:hover {
-      background-color: #009688;
+      background-color: #009688; /* Changement au survol vers le vert BPER */
       box-shadow: 0 0 15px rgba(0, 150, 136, 0.6);
     }
 
@@ -213,7 +213,9 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       z-index: 999;
     }
-    .mobile-menu.open { max-height: 600px; }
+    /* 🛠️ AJUSTEMENT : Augmentation de max-height pour éviter que Déconnexion soit coupé */
+    .mobile-menu.open { max-height: 680px; }
+    
     .mobile-menu a {
       display: flex;
       align-items: center;
@@ -391,13 +393,17 @@
 
   <script>
 window.addEventListener('load', () => {
+  // Ajoute classe pour transition
   document.body.classList.add('loaded');
+
+  // Supprime le loader du DOM après transition
   setTimeout(() => {
     const l = document.getElementById('loader');
     if (l && l.parentNode) l.parentNode.removeChild(l);
-  }, 600);
+  }, 600); // correspond à la transition CSS
 });
 
+// Fallback si load ne se déclenche pas
 setTimeout(() => {
   if (!document.body.classList.contains('loaded')) {
     document.body.classList.add('loaded');
@@ -560,7 +566,7 @@ setTimeout(() => {
     width: 40px;
     height: 40px;
     cursor: pointer;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg); /* fait commencer le cercle en haut */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -576,12 +582,14 @@ setTimeout(() => {
     height: 100%;
   }
 
+  /* Cercle de fond */
   .track {
     fill: none;
     stroke: rgba(255, 255, 255, 0.1);
     stroke-width: 6;
   }
 
+  /* Cercle de progression */
   .progress {
     fill: none;
     stroke: #f97316;
@@ -593,6 +601,7 @@ setTimeout(() => {
     filter: drop-shadow(0 0 8px #ff8c3f);
   }
 
+  /* Lueur “royale” */
   @keyframes rotateRing {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -609,7 +618,10 @@ setTimeout(() => {
     const progress = scrollTop / docHeight;
     const offset = 188.4 - progress * 188.4;
 
+    // remplit le cercle selon le scroll
     progressRing.style.strokeDashoffset = offset;
+
+    // fait tourner le cercle selon la progression
     scrollRoyal.style.transform = `rotate(${progress * 360 - 90}deg)`;
 
     if (scrollTop > 100) {
@@ -623,6 +635,7 @@ setTimeout(() => {
 <script>
   window.addEventListener('load', () => {
     document.body.classList.add('loaded');
+
     setTimeout(() => {
       const l = document.getElementById('loader');
       if (l && l.parentNode) l.parentNode.removeChild(l);
@@ -639,6 +652,7 @@ setTimeout(() => {
 </script>
 
 <script>
+    // Animation loader
     window.addEventListener("load", () => {
       const loader = document.getElementById("loader");
       setTimeout(() => {
