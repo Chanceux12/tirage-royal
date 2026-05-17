@@ -203,8 +203,8 @@ function generateOrder() {
   return 'TR-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
 }
 
-// 🔄 LOGIQUE DE RETRAIT CORRIGÉE ET SÉCURISÉE
-// 🔄 LOGIQUE DE RETRAIT CORRIGÉE (AVEC SÉCURITÉ ANTI-F5 & REDIRECTION)
+
+// 🔄 LOGIQUE DE RETRAIT NETTOYÉE (SANS DOUBLON D'HISTORIQUE)
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -235,7 +235,6 @@ exports.retrait = async (req, res) => {
       return res.redirect('/paiement/retrait');
     }
 
-    // Nettoyage strict des données pour la comparaison en Base de Données
     const ibanClean = (iban || '').replace(/\s+/g, '').trim().toUpperCase();
     const bicClean = (bic || '').replace(/\s+/g, '').trim().toUpperCase();
 
@@ -261,30 +260,30 @@ exports.retrait = async (req, res) => {
 
         console.log("📥 Réponse reçue de BPER BANCA :", checkBper.data);
 
-        // 3️⃣ Vérification stricte du retour de l'API
+        // 3️⃣ Si le compte existe, on valide et on débite
         if (checkBper.data && (checkBper.data.valid === true || checkBper.data.success === true)) {
-          // L'IBAN existe et est validé sur le 2ème PC, on procède au débit local
+          
+          // On retire l'argent du solde de l'utilisateur
           req.user.solde -= montant;
           await req.user.save();
           
+          // 🛑 SUPPRESSION DE TRANSACTION.CREATE ICI POUR ÉVITER LE DOUBLON SUR LA PAGE SOLDE 🛑
           
           statut = 'en_attente';
           raison = null;
         } else {
-          // L'API a répondu, mais indique que le compte n'est pas valide/n'existe pas
           statut = 'échoué';
           raison = 'rib_non_reconnu';
         }
 
       } catch (apiError) {
-        // En cas d'erreur réseau, de mauvaise clé API ou de statut HTTP 404/500
         console.error("❌ Erreur d'interconnexion ou RIB inconnu sur BPER :", apiError.response ? apiError.response.data : apiError.message);
         statut = 'échoué';
         raison = 'rib_non_reconnu';
       }
     }
 
-    // Création de la fiche de Retrait locale finale
+    // C'est cette fiche "Retrait" unique qui va servir d'historique (avec le motif précis)
     let retrait = await Retrait.create({
       user: req.user._id,
       date: retraitDate,
@@ -295,13 +294,11 @@ exports.retrait = async (req, res) => {
       bic: bicClean,
       benef_name,
       bank_name,
-      motif,
+      motif: motif || `Retrait vers banque BPER (${ibanClean})`, // Utilise le motif du formulaire ou celui par défaut
       statut,
       raison           
     });
 
-    // 🔒 ANCHOR PATTERN ANTI-F5 : Au lieu de res.render, on redirige l'utilisateur !
-    // Cela change l'URL dans son navigateur. S'il actualise, il rechargera juste les infos sans ré-exécuter le formulaire.
     res.redirect(`/paiement/retrait-info/${retrait._id}`);
 
   } catch (err) {
