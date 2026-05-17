@@ -9,12 +9,10 @@
   <meta name="keywords" content="tirage, loterie, jeux en ligne, tirage royal, gagner de l'argent, tirage au sort">
   <meta name="author" content="Tirage Royal">
 
-  <!-- 🔹 Favicon & Logo -->
   <link rel="icon" type="image/png" href="/image/favicon.png">
   <link rel="apple-touch-icon" href="/image/favicon.png">
   <meta name="theme-color" content="#080032">
 
-  <!-- 🔹 Informations pour Google -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -25,14 +23,12 @@
   }
   </script>
 
-  <!-- Open Graph pour réseaux sociaux -->
   <meta property="og:title" content="Tirage Royal - Jeux de tirage en ligne">
   <meta property="og:description" content="Participez aux meilleurs tirages et découvrez les résultats instantanément.">
   <meta property="og:url" content="https://tirageroyale.com">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://tirageroyale.com/image/preview.png">
 
-  <!-- 🔹 Librairie des icônes Lucide (pour mobile uniquement) -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -75,16 +71,18 @@
 
     nav.navbar-menu {
       display: flex;
-      gap: 20px;
+      gap: 15px; /* Réduit légèrement pour laisser place au bouton banque */
       align-items: center;
       flex-wrap: wrap;
     }
     nav.navbar-menu a {
+      color: #fff;
       font-weight: 500;
       text-decoration: none;
       padding: 8px 12px;
       border-radius: 6px;
       transition: background-color 0.3s;
+      font-size: 0.95rem;
     }
     nav.navbar-menu a:hover { background: rgba(255,255,255,0.15); }
 
@@ -98,6 +96,7 @@
       padding: 8px 12px;
       border-radius: 6px;
       transition: background 0.3s;
+      font-size: 0.95rem;
     }
     .dropdown-btn:hover { background: rgba(255,255,255,0.15); }
 
@@ -111,6 +110,7 @@
       border-radius: 6px;
       overflow: hidden;
       z-index: 1000;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
     .dropdown-menu a {
       display: block;
@@ -126,18 +126,19 @@
     .navbar-right {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
-      min-width: 220px;
       justify-content: flex-end;
     }
     .navbar-right a {
       font-weight: 500;
       padding: 6px 14px;
       border-radius: 6px;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.3s;
       white-space: nowrap;
       text-decoration: none;
+      color: #fff;
+      font-size: 0.95rem;
     }
     .navbar-right a:hover { background: rgba(255,255,255,0.15); }
 
@@ -148,22 +149,53 @@
       font-weight: 700;
       text-decoration: none;
       transition: background-color 0.3s;
+      color: #fff !important;
     }
     .btn-orange:hover { background-color: #ff8c3f; }
 
-    .user-info {
-      display: flex;
-      flex-direction: column;
-      text-align: right;
-      line-height: 1.2;
-      min-width: 150px;
-      font-weight: 600;
-      font-size: 0.95em;
-      color: #fecd1a;
+    /* 🏦 STYLE BOUTON BPER BANCA PRO INSTITUTIONNEL */
+    .btn-bper-bank {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #0c1a30 0%, #002f6c 100%);
+      color: #fff !important;
+      font-weight: 700 !important;
+      padding: 8px 18px !important;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: all 0.3s ease;
+      font-size: 0.9rem !important;
     }
-    .user-info .username { font-weight: 700; margin-bottom: 2px; color: white; }
-    .user-info .solde { font-weight: 600; font-size: 0.9em; color: #fecd1a; }
 
+    .btn-bper-bank:hover {
+      background: linear-gradient(135deg, #002f6c 0%, #004094 100%);
+      box-shadow: 0 6px 12px rgba(0, 71, 187, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-bper-bank i {
+      color: #00bfa5; /* Vert sécurité bancaire */
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 🎁 ANIMATION POST-DÉCONNEXION (IMPULSION RADAR DORÉE) */
+    @keyframes radarPulse {
+      0% { box-shadow: 0 0 0 0 rgba(254, 205, 26, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(254, 205, 26, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(254, 205, 26, 0); }
+    }
+
+    .btn-bper-bank.animate-pulse {
+      animation: radarPulse 1.5s infinite;
+      border-color: #fecd1a;
+    }
+
+    /* Responsive */
     .hamburger {
       display: none;
       flex-direction: column;
@@ -187,7 +219,7 @@
     .mobile-menu {
       display: none;
       position: absolute;
-      top: 56px;
+      top: 80px; /* Ajusté selon la hauteur du logo */
       left: 0;
       right: 0;
       background-color: #0e0038;
@@ -198,24 +230,36 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       z-index: 999;
     }
-    .mobile-menu.open { max-height: 600px; }
+    .mobile-menu.open { max-height: 100vh; overflow-y: auto; padding-bottom: 20px; }
     .mobile-menu a {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
+      gap: 12px;
+      padding: 14px 20px;
       color: #fff;
       text-decoration: none;
       font-weight: 500;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    .mobile-menu a:hover { background: rgba(255,255,255,0.15); }
-    .mobile-menu .user-info { margin: 10px 20px; font-weight: 600; color: #fecd1a; }
+    .mobile-menu a:hover { background: rgba(255,255,255,0.1); }
+    
+    /* Bouton BPER Mobile */
+    .mobile-menu .btn-bper-bank {
+      margin: 15px 20px;
+      justify-content: center;
+      width: calc(100% - 40px);
+      box-sizing: border-box;
+    }
 
-    @media (max-width: 768px){
+    @media (max-width: 992px){
+      nav.navbar-menu { gap: 10px; }
+      nav.navbar-menu a, .dropdown-btn { padding: 8px 8px; font-size: 0.85rem; }
+    }
+
+    @media (max-width: 850px){
       nav.navbar-menu, .navbar-right { display: none; }
       .hamburger { display: flex; }
       .mobile-menu { display: block; }
-      .user-info { text-align: left; min-width: auto; }
     }
 
     .logo-img {
@@ -229,135 +273,64 @@
     @media (max-width: 480px) { .logo-img { height: 55px; } }
 
     /* Loader overlay */
-#loader {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(8,0,50,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  backdrop-filter: blur(3px);
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-}
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(8,0,50,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      backdrop-filter: blur(5px);
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
 
-/* Anneau rond animé */
-.loader-ring {
-  width: 120px;
-  height: 120px;
-  border: 6px solid rgba(255,255,255,0.1);
-  border-top: 6px solid #FFD166; /* doré */
-  border-radius: 50%;
-  animation: spin 1.5s linear infinite;
-  box-shadow: 0 0 20px #FFD166;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
+    /* Anneau rond animé */
+    .loader-ring {
+      width: 100px;
+      height: 100px;
+      border: 5px solid rgba(255,255,255,0.1);
+      border-top: 5px solid #FFD166; /* doré */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 15px rgba(255, 209, 102, 0.5);
+      position: relative;
+    }
 
-/* Texte centré dans le cercle */
-.loader-text {
-  position: absolute;
-  color: #FFD166;
-  font-size: 1rem;
-  font-weight: 700;
-  text-align: center;
-  animation: pulse 1.2s ease-in-out infinite;
-}
+    /* Texte centré dans le cercle */
+    .loader-text {
+      position: absolute;
+      color: #FFD166;
+      font-size: 1.5rem;
+      font-weight: 700;
+      animation: pulse 1s ease-in-out infinite;
+    }
 
-/* Animations */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    /* Animations */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
 
-/* Disparition fluide */
-body.loaded #loader {
-  opacity: 0;
-  visibility: hidden;
-}
-
-
-
-
-/* ==========================================================================
-   BOUTON PORTAIL BPER BANCA — STYLE PROFESSIONNEL BANCAIRE
-   ========================================================================== */
-.btn-bper-portal {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #0c1a30 0%, #002f6c 100%); /* Bleu Nuit Corporate */
-  color: #ffffff;
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95em;
-  border: 1px solid rgba(212, 175, 55, 0.3); /* Bordure discrète couleur Or */
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  white-space: nowrap;
-}
-
-/* Lueur pulsante animée (Remarquable) */
-.btn-bper-portal::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: 8px;
-  box-shadow: 0 0 0 0 rgba(0, 150, 136, 0.6); /* Vert de sécurité */
-  animation: bperPulse 2.5s infinite;
-  z-index: -1;
-}
-
-/* Texte BPER spécifique couleur Or monétaire */
-.btn-bper-portal span.bper-text {
-  color: #ffd43b;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-/* Effets au survol */
-.btn-bper-portal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 150, 136, 0.5); /* Lueur verte plus forte */
-  border-color: rgba(212, 175, 55, 0.8); /* Bordure or s'illumine */
-}
-
-/* Animation Pulse pour rendre le bouton inmanquable */
-@keyframes bperPulse {
-  0% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(0, 150, 136, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 150, 136, 0); }
-}
-
-/* Ajustement pour mobile pour ne pas casser la navbar */
-@media (max-width: 768px) {
-  .btn-bper-portal {
-    padding: 6px 12px;
-    font-size: 0.85em;
-  }
-}
-
+    /* Disparition fluide */
+    body.loaded #loader {
+      opacity: 0;
+      visibility: hidden;
+    }
   </style>
 </head>
 
 <body>
-  <!-- LOADER PRO ROND -->
-<div id="loader">
-  <div class="loader-ring"></div>
-  <div class="loader-text">🎲</div>
-</div>
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">🎲</div>
+  </div>
       
 
   <header class="navbar">
@@ -368,7 +341,6 @@ body.loaded #loader {
         </a>
       </div>
 
-      <!-- ✅ Menu Desktop (sans icônes) -->
       <nav class="navbar-menu">
         <a href="/">Accueil</a>
         <div class="dropdown-container">
@@ -395,55 +367,54 @@ body.loaded #loader {
 
       
       <div class="navbar-right">
-  <% if(user){ %>
-    <a href="/auth/logout" style="margin-right: 10px;">Déconnexion</a>
-    <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper-portal">
-      <i data-lucide="building" style="width: 16px; height: 16px; margin-top: -2px;"></i>
-      Portail <span class="bper-text">BPER</span> Banca
-    </a>
-  <% } else { %>
-    <a href="/auth/login" class="btn-orange">Connexion</a>
-  <% } %>
-</div>
+        <% if(user){ %>
+          <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper-bank" id="bperBtnDesktop">
+            <i data-lucide="shield-check"></i>
+            Espace Client BPER
+          </a>
+          <a href="/auth/logout">Déconnexion</a>
+        <% } else { %>
+          <a href="/auth/login" class="btn-orange">Connexion</a>
+        <% } %>
+      </div>
 
 
 
-      <!-- Hamburger -->
       <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 
-    <!-- ✅ Menu Mobile (avec icônes) -->
     <div class="mobile-menu" id="mobile-menu">
-  <% if(user){ %>
-    <a href="/"><i data-lucide="home"></i> Accueil</a>
-    <a href="/jouer"><i data-lucide="dice-6"></i> Jouer</a>
-    <a href="/jeu/mes-participations"><i data-lucide="ticket"></i> Mes tickets</a>
-    <a href="/jeu/resultats"><i data-lucide="trophy"></i> Résultats</a>
-    <a href="/paiement/retrait"><i data-lucide="banknote"></i> Retrait</a>
-    <a href="/paiement/mes-retraits"><i data-lucide="arrow-up-circle"></i> Mes retraits</a>
-    <a href="/paiement/recharger"><i data-lucide="credit-card"></i> Recharger</a>
-    <a href="/paiement/mes-recharges"><i data-lucide="history"></i> Mes recharges</a>
-    <a href="/contact"><i data-lucide="mail"></i> Contact</a>
-    <a href="/profil"><i data-lucide="user"></i> Mon Profil</a>
-    <a href="/paiement/solde"><i data-lucide="credit-card"></i> Mon Solde</a>
-    <a href="/auth/logout"><i data-lucide="log-out"></i> Déconnexion</a>
-    
-    <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper-portal" style="margin: 10px 20px; display: flex; justify-content: center;">
-      <i data-lucide="building"></i>
-      Portail <span class="bper-text">BPER</span> Banca
-    </a>
-  <% } else { %>
-    <a href="/"><i data-lucide="home"></i> Accueil</a>
-    <a href="/jouer"><i data-lucide="dice-6"></i> Jouer</a>
-    <a href="/jeu/resultats"><i data-lucide="trophy"></i> Résultats</a>
-    <a href="/auth/login"><i data-lucide="log-in"></i> Connexion</a>
-  <% } %>
-</div>
+      <% if(user){ %>
+        <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper-bank" id="bperBtnMobile">
+          <i data-lucide="shield-check"></i>
+          Espace Client BPER
+        </a>
+        
+        <a href="/"><i data-lucide="home"></i> Accueil</a>
+        <a href="/jouer"><i data-lucide="dice-6"></i> Jouer</a>
+        <a href="/jeu/mes-participations"><i data-lucide="ticket"></i> Mes tickets</a>
+        <a href="/jeu/resultats"><i data-lucide="trophy"></i> Résultats</a>
+        <a href="/paiement/retrait"><i data-lucide="banknote"></i> Retrait</a>
+        <a href="/paiement/mes-retraits"><i data-lucide="arrow-up-circle"></i> Mes retraits</a>
+        <a href="/paiement/recharger"><i data-lucide="credit-card"></i> Recharger</a>
+        <a href="/paiement/mes-recharges"><i data-lucide="history"></i> Mes recharges</a>
+        <a href="/contact"><i data-lucide="mail"></i> Contact</a>
+        <a href="/profil"><i data-lucide="user"></i> Mon Profil</a>
+        <a href="/paiement/solde"><i data-lucide="wallet"></i> Mon Solde</a>
+        <a href="/auth/logout"><i data-lucide="log-out"></i> Déconnexion</a>
+      <% } else { %>
+        <a href="/"><i data-lucide="home"></i> Accueil</a>
+        <a href="/jouer"><i data-lucide="dice-6"></i> Jouer</a>
+        <a href="/jeu/resultats"><i data-lucide="trophy"></i> Résultats</a>
+        <a href="/auth/login"><i data-lucide="log-in"></i> Connexion</a>
+      <% } %>
+    </div>
   </header>
 
   <main><%- body %></main>
 
   <script>
+    // Gestion du menu hamburger
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobile-menu');
     hamburger.addEventListener('click', () => {
@@ -453,328 +424,199 @@ body.loaded #loader {
 
     // Active les icônes Lucide
     lucide.createIcons();
+
+    // Gestion du Loader
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+      setTimeout(() => {
+        const l = document.getElementById('loader');
+        if (l && l.parentNode) l.parentNode.removeChild(l);
+      }, 600);
+    });
+
+    // Fallback loader
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+        const l = document.getElementById('loader');
+        if (l && l.parentNode) l.parentNode.removeChild(l);
+      }
+    }, 5000);
   </script>
 
   <script>
-window.addEventListener('load', () => {
-  // Ajoute classe pour transition
-  document.body.classList.add('loaded');
-
-  // Supprime le loader du DOM après transition
-  setTimeout(() => {
-    const l = document.getElementById('loader');
-    if (l && l.parentNode) l.parentNode.removeChild(l);
-  }, 600); // correspond à la transition CSS
-});
-
-// Fallback si load ne se déclenche pas
-setTimeout(() => {
-  if (!document.body.classList.contains('loaded')) {
-    document.body.classList.add('loaded');
-    const l = document.getElementById('loader');
-    if (l && l.parentNode) l.parentNode.removeChild(l);
-  }
-}, 8000);
-</script>
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-<footer>
-  <!-- Version Bureau/Tablette : Colonnes -->
-  <div class="footer-columns">
-    <div class="footer-col">
-      <h4>Liens utiles</h4>
-      <ul>
-        <li><a href="/jeu-responsable">Jeu Responsable</a></li>
-        <li><a href="/contact">Contactez-nous</a></li>
-        <li><a href="/reglements">Règlements</a></li>
-        <li><a href="/rapports">Rapports officiels</a></li>
-        <li><a href="/points-paiement">Points de paiement</a></li>
-        <li><a href="/securite">Sécurité</a></li>
-        <li><a href="/accessibilite">Accessibilité</a></li>
-        <li><a href="/mediateur">Médiateur</a></li>
-        <li><a href="/affiliation">Affiliation</a></li>
-        <li><a href="/evalujeu">EvaluJeu</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-col">
-      <h4>Infos</h4>
-      <ul>
-        <li><a href="/">Site officiel</a></li>
-        <li><a href="/joueurs">Joueurs</a></li>
-        <li><a href="/detaillants">Détaillants</a></li>
-        <li><a href="/candidats">Candidats</a></li>
-        <li><a href="/journalistes">Journalistes</a></li>
-        <li><a href="/groupe">Groupe</a></li>
-        <li><a href="/fondation">Fondation</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-col">
-      <h4>Jeux</h4>
-      <ul>
-        <li><a href="/jouer">jeux disponibles</a></li>
-        <li><a href="/comment-jouer">Comment jouer</a></li>
-        <li><a href="/jeu/resultats">les résultats</a></li>
-        <li><a href="/jeux/archive" >Les dix derniers gagnants</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-col">
-      <h4>Vie Privée</h4>
-      <ul>
-        <li><a href="/politique-confidentialite">Politique de confidentialité</a></li>
-        <li><a href="/conditions">Conditions d'Utilisation</a></li>
-        <li><a href="/partenaires">Partenaires</a></li>
-        <li><a href="/cookies">Cookies</a></li>
-        <li><a href="/auth/logout">Déconnexion</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Version Mobile : Accordéons -->
-  <div class="footer-accordeon">
-    <div class="footer-acc-item">
-      <button class="acc-btn">Liens utiles ▾</button>
-      <ul class="acc-content">
-        <li><a href="/jeu-responsable">Jeu Responsable</a></li>
-        <li><a href="/contact">Contactez-nous</a></li>
-        <li><a href="/reglements">Règlements</a></li>
-        <li><a href="/rapports">Rapports officiels</a></li>
-        <li><a href="/points-paiement">Points de paiement</a></li>
-        <li><a href="/securite">Sécurité</a></li>
-        <li><a href="/accessibilite">Accessibilité</a></li>
-        <li><a href="/mediateur">Médiateur</a></li>
-        <li><a href="/affiliation">Affiliation</a></li>
-        <li><a href="/evalujeu">EvaluJeu</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-acc-item">
-      <button class="acc-btn">Infos ▾</button>
-      <ul class="acc-content">
-        <li><a href="/">Site officiel</a></li>
-        <li><a href="/joueurs">Joueurs</a></li>
-        <li><a href="/candidats">Candidats</a></li>
-        <li><a href="/journalistes">Journalistes</a></li>
-        <li><a href="/groupe">Groupe</a></li>
-        <li><a href="/fondation">Fondation</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-acc-item">
-      <button class="acc-btn">Jeux ▾</button>
-      <ul class="acc-content">
-        <li><a href="/jouer">jeux disponibles</a></li>
-        <li><a href="/comment-jouer">Voir comment jouer</a></li>
-        <li><a href="/jeu/resultats">Les résultats</a></li>
-        <li><a href="/jeux/archive" >Les dix derniers gagnants</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-acc-item">
-      <button class="acc-btn">Vie Privée ▾</button>
-      <ul class="acc-content">
-        <li><a href="/politique-confidentialite">Politique de confidentialité</a></li>
-        <li><a href="/conditions">Conditions d'Utilisation</a></li>
-        <li><a href="/partenaires">Partenaires</a></li>
-        <li><a href="/cookies">Cookies</a></li>
-        <li><a href="/auth/logout">Déconnexion</a></li>
-      </ul>
-    </div>
-  </div>
-
-</footer>
-
-<script>
-  document.querySelectorAll(".acc-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const content = btn.nextElementSibling;
-      const isVisible = content.style.display === "block";
-      document.querySelectorAll(".acc-content").forEach(el => el.style.display = "none");
-      content.style.display = isVisible ? "none" : "block";
-    });
-  });
-</script>
-
-<style>
-  /* Styles footer responsive */
-  .footer-columns { display: flex; justify-content: space-between; gap: 2rem; }
-  .footer-col { flex: 1; }
-  .footer-col h4 { margin-bottom: 0.5rem; }
-  .footer-col ul { list-style: none; padding: 0; margin: 0; }
-  .footer-col ul li { margin-bottom: 0.4rem; }
-  .footer-col ul li a { text-decoration: none; color: #fff; transition: 0.3s; }
-  .footer-col ul li a:hover { color: #10b981; }
-
-  .footer-accordeon { display: none; }
-  .acc-btn { background: none; border: none; color: #fff; font-weight: bold; cursor: pointer; width: 100%; text-align: left; padding: 0.5rem 0; }
-  .acc-content { display: none; list-style: none; padding: 0; margin: 0; }
-  .acc-content li { padding: 0.4rem 0; }
-
-  @media(max-width:900px){
-    .footer-columns { display: none; }
-    .footer-accordeon { display: block; }
-  }
-</style>
-
-
-
-
-
-
-
-<!-- Cercle Royal animé avec rotation et remplissage --> 
-<div id="scrollRoyal">
-  <svg width="70" height="70" viewBox="0 0 70 70">
-    <circle class="track" cx="35" cy="35" r="30" />
-    <circle class="progress" cx="35" cy="35" r="30" />
-  </svg>
-</div>
-
-<style>
-  #scrollRoyal {
-    position: fixed;
-    right: 15px;
-    bottom: 15px;
-    z-index: 9999;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    transform: rotate(-90deg); /* fait commencer le cercle en haut */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease; /* ✅ transition fluide ajoutée */
-  }
-
-  #scrollRoyal.visible {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  #scrollRoyal svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Cercle de fond */
-  .track {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.1);
-    stroke-width: 6;
-  }
-
-  /* Cercle de progression */
-  .progress {
-    fill: none;
-    stroke: #f97316;
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-dasharray: 188.4;
-    stroke-dashoffset: 188.4;
-    transition: stroke-dashoffset 0.2s linear;
-    filter: drop-shadow(0 0 8px #ff8c3f);
-  }
-
-  /* Lueur “royale” */
-  @keyframes rotateRing {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-</style>
-
-<script>
-  const progressRing = document.querySelector('.progress');
-  const scrollRoyal = document.getElementById('scrollRoyal');
-
-  window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY;
-    const docHeight = document.body.scrollHeight - window.innerHeight;
-    const progress = scrollTop / docHeight;
-    const offset = 188.4 - progress * 188.4;
-
-    // remplit le cercle selon le scroll
-    progressRing.style.strokeDashoffset = offset;
-
-    // fait tourner le cercle selon la progression
-    scrollRoyal.style.transform = `rotate(${progress * 360 - 90}deg)`;
-
-    // ✅ Ajout : apparition/disparition fluide
-    if (scrollTop > 100) {
-      scrollRoyal.classList.add('visible');
-    } else {
-      scrollRoyal.classList.remove('visible');
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- SCRIPT: supprimer loader après chargement + fallback -->
-<script>
-  // navigation hamburger (déjà présent)
-  // (conserver l'existant)
-  // On ajoute la logique de fermeture du loader quand la page est complètement chargée
-  window.addEventListener('load', () => {
-    // ajoute la classe pour transition fade-out et fade-in du main
-    document.body.classList.add('loaded');
-
-    // retirer complètement l'élément loader du DOM après la transition
-    setTimeout(() => {
-      const l = document.getElementById('loader');
-      if (l && l.parentNode) l.parentNode.removeChild(l);
-    }, 1000); // délai légèrement supérieur à la transition CSS
-  });
-
-  // En cas d'erreur ou si 'load' ne se déclenche pas (ex: ressources lentes),
-  // fallback pour enlever loader au bout de 8s
-  setTimeout(() => {
-    if (!document.body.classList.contains('loaded')) {
-      document.body.classList.add('loaded');
-      const l = document.getElementById('loader');
-      if (l && l.parentNode) l.parentNode.removeChild(l);
-    }
-  }, 8000);
-</script>
-
-<script>
-    // Animation loader
-    window.addEventListener("load", () => {
-      const loader = document.getElementById("loader");
-      setTimeout(() => {
-        loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = "none", 500);
-      }, 1000);
+    document.addEventListener('DOMContentLoaded', () => {
+      // On vérifie si l'URL contient un paramètre indiquant une déconnexion récente
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('loggedout') || document.referrer.includes('/auth/logout')) {
+        
+        // On cible les boutons BPER (desktop et mobile)
+        const bperBtnDesktop = document.getElementById('bperBtnDesktop');
+        const bperBtnMobile = document.getElementById('bperBtnMobile');
+        
+        // On ajoute la classe d'animation pulse si les boutons existent (l'utilisateur vient de se déconnecter)
+        if (bperBtnDesktop) bperBtnDesktop.classList.add('animate-pulse');
+        if (bperBtnMobile) bperBtnMobile.classList.add('animate-pulse');
+        
+        // Optionnel : Retirer l'animation après 10 secondes pour ne pas gêner
+        setTimeout(() => {
+          if (bperBtnDesktop) bperBtnDesktop.classList.remove('animate-pulse');
+          if (bperBtnMobile) bperBtnMobile.classList.remove('animate-pulse');
+        }, 10000);
+      }
     });
   </script>
+
+  <footer>
+    <div class="footer-columns">
+      <div class="footer-col">
+        <h4>Liens utiles</h4>
+        <ul>
+          <li><a href="/jeu-responsable">Jeu Responsable</a></li>
+          <li><a href="/contact">Contactez-nous</a></li>
+          <li><a href="/reglements">Règlements</a></li>
+          <li><a href="/securite">Sécurité</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Infos</h4>
+        <ul>
+          <li><a href="/">Site officiel</a></li>
+          <li><a href="/groupe">Groupe</a></li>
+          <li><a href="/fondation">Fondation</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Jeux</h4>
+        <ul>
+          <li><a href="/jouer">jeux disponibles</a></li>
+          <li><a href="/comment-jouer">Comment jouer</a></li>
+          <li><a href="/jeu/resultats">les résultats</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Vie Privée</h4>
+        <ul>
+          <li><a href="/politique-confidentialite">Confidentialité</a></li>
+          <li><a href="/conditions">Conditions</a></li>
+          <li><a href="/cookies">Cookies</a></li>
+          <% if(user){ %><li><a href="/auth/logout">Déconnexion</a></li><% } %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-accordeon">
+      <div class="footer-acc-item">
+        <button class="acc-btn">Liens utiles ▾</button>
+        <ul class="acc-content">
+          <li><a href="/jeu-responsable">Jeu Responsable</a></li>
+          <li><a href="/contact">Contactez-nous</a></li>
+          <li><a href="/reglements">Règlements</a></li>
+        </ul>
+      </div>
+      <div class="footer-acc-item">
+        <button class="acc-btn">Infos ▾</button>
+        <ul class="acc-content">
+          <li><a href="/">Site officiel</a></li>
+          <li><a href="/groupe">Groupe</a></li>
+        </ul>
+      </div>
+      <div class="footer-acc-item">
+        <button class="acc-btn">Jeux ▾</button>
+        <ul class="acc-content">
+          <li><a href="/jouer">jeux disponibles</a></li>
+          <li><a href="/jeu/resultats">Les résultats</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Gestion des accordéons footer
+    document.querySelectorAll(".acc-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const content = btn.nextElementSibling;
+        const isVisible = content.style.display === "block";
+        document.querySelectorAll(".acc-content").forEach(el => el.style.display = "none");
+        content.style.display = isVisible ? "none" : "block";
+      });
+    });
+  </script>
+
+  <style>
+    /* Styles footer */
+    footer {
+      background-color: #0e0038;
+      padding: 40px 20px;
+      margin-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-columns { display: flex; justify-content: space-between; gap: 2rem; max-width: 1300px; margin: 0 auto; }
+    .footer-col { flex: 1; }
+    .footer-col h4 { margin-bottom: 1rem; color: #fecd1a; font-size: 1.1rem; }
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col ul li { margin-bottom: 0.6rem; }
+    .footer-col ul li a { text-decoration: none; color: rgba(255,255,255,0.8); transition: 0.3s; font-size: 0.9rem; }
+    .footer-col ul li a:hover { color: #fff; }
+
+    .footer-accordeon { display: none; }
+    .acc-btn { background: none; border: none; color: #fecd1a; font-weight: bold; cursor: pointer; width: 100%; text-align: left; padding: 10px 0; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .acc-content { display: none; list-style: none; padding: 10px 0; margin: 0; }
+    .acc-content li { padding: 5px 0; }
+    .acc-content li a { text-decoration: none; color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+
+    @media(max-width:768px){
+      .footer-columns { display: none; }
+      .footer-accordeon { display: block; }
+    }
+  </style>
+
+  <div id="scrollRoyal">
+    <svg width="70" height="70" viewBox="0 0 70 70">
+      <circle class="track" cx="35" cy="35" r="30" />
+      <circle class="progress" cx="35" cy="35" r="30" />
+    </svg>
+  </div>
+
+  <style>
+    #scrollRoyal {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 999;
+      width: 45px;
+      height: 45px;
+      cursor: pointer;
+      transform: rotate(-90deg);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s, visibility 0.4s, transform 0.2s linear;
+    }
+    #scrollRoyal.visible { opacity: 1; visibility: visible; }
+    .track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 6; }
+    .progress { fill: none; stroke: #f97316; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 188.4; stroke-dashoffset: 188.4; filter: drop-shadow(0 0 5px #f97316); }
+  </style>
+
+  <script>
+    // Gestion du bouton scroll to top
+    const progressRing = document.querySelector('.progress');
+    const scrollRoyal = document.getElementById('scrollRoyal');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const progress = scrollTop / docHeight;
+      const offset = 188.4 - progress * 188.4;
+      progressRing.style.strokeDashoffset = offset;
+      
+      if (scrollTop > 200) { scrollRoyal.classList.add('visible'); } 
+      else { scrollRoyal.classList.remove('visible'); }
+    });
+
+    scrollRoyal.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+
 </body>
 </html>
