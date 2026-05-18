@@ -218,31 +218,27 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 1️⃣ On prépare la chaîne de caractères (String) de la nouvelle combinaison reçue
-    // Exemple : [5, 12, 1, 44, 3] devient "1,3,5,12,44"
-    const chaineNumerosRecus = numerosFormates.join(',');
-    const chaineEtoilesRecues = etoilesFormatees.join(',');
-
-    // 🔒 DOUBLE SÉCURITÉ RADICALE : Comparaison par chaînes de caractères (Strings)
-    // On va chercher tous les tickets de cet utilisateur pour ce tirage au format JS pur
+    // 🔒 SECTION SÉCURITÉ ANTI-DOUBLON (Seuls les 5 numéros comptent)
+    // On récupère tous les tickets du joueur pour ce tirage au format JS pur (.lean)
     const ticketsUtilisateur = await Ticket.find({
       user: req.user._id,
       jeu: jeuPreCheck._id,
       tirage: tirage._id
     }).lean();
 
-    // On vérifie s'il y a un doublon textuel exact
-    const aDejaJoueCetteCombinaison = ticketsUtilisateur.some(ticket => {
-      // On crée des copies triées des tableaux de la base de données pour ne pas les corrompre
-      const dejavuNumsTries = [...ticket.numerosChoisis].sort((a, b) => a - b).join(',');
-      const dejavuEtoilesTriees = [...ticket.etoilesChoisies].sort((a, b) => a - b).join(',');
+    // On vérifie si ces exacts numéros ont déjà été joués
+    const aDejaJoueCesNumeros = ticketsUtilisateur.some(ticket => {
+      if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== numerosFormates.length) return false;
 
-      // Comparaison de texte stricte
-      return dejavuNumsTries === chaineNumerosRecus && dejavuEtoilesTriees === chaineEtoilesRecues;
+      // On s'assure que les numéros enregistrés en base sont triés pour la comparaison
+      const dejavuNums = [...ticket.numerosChoisis].sort((a, b) => a - b);
+
+      // Vérification absolue numéro par numéro
+      return dejavuNums.every((val, index) => val === numerosFormates[index]);
     });
 
-    if (aDejaJoueCetteCombinaison) {
-      req.flash('error_msg', 'Vous avez déjà validé cette combinaison exacte de numéros sur ce jeu. Veuillez modifier vos choix ou essayer un autre jeu.');
+    if (aDejaJoueCesNumeros) {
+      req.flash('error_msg', 'Vous avez déjà validé ces numéros sur ce jeu. Veuillez modifier votre sélection ou essayer un autre jeu.');
       return res.redirect(`/jeu/${slug}`);
     }
     // 3️⃣ Suite du processus normal (Achat et enregistrement)
