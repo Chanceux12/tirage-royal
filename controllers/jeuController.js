@@ -218,28 +218,27 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 🔒 DOUBLE SÉCURITÉ COMPLÈTEMENT INFAILLIBLE (.lean() ajouté)
-    // On récupère TOUS les tickets au format JavaScript PUR (grâce à .lean())
+    // 1️⃣ On prépare la chaîne de caractères (String) de la nouvelle combinaison reçue
+    // Exemple : [5, 12, 1, 44, 3] devient "1,3,5,12,44"
+    const chaineNumerosRecus = numerosFormates.join(',');
+    const chaineEtoilesRecues = etoilesFormatees.join(',');
+
+    // 🔒 DOUBLE SÉCURITÉ RADICALE : Comparaison par chaînes de caractères (Strings)
+    // On va chercher tous les tickets de cet utilisateur pour ce tirage au format JS pur
     const ticketsUtilisateur = await Ticket.find({
       user: req.user._id,
       jeu: jeuPreCheck._id,
       tirage: tirage._id
     }).lean();
 
-    // On parcourt chaque ticket existant pour voir s'il y a une copie conforme
+    // On vérifie s'il y a un doublon textuel exact
     const aDejaJoueCetteCombinaison = ticketsUtilisateur.some(ticket => {
-      // Pas besoin de décomposer avec [...], ce sont déjà des tableaux JS natifs et purs
-      const dejavuNums = ticket.numerosChoisis.sort((a, b) => a - b);
-      const dejavuEtoiles = ticket.etoilesChoisies.sort((a, b) => a - b);
+      // On crée des copies triées des tableaux de la base de données pour ne pas les corrompre
+      const dejavuNumsTries = [...ticket.numerosChoisis].sort((a, b) => a - b).join(',');
+      const dejavuEtoilesTriees = [...ticket.etoilesChoisies].sort((a, b) => a - b).join(',');
 
-      // Vérification absolue numéro par numéro
-      const numerosIdentiques = dejavuNums.length === numerosFormates.length && 
-                                dejavuNums.every((val, index) => val === numerosFormates[index]);
-                                
-      const etoilesIdentiques = dejavuEtoiles.length === etoilesFormatees.length && 
-                                dejavuEtoiles.every((val, index) => val === etoilesFormatees[index]);
-
-      return numerosIdentiques && etoilesIdentiques;
+      // Comparaison de texte stricte
+      return dejavuNumsTries === chaineNumerosRecus && dejavuEtoilesTriees === chaineEtoilesRecues;
     });
 
     if (aDejaJoueCetteCombinaison) {
