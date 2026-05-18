@@ -188,28 +188,31 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 1️⃣ Conversion en nombres et tri croissant obligatoire pour la comparaison exacte
-    const numerosFormates = numeros.map(Number).sort((a, b) => a - b);
-    const etoilesFormatees = etoiles.map(Number).sort((a, b) => a - b);
+    // Conversion en nombres et tri pour la cohérence
+    const numerosNum = numeros.map(Number).sort((a, b) => a - b);
+    const etoilesNum = etoiles.map(Number);
 
-    const numerosValides = numerosFormates.every(num => Number.isInteger(num) && num >= NUM_MIN && num <= NUM_MAX);
-    const etoilesValides = etoilesFormatees.every(num => Number.isInteger(num) && num >= ETOILE_MIN && num <= ETOILE_MAX);
+    const numerosValides = numerosNum.every(num => {
+      return Number.isInteger(num) && num >= NUM_MIN && num <= NUM_MAX;
+    });
+    const etoilesValides = etoilesNum.every(num => {
+      return Number.isInteger(num) && num >= ETOILE_MIN && num <= ETOILE_MAX;
+    });
 
     if (!numerosValides || !etoilesValides) {
       req.flash('error_msg', 'Numéros ou étoiles invalides.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // Récupération du jeu
-    const jeuPreCheck = await Jeu.findOne({ slug });
-    if (!jeuPreCheck) {
+    // 1. Récupération du tirage en cours d'abord (nécessaire pour la vérification du doublon)
+    const jeuEnCours = await Jeu.findOne({ slug });
+    if (!jeuEnCours) {
       req.flash('error_msg', 'Jeu introuvable.');
-      return res.redirect('/');
+      return res.redirect(`/jeu/${slug}`);
     }
 
-    // Récupération du tirage actif
     const tirage = await Tirage.findOne({
-      jeu: jeuPreCheck._id,
+      jeu: jeuEnCours._id,
       resultatPublie: false
     }).sort({ dateTirage: 1 });
 
@@ -218,30 +221,19 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 🔒 SECTION SÉCURITÉ ANTI-DOUBLON (Seuls les 5 numéros comptent)
-    // On récupère tous les tickets du joueur pour ce tirage au format JS pur (.lean)
-    const ticketsUtilisateur = await Ticket.find({
+    // 🔒 2. VERIFICATION DU DOUBLON (Seuls les 5 numéros comptent, peu importe l'ordre)
+    const ticketExistant = await Ticket.findOne({
       user: req.user._id,
-      jeu: jeuPreCheck._id,
-      tirage: tirage._id
-    }).lean();
-
-    // On vérifie si ces exacts numéros ont déjà été joués
-    const aDejaJoueCesNumeros = ticketsUtilisateur.some(ticket => {
-      if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== numerosFormates.length) return false;
-
-      // On s'assure que les numéros enregistrés en base sont triés pour la comparaison
-      const dejavuNums = [...ticket.numerosChoisis].sort((a, b) => a - b);
-
-      // Vérification absolue numéro par numéro
-      return dejavuNums.every((val, index) => val === numerosFormates[index]);
+      tirage: tirage._id,
+      numerosChoisis: { $all: numerosNum, $size: 5 } // Vérifie que les 5 mêmes numéros existent déjà
     });
 
-    if (aDejaJoueCesNumeros) {
-      req.flash('error_msg', 'Vous avez déjà validé ces numéros sur ce jeu. Veuillez modifier votre sélection ou essayer un autre jeu.');
+    if (ticketExistant) {
+      req.flash('error_msg', 'Vous avez déjà validé un ticket avec ces 5 numéros pour ce tirage. Veuillez choisir une autre combinaison ou un autre jeu.');
       return res.redirect(`/jeu/${slug}`);
     }
-    // 3️⃣ Suite du processus normal (Achat et enregistrement)
+
+    // 3. Décrémentation du billet si la combinaison est unique
     const jeu = await Jeu.findOneAndUpdate(
       { slug, billetsRestants: { $gt: 0 } },
       { $inc: { billetsRestants: -1 } },
@@ -262,13 +254,14 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
+    // 4. Création du ticket
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
       tirage: tirage._id,
       prix,
-      numerosChoisis: numerosFormates, // Sauvegardé trié
-      etoilesChoisies: etoilesFormatees, // Sauvegardé trié
+      numerosChoisis: numerosNum,
+      etoilesChoisies: etoilesNum,
       dateTirage: tirage.dateTirage,
       statut: 'En attente',
       gainPotentiel: tirage.gain || 0
@@ -292,7 +285,7 @@ exports.participerJeu = async (req, res) => {
     }
     await jeu.save();
 
-    // Envoi du mail
+    // ✅ Envoi d’un mail de confirmation de participation
     try {
       await sendTicketMail(
         user.email,
@@ -311,6 +304,7 @@ exports.participerJeu = async (req, res) => {
             .header img { max-width: 150px; }
             h2 { color: #080032; }
             p { color: #333333; font-size: 16px; line-height: 1.5; }
+            .nums { background-color: #f0f0f0; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; letter-spacing: 3px; }
             .gain { background-color: #e0f7ff; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; margin-top: 10px; color: #007acc; }
             .button { display: inline-block; padding: 10px 20px; background-color: #080032; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
             .footer { font-size: 12px; color: #888888; text-align: center; margin-top: 20px; }
@@ -323,17 +317,17 @@ exports.participerJeu = async (req, res) => {
             </div>
             <h2>Participation confirmée 🎟️</h2>
             <p>Bonjour ${user.nom || user.username},</p>
-            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> !</p>
+            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> ! Nous sommes ravis de vous compter parmi nos participant(e) de ce jour.</p>
             <p>Voici vos numéros joués :</p>
             
             <div style="text-align:center; margin:15px 0;">
               <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
-                ${numerosFormates.map(n => `
+                ${numerosNum.map(n => `
                   <span style="display:inline-block; background:#080032; color:#ffffff; font-weight:bold; border-radius:50%; width:44px; height:44px; line-height:44px; text-align:center; margin:4px; font-size:17px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">${n}</span>
                 `).join('')}
               </div>
               <div style="display:flex; justify-content:center; flex-wrap:wrap;">
-                ${etoilesFormatees.map(e => `
+                ${etoilesNum.map(e => `
                   <span style="display:inline-block; background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00); color:#000000; font-weight:bold; border-radius:50%; width:44px; height:44px; text-align:center; margin:4px; font-size:17px; line-height:44px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">⭐</span>
                 `).join('')}
               </div>
@@ -341,6 +335,7 @@ exports.participerJeu = async (req, res) => {
 
             <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
             <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
+            <p>Vous pouvez consulter vos participations ici :</p>
             <p><a href="https://tirageroyale.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
             <p class="footer">Cet e-mail est automatique — ne pas répondre à ce message.</p>
           </div>
@@ -348,6 +343,7 @@ exports.participerJeu = async (req, res) => {
         </html>
         `
       );
+      console.log(`📧 Mail de confirmation envoyé à ${user.email}`);
     } catch (err) {
       console.error('❌ Erreur lors de l’envoi du mail de ticket :', err);
     }
@@ -355,8 +351,8 @@ exports.participerJeu = async (req, res) => {
     res.render('pages/confirmation', {
       ticket,
       jeu,
-      numeros: numerosFormates,
-      etoiles: etoilesFormatees,
+      numeros: numerosNum,
+      etoiles: etoilesNum,
       messages: req.flash()
     });
 
