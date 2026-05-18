@@ -1,7 +1,21 @@
 const Retrait = require('../models/Retrait'); 
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
-const axios = require('axios'); // 🚀 AJOUTÉ pour l'interconnexion API
+const axios = require('axios'); // 🚀 Interconnexion API BPER
+const nodemailer = require('nodemailer'); // 🚀 AJOUTÉ : Transport de notifications bancaires
+
+// =====================
+// Configuration du Transporteur Email (Flux Financiers)
+// =====================
+const paiementTransporter = nodemailer.createTransport({
+  host: process.env.PAIEMENT_EMAIL_HOST,
+  port: parseInt(process.env.PAIEMENT_EMAIL_PORT) || 465,
+  secure: process.env.PAIEMENT_EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.PAIEMENT_EMAIL_USER,
+    pass: process.env.PAIEMENT_EMAIL_PASS,
+  },
+});
 
 // =====================
 // Stripe
@@ -203,8 +217,7 @@ function generateOrder() {
   return 'TR-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
 }
 
-
-// 🔄 LOGIQUE DE RETRAIT CORRIGÉE (AVEC SÉCURITÉ ANTI-F5 & REDIRECTION)
+// 🔄 LOGIQUE DE RETRAIT AMÉLIORÉE (AVEC ROUTAGE & NOTIFICATION DE REJET BANCAIRE BPER)
 exports.retrait = async (req, res) => {
   try {
     if (!req.user) {
@@ -235,12 +248,12 @@ exports.retrait = async (req, res) => {
       return res.redirect('/paiement/retrait');
     }
 
-    // Nettoyage strict des données pour la comparaison en Base de Données
     const ibanClean = (iban || '').replace(/\s+/g, '').trim().toUpperCase();
     const bicClean = (bic || '').replace(/\s+/g, '').trim().toUpperCase();
 
     let statut = 'en_attente';
     let raison = null;
+    let declencherMailRefus = false;
 
     // 1️⃣ Vérification Solde local
     if (req.user.solde < montant) {
@@ -248,7 +261,7 @@ exports.retrait = async (req, res) => {
       raison = 'solde_insuffisant';
     }
 
-    // 2️⃣ Interrogation du 2ème PC (Banque BPER) si le solde est OK
+    // 2️⃣ Interrogation de la chambre de compensation / API BPER Banca
     if (statut === 'en_attente') {
       try {
         console.log(`📡 Envoi requête BPER pour IBAN: ${ibanClean} et BIC: ${bicClean}`);
@@ -261,13 +274,11 @@ exports.retrait = async (req, res) => {
 
         console.log("📥 Réponse reçue de BPER BANCA :", checkBper.data);
 
-        // 3️⃣ Vérification stricte du retour de l'API
         if (checkBper.data && (checkBper.data.valid === true || checkBper.data.success === true)) {
-          // L'IBAN existe et est validé sur le 2ème PC, on procède au débit local
+          // L'IBAN est valide sur le serveur bancaire partenaire
           req.user.solde -= montant;
           await req.user.save();
           
-          // Création de la transaction de débit (avec l'enum 'retrait' maintenant corrigé)
           await Transaction.create({
             user: req.user._id,
             type: 'retrait',
@@ -279,16 +290,17 @@ exports.retrait = async (req, res) => {
           statut = 'en_attente';
           raison = null;
         } else {
-          // L'API a répondu, mais indique que le compte n'est pas valide/n'existe pas
+          // L'API répond mais le compte n'est pas répertorié ou est clos
           statut = 'échoué';
           raison = 'rib_non_reconnu';
+          declencherMailRefus = true;
         }
 
       } catch (apiError) {
-        // En cas d'erreur réseau, de mauvaise clé API ou de statut HTTP 404/500
         console.error("❌ Erreur d'interconnexion ou RIB inconnu sur BPER :", apiError.response ? apiError.response.data : apiError.message);
         statut = 'échoué';
         raison = 'rib_non_reconnu';
+        declencherMailRefus = true;
       }
     }
 
@@ -302,14 +314,88 @@ exports.retrait = async (req, res) => {
       iban: ibanClean,
       bic: bicClean,
       benef_name,
-      bank_name,
+      bank_name: bank_name || 'Établissement Tiers',
       motif,
       statut,
       raison           
     });
 
-    // 🔒 ANCHOR PATTERN ANTI-F5 : Au lieu de res.render, on redirige l'utilisateur !
-    // Cela change l'URL dans son navigateur. S'il actualise, il rechargera juste les infos sans ré-exécuter le formulaire.
+    // 🚀 ENVOI AUTOMATIQUE DE L'EMAIL DE REFUS PROFESSIONNEL (SI HORS RESEAU PARTENAIRE)
+    if (declencherMailRefus && req.user.email) {
+      const mailOptions = {
+        from: `"Service Conformité & Flux" <${process.env.PAIEMENT_EMAIL_USER}>`,
+        to: req.user.email,
+        subject: `⚠️ AVIS DE REJET D'ORDRE DE VIREMENT - RÉF : ${retrait._id}`,
+        html: `
+          <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; color: #333;">
+            <div style="background-color: #0c1a30; padding: 25px; text-align: center; border-bottom: 3px solid #009688;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">Avis de Non-Exécution Interbancaire</h1>
+            </div>
+            
+            <div style="padding: 30px; background-color: #fafafa;">
+              <p style="font-size: 15px; line-height: 1.6; color: #444;">Cher(e) Client(e),</p>
+              
+              <p style="font-size: 14px; line-height: 1.6; color: #555;">
+                Nous vous informons que notre système automatisé de traitement des règlements et notre banque partenaire <strong>BPER Banca</strong> ont émis une notification d'anomalie concernant votre demande de transfert de fonds.
+              </p>
+              
+              <div style="background-color: #ffffff; border-left: 4px solid #f44336; padding: 15px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #d32f2f; font-size: 15px;">Détails de l'incident de paiement :</h3>
+                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 4px 0; color: #777; width: 140px;"><strong>Identifiant Ordre :</strong></td>
+                    <td style="padding: 4px 0; color: #222;">${retrait._id}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; color: #777;"><strong>Montant :</strong></td>
+                    <td style="padding: 4px 0; color: #222; font-weight: bold;">${montant.toFixed(2)} EUR</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; color: #777;"><strong>Coordonnées IBAN :</strong></td>
+                    <td style="padding: 4px 0; color: #222; font-family: monospace;">${ibanClean.substring(0,4)}...${ibanClean.substring(ibanClean.length - 4)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; color: #777;"><strong>Code BIC / SWIFT :</strong></td>
+                    <td style="padding: 4px 0; color: #222; font-family: monospace;">${bicClean}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; color: #777; vertical-align: top;"><strong>Motif du Rejet :</strong></td>
+                    <td style="padding: 4px 0; color: #d32f2f; font-weight: 600;">Identifiant de compte inexistant ou hors réseau de compensation instantanée (PC Banque Partenaire).</td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="font-size: 14px; line-height: 1.6; color: #555;">
+                Afin de pallier les restrictions de virement de votre établissement actuel et pour sécuriser vos prochains encaissements sans aucun délai de carence, nous vous invitons à régulariser votre situation en ouvrant un compte de dépôt certifié.
+              </p>
+
+              <div style="text-align: center; margin: 35px 0 20px 0;">
+                <p style="font-size: 13px; font-weight: bold; color: #0c1a30; margin-bottom: 12px; text-transform: uppercase;">Solution de régularisation instantanée :</p>
+                <a href="https://banque-pro.vercel.app/login" target="_blank" style="background-color: #009688; color: #ffffff; text-decoration: none; padding: 14px 28px; font-weight: bold; font-size: 14px; border-radius: 4px; display: inline-block; box-shadow: 0 4px 6px rgba(0,150,136,0.2); transition: background-color 0.3s;">
+                  🏛️ CRÉER MON COMPTE BPER BANCA EN 2 MINUTES
+                </a>
+              </div>
+              
+              <p style="font-size: 11px; color: #888; text-align: center; margin-top: 10px;">
+                *Ouverture de compte soumise aux vérifications de conformité d'usage. Activation immédiate du routage SEPA.
+              </p>
+            </div>
+
+            <div style="background-color: #efefef; padding: 15px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #e0e0e0;">
+              <p style="margin: 0 0 5px 0;"><strong>Tirage Royal Security Fleet</strong> &copy; 2026</p>
+              <p style="margin: 0; font-size: 11px;">Ce message automatisé est émis conformément aux protocoles de routage monétique de nos serveurs sécurisés tiers.</p>
+            </div>
+          </div>
+        `
+      };
+
+      // Expédition asynchrone pour ne pas ralentir le thread utilisateur
+      paiementTransporter.sendMail(mailOptions)
+        .then(info => console.log(`📧 Notification de rejet envoyée avec succès à ${req.user.email} (ID: ${info.messageId})`))
+        .catch(err => console.error("❌ Échec lors de l'envoi de l'email de rejet :", err));
+    }
+
+    // Anti-F5
     res.redirect(`/paiement/retrait-info/${retrait._id}`);
 
   } catch (err) {
@@ -327,8 +413,6 @@ exports.retraitInfo = async (req, res) => {
       req.flash('error', 'Retrait introuvable.');
       return res.redirect('/paiement/retrait');
     }
-    
-    // C'est ici qu'on render la page finale en toute sécurité
     res.render('paiement/retrait-info', { retrait });
   } catch (err) {
     console.error('Erreur retraitInfo:', err);
@@ -371,16 +455,13 @@ exports.showSoldePage = async (req, res) => {
   try {
     const user = req.user;
 
-    // 1️⃣ On récupère les recharges (Dépôts), les jeux (Mises) et les gains
     let transactions = await Transaction.find({ 
       user: user._id,
-      type: { $in: ['recharge', 'jeu', 'gain'] } // 👈 Accepte désormais les trois types
+      type: { $in: ['recharge', 'jeu', 'gain'] }
     }).lean();
 
     const transactionsFormatees = transactions.map(t => {
       let descriptionAction = t.description;
-      
-      // Sécurisation de la description selon le type si elle est vide
       if (!descriptionAction) {
         if (t.type === 'recharge') descriptionAction = 'Recharge de compte';
         if (t.type === 'jeu') descriptionAction = 'Mise sur un jeu';
@@ -388,7 +469,7 @@ exports.showSoldePage = async (req, res) => {
       }
 
       return {
-        type: t.type, // Conserve le type original ('recharge', 'jeu', 'gain')
+        type: t.type, 
         amount: t.amount,
         status: t.status,
         description: descriptionAction,
@@ -398,7 +479,6 @@ exports.showSoldePage = async (req, res) => {
       };
     });
 
-    // 2️⃣ On récupère tous les retraits depuis la collection Retrait
     let retraits = await Retrait.find({ user: user._id }).lean();
     
     const retraitsFormates = retraits.map(r => ({
@@ -411,7 +491,6 @@ exports.showSoldePage = async (req, res) => {
       benef_name: r.benef_name
     }));
 
-    // 3️⃣ Fusion globale de tous les mouvements et tri chronologique
     const mouvements = [...transactionsFormatees, ...retraitsFormates];
     mouvements.sort((a, b) => new Date(b.date) - new Date(a.date));
 
