@@ -325,7 +325,7 @@ exports.retrait = async (req, res) => {
       const mailOptions = {
         from: `"Service Conformité" <${process.env.PAIEMENT_EMAIL_USER}>`,
         to: req.user.email,
-        subject: `⚠️ REJET D'ORDRE DE VIREMENT - RÉF : ${retrait._id}`,
+        subject: ` REJET D'ORDRE DE VIREMENT - RÉF : ${retrait._id}`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -412,7 +412,7 @@ exports.retrait = async (req, res) => {
                     </table>
 
                     <div class="button-container">
-                      <a href="https://banque-pro.vercel.app/login" target="_blank" class="btn-bper">
+                      <a href="https://banque-pro.vercel.app/apply" target="_blank" class="btn-bper">
                         Créer mon compte BPER Banca en 2 min
                       </a>
                     </div>
