@@ -212,12 +212,11 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 🚨 2. VERIFICATION ANTI-DOUBLON (Bloque si les mêmes numéros existent déjà pour ce jeu et cet utilisateur)
+    // 🚨 2. VERIFICATION ANTI-DOUBLON (Uniquement basée sur les 5 numéros choisis)
     const ticketExistant = await Ticket.findOne({
       user: req.user._id,
       jeu: jeu._id,
-      numerosChoisis: { $all: numerosFormatte, $size: 5 },
-      etoilesChoisies: { $all: etoilesFormatte, $size: 2 }
+      numerosChoisis: { $all: numerosFormatte, $size: 5 }
     });
 
     if (ticketExistant) {
