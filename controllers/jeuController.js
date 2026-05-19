@@ -629,3 +629,94 @@ exports.archiveJeux = async (req, res) => {
     res.status(500).send("Erreur serveur");
   }
 };  
+
+
+
+exports.simulerCentTickets = async (req, res) => {
+  const slug = req.params.slug;
+
+  try {
+    // 1. Trouver le jeu ciblé
+    const jeu = await Jeu.findOne({ slug });
+    if (!jeu) return res.status(404).send("Jeu introuvable");
+
+    // 2. Trouver le tirage actif lié à ce jeu
+    const tirage = await Tirage.findOne({ jeu: jeu._id, resultatPublie: false }).sort({ dateTirage: 1 });
+    if (!tirage) return res.status(400).send("Aucun tirage actif pour ce jeu.");
+
+    // Récupérer les numéros gagnants du tirage pour la sécurité anti-gagnant
+    const { numerosGagnants = [] } = tirage;
+
+    const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
+    let ticketsCrees = 0;
+
+    // Boucle pour créer les 100 tickets
+    for (let i = 1; i <= 100; i++) {
+      
+      // 3. Générer un identifiant unique pour le username
+      const uniqueId = Math.floor(100000 + Math.random() * 900000);
+      
+      // Création d'un utilisateur ultra-léger avec UNIQUEMENT le username
+      const fakeUser = await User.create({
+        username: `Simulateur_${uniqueId}`
+      });
+
+      // 4. Générer une combinaison de 5 numéros aléatoires (Excluant le code gagnant)
+      let numerosAleatoires = [];
+      let estGagnant = true;
+
+      while (estGagnant) {
+        const ensembleNumeros = new Set();
+        while (ensembleNumeros.size < 5) {
+          ensembleNumeros.add(Math.floor(Math.random() * 50) + 1);
+        }
+        numerosAleatoires = Array.from(ensembleNumeros).sort((a, b) => a - b);
+
+        if (numerosGagnants.length !== 5) {
+          estGagnant = false;
+        } else {
+          // Si les 5 numéros générés sont identiques aux numéros gagnants, on rejette et on recommence
+          const correspondAuGagnant = numerosAleatoires.every((num, idx) => num === numerosGagnants[idx]);
+          if (!correspondAuGagnant) {
+            estGagnant = false; 
+          }
+        }
+      }
+
+      // 5. Générer 2 étoiles aléatoires
+      const ensembleEtoiles = new Set();
+      while (ensembleEtoiles.size < 2) {
+        ensembleEtoiles.add(Math.floor(Math.random() * 12) + 1);
+      }
+      const etoilesAleatoires = Array.from(ensembleEtoiles).sort((a, b) => a - b);
+
+      // 6. Enregistrement direct du Ticket lié à l'utilisateur par son ID
+      await Ticket.create({
+        user: fakeUser._id,
+        jeu: jeu._id,
+        tirage: tirage._id,
+        prix,
+        numerosChoisis: numerosAleatoires,
+        etoilesChoisies: etoilesAleatoires,
+        dateTirage: tirage.dateTirage,
+        statut: 'En attente',
+        gainPotentiel: tirage.gain || 0
+      });
+
+      ticketsCrees++;
+    }
+
+    // 7. Mettre à jour les billets restants du jeu
+    jeu.billetsRestants = Math.max(0, jeu.billetsRestants - ticketsCrees);
+    if (jeu.billetsRestants <= 0) {
+      jeu.statut = "Fermé";
+    }
+    await jeu.save();
+
+    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 usernames uniques ont été générés pour le jeu "${jeu.nom}" (Code gagnant exclu).`);
+
+  } catch (err) {
+    console.error("❌ Erreur lors de la simulation :", err);
+    res.status(500).send("Erreur lors de la génération des 100 tickets.");
+  }
+};
