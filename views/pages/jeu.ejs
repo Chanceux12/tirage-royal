@@ -1,4 +1,4 @@
-<!DOCTYPE html>    
+    <!DOCTYPE html>    
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -62,15 +62,15 @@
 
     /* ---------- APERÇU "Votre sélection" ---------- */
     .selection-cadre {
-      display: inline-flex;
+      display: inline-flex;        /* largeur automatique selon le contenu */
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 15px;
-      border: 2px solid white;
+      padding: 10px 15px;          /* espace interne du cadre */
+      border: 2px solid white;     /* cadre blanc */
       border-radius: 12px;
       background: transparent;
-      margin: 10px auto;
+      margin: 10px auto;           /* centré */
     }
     .selection-cadre .bubble,
     .selection-cadre .bubble.star {
@@ -114,11 +114,11 @@
     /* ---------- Responsive ---------- */
     @media (max-width: 600px) {
       .boules-container {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 50 boules */
         gap: 8px;
       }
       .etoiles-container {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 10 étoiles */
         gap: 8px;
       }
       .boule { width: 45px; height: 45px; font-size: 16px; }
@@ -216,10 +216,11 @@
   <div style="margin-top:20px; text-align:center;">
     <form id="form-participation" action="/jeu/<%= jeu.slug %>/participer" method="POST">
       <div id="hidden-fields"></div>
-      <button type="submit" class="cta-btn" id="submit-btn">✅ Valider ma participation</button>
+      <button type="submit" class="cta-btn">✅ Valider ma participation</button>
     </form>
   </div>
 </section>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -252,7 +253,7 @@
       selectionEtoiles.forEach(etoile => {
         const el = document.createElement('div');
         el.className = 'bubble star';
-        el.textContent = etoile;
+        el.textContent = etoile;  // ★ ajouté via CSS (blanc)
         preview.appendChild(el);
       });
       localStorage.setItem('selection', JSON.stringify({
@@ -263,39 +264,27 @@
     }
 
     function restoreSelection() {
-  // 🔍 SI LE SERVEUR REJECTE LE TICKET : On nettoie TOUT pour débloquer le bouton valider
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('clearSelection') === 'true') {
-    localStorage.removeItem('selection');
-    selectionNumeros = [];
-    selectionEtoiles = [];
-    document.querySelectorAll('.boule').forEach(b => b.classList.remove('selected'));
-    updatePreview();
-    return; 
-  }
+      const saved = JSON.parse(localStorage.getItem('selection'));
+      if (saved) {
+        selectionNumeros = (saved.numeros || []).map(String);
+        selectionEtoiles = (saved.etoiles || []).map(String);
 
-  // Sinon, comportement normal de restauration
-  const saved = JSON.parse(localStorage.getItem('selection'));
-  if (saved) {
-    selectionNumeros = (saved.numeros || []).map(String);
-    selectionEtoiles = (saved.etoiles || []).map(String);
+        boules.forEach(b => {
+          if (selectionNumeros.includes(String(b.dataset.number))) {
+            b.classList.add('selected');
+          }
+        });
+        etoiles.forEach(e => {
+          if (selectionEtoiles.includes(String(e.dataset.etoile))) {
+            e.classList.add('selected');
+          }
+        });
 
-    boules.forEach(b => {
-      if (selectionNumeros.includes(String(b.dataset.number))) {
-        b.classList.add('selected');
+        updatePreview();
+      } else {
+        syncHiddenFields();
       }
-    });
-    etoiles.forEach(e => {
-      if (selectionEtoiles.includes(String(e.dataset.etoile))) {
-        b.classList.add('selected');
-      }
-    });
-
-    updatePreview();
-  } else {
-    syncHiddenFields();
-  }
-}
+    }
 
     boules.forEach(boule => {
       boule.addEventListener('click', function() {
@@ -364,9 +353,7 @@
   }
   setInterval(updateCountdown, 1000);
   updateCountdown();
-</script>
-
-
+    </script>
   </body>
 </html> 
 
