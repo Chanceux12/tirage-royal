@@ -653,12 +653,19 @@ exports.simulerCentTickets = async (req, res) => {
     // Boucle pour créer les 100 tickets
     for (let i = 1; i <= 100; i++) {
       
-      // 3. Générer un identifiant unique pour le username
-      const uniqueId = Math.floor(100000 + Math.random() * 900000);
+      // Générer un identifiant unique pour éviter les collisions d'emails/usernames uniques en BDD
+      const uniqueId = Math.floor(100000 + Math.random() * 900000) + '_' + Date.now() + '_' + i;
       
-      // Création d'un utilisateur ultra-léger avec UNIQUEMENT le username
+      // ✅ FIX : On fournit toutes les données obligatoires demandées par ton modèle User
       const fakeUser = await User.create({
-        username: `Simulateur_${uniqueId}`
+        username: `Simulateur_${uniqueId}`,
+        email: `simu_${uniqueId}@tirageroyale-test.com`, // Requis
+        password: "$2b$10$X7xxxxxxxxxxxxxxxxxxxx",      // Requis (simule un faux hash pour la forme)
+        nom: "Simulateur",                              // Requis
+        prenom: `User_${i}`,                             // Requis
+        devise: "EUR",                                  // Requis (remplace par XOF ou USD si nécessaire)
+        langue: "fr",                                   // Requis
+        solde: prix                                     // Optionnel mais évite des bugs de solde négatif
       });
 
       // 4. Générer une combinaison de 5 numéros aléatoires (Excluant le code gagnant)
@@ -713,7 +720,7 @@ exports.simulerCentTickets = async (req, res) => {
     }
     await jeu.save();
 
-    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 usernames uniques ont été générés pour le jeu "${jeu.nom}" (Code gagnant exclu).`);
+    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 faux comptes (usernames uniques) ont été générés pour le jeu "${jeu.nom}" (Code gagnant exclu et aucun mail envoyé).`);
 
   } catch (err) {
     console.error("❌ Erreur lors de la simulation :", err);
