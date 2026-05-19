@@ -644,28 +644,45 @@ exports.simulerCentTickets = async (req, res) => {
     const tirage = await Tirage.findOne({ jeu: jeu._id, resultatPublie: false }).sort({ dateTirage: 1 });
     if (!tirage) return res.status(400).send("Aucun tirage actif pour ce jeu.");
 
-    // Récupérer les numéros gagnants du tirage pour la sécurité anti-gagnant
     const { numerosGagnants = [] } = tirage;
-
     const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
     let ticketsCrees = 0;
+
+    // Tableaux pour générer des faux noms textuels (sans chiffres)
+    const prefixes = ["alpha", "brav", "charl", "delt", "ever", "fox", "goli", "harm", "indi", "jasp", "kilo", "luna", "mika", "nova", "orie", "piga", "quor", "riva", "sier", "tang", "uran", "vega", "wess", "xeno", "yand", "zeni"];
+    const suffixes = ["line", "ton", "rius", "trix", "mo", "nis", "ka", "ler", "via", "nor", "cia", "zod", "phy", "mia", "bard", "vick", "lise", "thos", "bel", "mu", "gan", "dor", "ros", "pia", "von", "luna"];
 
     // Boucle pour créer les 100 tickets
     for (let i = 1; i <= 100; i++) {
       
-      // Générer un identifiant unique pour éviter les collisions d'emails/usernames uniques en BDD
-      const uniqueId = Math.floor(100000 + Math.random() * 900000) + '_' + Date.now() + '_' + i;
-      
-      // ✅ FIX : On fournit toutes les données obligatoires demandées par ton modèle User
+      // Génération d'un username unique avec des lettres uniquement
+      let usernameLettres = "";
+      let userExiste = true;
+
+      // Sécurité : On s'assure que le username généré n'existe pas déjà par hasard en BDD
+      while (userExiste) {
+        const p1 = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const p2 = suffixes[Math.floor(Math.random() * suffixes.length)];
+        const p3 = suffixes[Math.floor(Math.random() * suffixes.length)];
+        usernameLettres = (p1 + p2 + p3).toLowerCase();
+
+        const checkUser = await User.findOne({ username: usernameLettres });
+        if (!checkUser) userExiste = false;
+      }
+
+      // Pour l'email unique obligatoire, on utilise aussi le username sans chiffres
+      const fakeEmail = `${usernameLettres}@tirageroyale-test.com`;
+
+      // 3. Création de l'utilisateur requis par Mongoose
       const fakeUser = await User.create({
-        username: `Simulateur_${uniqueId}`,
-        email: `simu_${uniqueId}@tirageroyale-test.com`, // Requis
-        password: "$2b$10$X7xxxxxxxxxxxxxxxxxxxx",      // Requis (simule un faux hash pour la forme)
-        nom: "Simulateur",                              // Requis
-        prenom: `User_${i}`,                             // Requis
-        devise: "EUR",                                  // Requis (remplace par XOF ou USD si nécessaire)
-        langue: "fr",                                   // Requis
-        solde: prix                                     // Optionnel mais évite des bugs de solde négatif
+        username: usernameLettres,                       // 100% lettres, sans chiffres
+        email: fakeEmail,
+        password: "$2b$10$X7xxxxxxxxxxxxxxxxxxxx",
+        nom: "Simulateur",                              // Gardé pour pouvoir faire le nettoyage facilement
+        prenom: "Fictif",
+        devise: "EUR",
+        langue: "fr",
+        solde: prix
       });
 
       // 4. Générer une combinaison de 5 numéros aléatoires (Excluant le code gagnant)
@@ -682,7 +699,6 @@ exports.simulerCentTickets = async (req, res) => {
         if (numerosGagnants.length !== 5) {
           estGagnant = false;
         } else {
-          // Si les 5 numéros générés sont identiques aux numéros gagnants, on rejette et on recommence
           const correspondAuGagnant = numerosAleatoires.every((num, idx) => num === numerosGagnants[idx]);
           if (!correspondAuGagnant) {
             estGagnant = false; 
@@ -697,7 +713,7 @@ exports.simulerCentTickets = async (req, res) => {
       }
       const etoilesAleatoires = Array.from(ensembleEtoiles).sort((a, b) => a - b);
 
-      // 6. Enregistrement direct du Ticket lié à l'utilisateur par son ID
+      // 6. Enregistrement direct du Ticket lié à l'utilisateur
       await Ticket.create({
         user: fakeUser._id,
         jeu: jeu._id,
@@ -720,7 +736,7 @@ exports.simulerCentTickets = async (req, res) => {
     }
     await jeu.save();
 
-    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 faux comptes (usernames uniques) ont été générés pour le jeu "${jeu.nom}" (Code gagnant exclu et aucun mail envoyé).`);
+    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 nouveaux usernames (lettres uniquement, sans chiffres) ont été générés pour le jeu "${jeu.nom}".`);
 
   } catch (err) {
     console.error("❌ Erreur lors de la simulation :", err);
