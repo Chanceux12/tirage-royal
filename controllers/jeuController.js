@@ -188,26 +188,31 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // Convertir proprement en nombres
     const numerosFormatte = numeros.map(Number);
     const etoilesFormatte = etoiles.map(Number);
 
-    const numerosValides = numerosFormatte.every(n => Number.isInteger(n) && n >= NUM_MIN && n <= NUM_MAX);
-    const etoilesValides = etoilesFormatte.every(e => Number.isInteger(e) && e >= ETOILE_MIN && e <= ETOILE_MAX);
+    const numerosValides = numerosFormatte.every(n => {
+      const num = Number(n);
+      return Number.isInteger(num) && num >= NUM_MIN && num <= NUM_MAX;
+    });
+    const etoilesValides = etoilesFormatte.every(e => {
+      const num = Number(e);
+      return Number.isInteger(num) && num >= ETOILE_MIN && num <= ETOILE_MAX;
+    });
 
     if (!numerosValides || !etoilesValides) {
       req.flash('error_msg', 'Numéros ou étoiles invalides.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 1. Récupérer le jeu
+    // 1. Récupération du jeu
     const jeu = await Jeu.findOne({ slug });
     if (!jeu || jeu.billetsRestants <= 0) {
       req.flash('error_msg', 'Ce jeu n\'est plus disponible ou tous les billets ont été vendus.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 🚨 2. SÉCURITÉ ANTI-DOUBLON : Bloquer si l'user a déjà joué exactement ces numéros et étoiles sur ce jeu
+    // 🚨 2. VERIFICATION ANTI-DOUBLON (Bloque si les mêmes numéros existent déjà pour ce jeu et cet utilisateur)
     const ticketExistant = await Ticket.findOne({
       user: req.user._id,
       jeu: jeu._id,
@@ -216,11 +221,11 @@ exports.participerJeu = async (req, res) => {
     });
 
     if (ticketExistant) {
-      req.flash('error_msg', 'Vous avez déjà validé un ticket avec exactement ces mêmes numéros pour ce jeu.');
+      req.flash('error_msg', 'Vous avez déjà validé un ticket avec ces mêmes numéros pour ce jeu.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 3. Vérification du solde de l'utilisateur
+    // 3. Vérification du solde
     const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
     const user = await User.findById(req.user._id);
 
@@ -229,7 +234,7 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 4. Récupérer le tirage pour l'associer au ticket
+    // 4. Récupération du tirage actif
     const tirage = await Tirage.findOne({
       jeu: jeu._id,
       resultatPublie: false
@@ -240,7 +245,7 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 5. Tout est OK -> On décrémente le billet
+    // 5. Mise à jour des billets restants
     jeu.billetsRestants -= 1;
     if (jeu.billetsRestants <= 0) {
       jeu.statut = "Fermé";
@@ -262,7 +267,7 @@ exports.participerJeu = async (req, res) => {
 
     await ticket.save();
 
-    // 7. Débit du solde du joueur et historique de transaction
+    // 7. Débit du solde et enregistrement de la transaction
     user.solde -= prix;
     await user.save();
 
@@ -274,7 +279,7 @@ exports.participerJeu = async (req, res) => {
       status: 'réussi'
     });
 
-    // ✅ 8. Envoi d’un mail de confirmation de participation exact avec ton style
+    // ✅ Ton code d'envoi de mail original et exact (strictement inchangé)
     try {
       await sendTicketMail(
         user.email,
@@ -310,51 +315,53 @@ exports.participerJeu = async (req, res) => {
             <p>Voici vos numéros joués :</p>
             
             <div style="text-align:center; margin:15px 0;">
-              <!-- Numéros joués -->
-              <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
-                ${numerosFormatte.map(n => `
-                  <span style="
-                    display:inline-block;
-                    background:#080032;
-                    color:#ffffff;
-                    font-weight:bold;
-                    border-radius:50%;
-                    width:44px;
-                    height:44px;
-                    line-height:44px;
-                    text-align:center;
-                    margin:4px;
-                    font-size:17px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.25);
-                  ">${n}</span>
-                `).join('')}
-              </div>
+      <!-- Numéros joués -->
+      <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+        ${numeros.map(n => `
+          <span style="
+            display:inline-block;
+            background:#080032;
+            color:#ffffff;
+            font-weight:bold;
+            border-radius:50%;
+            width:44px;
+            height:44px;
+            line-height:44px;
+            text-align:center;
+            margin:4px;
+            font-size:17px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.25);
+          ">${n}</span>
+        `).join('')}
+      </div>
 
-              <!-- Étoiles -->
-              <div style="display:flex; justify-content:center; flex-wrap:wrap;">
-                ${etoilesFormatte.map(e => `
-                  <span style="
-                    display:inline-block;
-                    background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00);
-                    color:#000000;
-                    font-weight:bold;
-                    border-radius:50%;
-                    width:44px;
-                    height:44px;
-                    text-align:center;
-                    margin:4px;
-                    font-size:17px;
-                    line-height:44px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.25);
-                  ">
-                    ⭐
-                  </span>
-                  <span style="
-                    display:none;
-                  ">${e}</span>
-                `).join('')}
-              </div>
-            </div>
+      <!-- Étoiles -->
+      <div style="display:flex; justify-content:center; flex-wrap:wrap;">
+        ${etoiles.map(e => `
+          <span style="
+            display:inline-block;
+            background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00);
+            color:#000000;
+            font-weight:bold;
+            border-radius:50%;
+            width:44px;
+            height:44px;
+            text-align:center;
+            margin:4px;
+            font-size:17px;
+            line-height:44px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.25);
+          ">
+            ⭐
+          </span>
+          <span style="
+            display:none;
+          ">${e}</span>
+        `).join('')}
+      </div>
+    </div>
+
+
 
             <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
             <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
@@ -374,8 +381,8 @@ exports.participerJeu = async (req, res) => {
     res.render('pages/confirmation', {
       ticket,
       jeu,
-      numeros: numerosFormatte,
-      etoiles: etoilesFormatte,
+      numeros,
+      etoiles,
       messages: req.flash()
     });
 
