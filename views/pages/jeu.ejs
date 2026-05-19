@@ -264,14 +264,6 @@
     }
 
     function restoreSelection() {
-      // 🔍 Ajout : Si l'URL demande de nettoyer la sélection suite au doublon refusé par le serveur
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('clearSelection') === 'true') {
-        localStorage.removeItem('selection');
-        syncHiddenFields();
-        return; 
-      }
-
       const saved = JSON.parse(localStorage.getItem('selection'));
       if (saved) {
         selectionNumeros = (saved.numeros || []).map(String);
@@ -361,6 +353,17 @@
   }
   setInterval(updateCountdown, 1000);
   updateCountdown();
+
+  form.addEventListener('submit', function(e) {
+      if (selectionNumeros.length !== maxNumeros || selectionEtoiles.length !== maxEtoiles) {
+        alert(`Veuillez choisir ${maxNumeros} numéros et ${maxEtoiles} étoiles.`);
+        e.preventDefault();
+        return;
+      }
+      syncHiddenFields();
+      // 🔍 AJOUT ICI : On efface le localStorage juste après la soumission pour éviter le blocage de l'interface
+      localStorage.removeItem('selection');
+    });
     </script>
   </body>
 </html> 
