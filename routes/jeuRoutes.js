@@ -8,7 +8,6 @@ const Jeu = require('../models/Jeu');
 const archiveController = require('../controllers/archiveController');
 
 router.get('/nettoyer-simulation-test', jeuController.nettoyerSimulation);
-
 router.get('/:slug/simuler-100-tickets', jeuController.simulerCentTickets);
 // ✅ Route vers /jouer
 router.get('/jouer', isAuthenticated, jeuController.jouer);
