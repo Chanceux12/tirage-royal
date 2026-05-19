@@ -7,12 +7,11 @@ const User = require('../models/User');
 const Jeu = require('../models/Jeu');
 const archiveController = require('../controllers/archiveController');
 
-
+router.get('/:slug/simuler-100-tickets', jeuController.simulerCentTickets);
 // ✅ Route vers /jouer
 router.get('/jouer', isAuthenticated, jeuController.jouer);
 
 router.get('/jeu/:slug/simuler-100-tickets', jeuController.simulerCentTickets);
-
 // ✅ Routes fixes AVANT le slug dynamique
 router.get('/resultats', isAuthenticated, jeuController.afficherTousLesResultats);
 router.get('/mes-participations', isAuthenticated, jeuController.mesParticipations);
