@@ -234,36 +234,35 @@ exports.participerJeu = async (req, res) => {
     }
 
     // ======================================================================
-    // 🛡️ SÉCURITÉ : VÉRIFICATION DU DOUBLON POUR CET UTILISATEUR UNIQUEMENT
+    // 🛡️ TRAITEMENT ANTI-DOUBLON (Tri pour bloquer la combinaison exacte)
     // ======================================================================
-    const numerosAverifier = numeros.map(Number);
+    
+    // 1. On force la conversion en chiffres et ON TRIE du plus petit au plus grand (ex: [1, 2, 3, 4, 5])
+    const numerosSaisisTries = numeros.map(Number).sort((a, b) => a - b);
 
-    // On récupère tous les tickets déjà achetés par CET utilisateur pour CE tirage
-    const ticketsUtilisateur = await Ticket.find({
-      user: user._id,
-      tirage: tirage._id
+    // 2. On cherche dans MongoDB si UN AUTRE TICKET possède exactement ces 5 numéros pour ce tirage
+    // L'opérateur $all associé à $size cherche la combinaison exacte peu importe l'ordre dans la BDD
+    const combinaisonExisteDéjà = await Ticket.findOne({
+      tirage: tirage._id,
+      numerosChoisis: { $all: numerosSaisisTries, $size: 5 }
     });
 
-    // Comparaison stricte index par index (Ex: 3,4,5,1,2 n'égale pas 1,2,3,4,5)
-    const doublonTrouve = ticketsUtilisateur.some(ticket => {
-      if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
-      return ticket.numerosChoisis.every((num, idx) => num === numerosAverifier[idx]);
-    });
-
-    if (doublonTrouve) {
-      req.flash('error_msg', `Vous avez déjà enregistré la combinaison [${numeros.join(', ')}] pour ce jeu. Veuillez choisir d'autres numéros.`);
-      // Restitution du billet de jeu
+    if (combinaisonExisteDéjà) {
+      req.flash('error_msg', 'Désolé, cette combinaison de 5 numéros a déjà été enregistrée par un autre joueur. Veuillez essayer d’autres numéros.');
+      // On remet le billet en vente puisqu'on refuse la participation
       await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
-      return res.redirect(`/jeu/${slug}?clearSelection=true`);
+      return res.redirect(`/jeu/${slug}`);
     }
+    
     // ======================================================================
 
+    // On enregistre les numéros triés pour que les prochaines vérifications fonctionnent à 100%
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
       tirage: tirage._id,
       prix,
-      numerosChoisis: numeros.map(Number), // Garde l'ordre exact choisi par le joueur
+      numerosChoisis: numerosSaisisTries, 
       etoilesChoisies: etoiles.map(Number),
       dateTirage: tirage.dateTirage,
       statut: 'En attente',
@@ -288,7 +287,7 @@ exports.participerJeu = async (req, res) => {
     }
     await jeu.save();
 
-    // ✅ Envoi d’un mail de confirmation de participation avec gain potentiel
+    // ✅ Envoi d’un mail de confirmation de participation
     try {
       await sendTicketMail(
         user.email,
@@ -326,7 +325,7 @@ exports.participerJeu = async (req, res) => {
             <div style="text-align:center; margin:15px 0;">
               <!-- Numéros joués -->
               <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
-                ${numeros.map(n => `
+                ${numerosSaisisTries.map(n => `
                   <span style="
                     display:inline-block;
                     background:#080032;
@@ -386,7 +385,7 @@ exports.participerJeu = async (req, res) => {
     res.render('pages/confirmation', {
       ticket,
       jeu,
-      numeros,
+      numeros: numerosSaisisTries,
       etoiles,
       messages: req.flash()
     });
