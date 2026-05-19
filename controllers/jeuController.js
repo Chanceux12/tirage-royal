@@ -739,13 +739,24 @@ exports.nettoyerSimulation = async (req, res) => {
       return res.status(200).send("🧹 Aucun utilisateur ou ticket de simulation à supprimer.");
     }
 
-    // 2. Supprimer tous les tickets associés à ces utilisateurs
+    // 2. Compter combien de tickets vont être supprimés pour chaque jeu afin de restaurer les stocks
+    const ticketsSimules = await Ticket.find({ user: { $in: idsUtilisateurs } });
+    
+    // Regrouper par jeu pour restituer les billets restants
+    for (const ticket of ticketsSimules) {
+      await Jeu.updateOne(
+        { _id: ticket.jeu },
+        { $inc: { billetsRestants: 1 }, $set: { statut: "Ouvert" } } // Rend la place et réouvre le jeu si fermé
+      );
+    }
+
+    // 3. Supprimer tous les tickets associés à ces utilisateurs
     const ticketsSupprimes = await Ticket.deleteMany({ user: { $in: idsUtilisateurs } });
 
-    // 3. Supprimer les utilisateurs eux-mêmes
+    // 4. Supprimer les utilisateurs eux-mêmes
     const utilisateursSupprimes = await User.deleteMany({ _id: { $in: idsUtilisateurs } });
 
-    res.status(200).send(` Zakarias ! Nettoyage réussi : ${utilisateursSupprimes.deletedCount} faux utilisateurs et ${ticketsSupprimes.deletedCount} tickets ont été retirés de la base de données.`);
+    res.status(200).send(`🧹 Nettoyage réussi sur Vercel ! ${utilisateursSupprimes.deletedCount} faux utilisateurs et ${ticketsSupprimes.deletedCount} tickets de test ont été définitivement supprimés. Les places des jeux ont été restaurées.`);
   } catch (err) {
     console.error("❌ Erreur lors du nettoyage :", err);
     res.status(500).send("Erreur interne lors de la suppression des données de test.");

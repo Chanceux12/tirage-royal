@@ -7,7 +7,8 @@ const User = require('../models/User');
 const Jeu = require('../models/Jeu');
 const archiveController = require('../controllers/archiveController');
 
-router.get('/nettoyer-simulation-test', jeuController.nettoyerSimulation);
+// 🚨 NOUVELLES URLS SÉCURISÉES POUR VERCEL (Évite le conflit avec :slug)
+router.get('/simulation/action/nettoyer', jeuController.nettoyerSimulation);
 router.get('/:slug/simuler-100-tickets', jeuController.simulerCentTickets);
 // ✅ Route vers /jouer
 router.get('/jouer', isAuthenticated, jeuController.jouer);
