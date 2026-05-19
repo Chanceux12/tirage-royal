@@ -207,8 +207,7 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 🚨 2. LA VÉRIFICATION DU TICKET (Strictement sur le Jeu et l'User)
-    // On cherche si un ticket existe déjà pour cet utilisateur ET ce jeu AVEC ces numéros exacts
+    // 🚨 2. SÉCURITÉ ANTI-DOUBLON : Bloquer si l'user a déjà joué exactement ces numéros et étoiles sur ce jeu
     const ticketExistant = await Ticket.findOne({
       user: req.user._id,
       jeu: jeu._id,
@@ -217,7 +216,7 @@ exports.participerJeu = async (req, res) => {
     });
 
     if (ticketExistant) {
-      req.flash('error_msg', 'Vous avez déjà validé un ticket avec ces mêmes numéros pour ce jeu !');
+      req.flash('error_msg', 'Vous avez déjà validé un ticket avec exactement ces mêmes numéros pour ce jeu.');
       return res.redirect(`/jeu/${slug}`);
     }
 
@@ -230,21 +229,25 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 4. Récupérer le tirage (nécessaire uniquement pour l'enregistrement du ticket)
-    const tirage = await Tirage.findOne({ jeu: jeu._id, resultatPublie: false }).sort({ dateTirage: 1 });
+    // 4. Récupérer le tirage pour l'associer au ticket
+    const tirage = await Tirage.findOne({
+      jeu: jeu._id,
+      resultatPublie: false
+    }).sort({ dateTirage: 1 });
+
     if (!tirage) {
-      req.flash('error_msg', 'Aucun tirage disponible pour ce jeu.');
+      req.flash('error_msg', 'Aucun tirage planifié pour ce jeu actuellement.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 5. Tout est bon -> On décrémente le billet et on met à jour le statut du jeu si besoin
+    // 5. Tout est OK -> On décrémente le billet
     jeu.billetsRestants -= 1;
     if (jeu.billetsRestants <= 0) {
       jeu.statut = "Fermé";
     }
     await jeu.save();
 
-    // 6. Création et sauvegarde du ticket
+    // 6. Création du ticket
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
@@ -256,9 +259,10 @@ exports.participerJeu = async (req, res) => {
       statut: 'En attente',
       gainPotentiel: tirage.gain || 0
     });
+
     await ticket.save();
 
-    // 7. Débit du joueur et log de la transaction
+    // 7. Débit du solde du joueur et historique de transaction
     user.solde -= prix;
     await user.save();
 
@@ -270,11 +274,101 @@ exports.participerJeu = async (req, res) => {
       status: 'réussi'
     });
 
-    // 8. Envoi du mail
+    // ✅ 8. Envoi d’un mail de confirmation de participation exact avec ton style
     try {
-      await sendTicketMail(user.email, `🎟️ Confirmation de participation - ${jeu.nom}`, `...ton HTML...`);
+      await sendTicketMail(
+        user.email,
+        `🎟️ Confirmation de participation - ${jeu.nom}`,
+        `
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Confirmation de participation</title>
+          <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin:0; padding:0; }
+            .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; }
+            .header { text-align: center; padding-bottom: 20px; }
+            .header img { max-width: 150px; }
+            h2 { color: #080032; }
+            p { color: #333333; font-size: 16px; line-height: 1.5; }
+            .nums { background-color: #f0f0f0; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; letter-spacing: 3px; }
+            .gain { background-color: #e0f7ff; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; margin-top: 10px; color: #007acc; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #080032; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { font-size: 12px; color: #888888; text-align: center; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <img src="https://tirageroyale.com/image/logo.png" alt="Tirage Royal">
+            </div>
+            <h2>Participation confirmée 🎟️</h2>
+            <p>Bonjour ${user.nom || user.username},</p>
+            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> ! Nous sommes ravis de vous compter parmi nos participant(e) de ce jour.</p>
+            <p>Voici vos numéros joués :</p>
+            
+            <div style="text-align:center; margin:15px 0;">
+              <!-- Numéros joués -->
+              <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+                ${numerosFormatte.map(n => `
+                  <span style="
+                    display:inline-block;
+                    background:#080032;
+                    color:#ffffff;
+                    font-weight:bold;
+                    border-radius:50%;
+                    width:44px;
+                    height:44px;
+                    line-height:44px;
+                    text-align:center;
+                    margin:4px;
+                    font-size:17px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+                  ">${n}</span>
+                `).join('')}
+              </div>
+
+              <!-- Étoiles -->
+              <div style="display:flex; justify-content:center; flex-wrap:wrap;">
+                ${etoilesFormatte.map(e => `
+                  <span style="
+                    display:inline-block;
+                    background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00);
+                    color:#000000;
+                    font-weight:bold;
+                    border-radius:50%;
+                    width:44px;
+                    height:44px;
+                    text-align:center;
+                    margin:4px;
+                    font-size:17px;
+                    line-height:44px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+                  ">
+                    ⭐
+                  </span>
+                  <span style="
+                    display:none;
+                  ">${e}</span>
+                `).join('')}
+              </div>
+            </div>
+
+            <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
+            <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
+            <p>Vous pouvez consulter vos participations ici :</p>
+            <p><a href="https://tirageroyale.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
+            <p class="footer">Cet e-mail est automatique — ne pas répondre à ce message.</p>
+          </div>
+        </body>
+        </html>
+        `
+      );
+      console.log(`📧 Mail de confirmation envoyé à ${user.email}`);
     } catch (err) {
-      console.error('❌ Erreur mail :', err);
+      console.error('❌ Erreur lors de l’envoi du mail de ticket :', err);
     }
 
     res.render('pages/confirmation', {
@@ -286,7 +380,7 @@ exports.participerJeu = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ ERREUR :", err);
+    console.error("❌ ERREUR attrapée :", err);
     req.flash('error_msg', 'Une erreur est survenue.');
     res.redirect(`/jeu/${slug}`);
   }
