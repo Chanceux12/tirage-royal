@@ -234,36 +234,42 @@ exports.participerJeu = async (req, res) => {
     }
 
     // ======================================================================
-    // 🛡️ SÉCURITÉ ANTI-DOUBLON STRICTE (Uniquement sur les 5 numéros)
+    // 🛡️ SÉCURITÉ ANTI-DOUBLON ABSOLUE (FORÇAGE TYPE ET TRI CROISSANT)
     // ======================================================================
-    // 1. On force la conversion de la saisie utilisateur en vrais nombres (pas de texte)
-    const numerosSaisis = numeros.map(Number);
+    // 1. On transforme en vrais Nombres et on trie du plus petit au plus grand
+    const numerosSaisisTries = numeros.map(Number).sort((a, b) => a - b);
 
-    // 2. On récupère tous les tickets existants pour CE tirage spécifique
+    // 2. Récupération de tous les tickets du tirage en cours
     const ticketsExistants = await Ticket.find({ tirage: tirage._id });
 
-    // 3. On compare avec JavaScript (insensible à l'ordre des numéros)
+    // 3. Comparaison basée sur une chaîne de caractères standardisée (Ex: "1-2-3-4-5")
+    const empreinteSaisie = numerosSaisisTries.join('-');
+    
     const combinaisonExisteDéjà = ticketsExistants.some(ticket => {
-      // Si la longueur diffère (sécurité), on passe
-      if (ticket.numerosChoisis.length !== numerosSaisis.length) return false;
-      // On vérifie que TOUS les numéros saisis sont inclus dans ce ticket de la BDD
-      return numerosSaisis.every(num => ticket.numerosChoisis.includes(num));
+      if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
+      
+      // On force le tri du ticket de la BDD pour être certain de comparer la même chose
+      const ticketTrié = ticket.numerosChoisis.map(Number).sort((a, b) => a - b);
+      const empreinteTicket = ticketTrié.join('-');
+      
+      return empreinteSaisie === empreinteTicket;
     });
 
     if (combinaisonExisteDéjà) {
-      req.flash('error_msg', 'Désolé, cette combinaison de 5 numéros a déjà été validée par un autre joueur pour ce tirage. Veuillez en choisir une autre.');
-      // On ré-incrémente le billet puisqu'on annule l'action
+      req.flash('error_msg', 'Désolé, cette combinaison de 5 numéros a déjà été enregistrée par un autre joueur. Veuillez essayer d’autres numéros.');
+      // Annulation de la réservation du billet
       await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
       return res.redirect(`/jeu/${slug}`);
     }
     // ======================================================================
 
+    // On enregistre les numéros TOUJOURS triés pour garder une base de données propre
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
       tirage: tirage._id,
       prix,
-      numerosChoisis: numeros.map(Number),
+      numerosChoisis: numerosSaisisTries, 
       etoilesChoisies: etoiles.map(Number),
       dateTirage: tirage.dateTirage,
       statut: 'En attente',
@@ -288,7 +294,7 @@ exports.participerJeu = async (req, res) => {
     }
     await jeu.save();
 
-    // ✅ Envoi d’un mail de confirmation de participation avec gain potentiel
+    // ✅ Envoi d’un mail de confirmation de participation
     try {
       await sendTicketMail(
         user.email,
@@ -326,7 +332,7 @@ exports.participerJeu = async (req, res) => {
             <div style="text-align:center; margin:15px 0;">
               <!-- Numéros joués -->
               <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
-                ${numeros.map(n => `
+                ${numerosSaisisTries.map(n => `
                   <span style="
                     display:inline-block;
                     background:#080032;
@@ -386,7 +392,7 @@ exports.participerJeu = async (req, res) => {
     res.render('pages/confirmation', {
       ticket,
       jeu,
-      numeros,
+      numeros: numerosSaisisTries,
       etoiles,
       messages: req.flash()
     });
