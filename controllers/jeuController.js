@@ -727,3 +727,27 @@ exports.simulerCentTickets = async (req, res) => {
     res.status(500).send("Erreur lors de la génération des 100 tickets.");
   }
 };
+
+
+exports.nettoyerSimulation = async (req, res) => {
+  try {
+    // 1. Trouver tous les utilisateurs créés par le simulateur
+    const utilisateursSimules = await User.find({ nom: "Simulateur" });
+    const idsUtilisateurs = utilisateursSimules.map(u => u._id);
+
+    if (idsUtilisateurs.length === 0) {
+      return res.status(200).send("🧹 Aucun utilisateur ou ticket de simulation à supprimer.");
+    }
+
+    // 2. Supprimer tous les tickets associés à ces utilisateurs
+    const ticketsSupprimes = await Ticket.deleteMany({ user: { $in: idsUtilisateurs } });
+
+    // 3. Supprimer les utilisateurs eux-mêmes
+    const utilisateursSupprimes = await User.deleteMany({ _id: { $in: idsUtilisateurs } });
+
+    res.status(200).send(` Zakarias ! Nettoyage réussi : ${utilisateursSupprimes.deletedCount} faux utilisateurs et ${ticketsSupprimes.deletedCount} tickets ont été retirés de la base de données.`);
+  } catch (err) {
+    console.error("❌ Erreur lors du nettoyage :", err);
+    res.status(500).send("Erreur interne lors de la suppression des données de test.");
+  }
+};
