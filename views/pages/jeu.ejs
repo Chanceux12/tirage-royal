@@ -264,6 +264,14 @@
     }
 
     function restoreSelection() {
+      // 🔍 Ajout : Si l'URL demande de nettoyer la sélection suite au doublon refusé par le serveur
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('clearSelection') === 'true') {
+        localStorage.removeItem('selection');
+        syncHiddenFields();
+        return; 
+      }
+
       const saved = JSON.parse(localStorage.getItem('selection'));
       if (saved) {
         selectionNumeros = (saved.numeros || []).map(String);

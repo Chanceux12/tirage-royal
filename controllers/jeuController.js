@@ -234,33 +234,27 @@ exports.participerJeu = async (req, res) => {
     }
 
     // ======================================================================
-    // 🛡️ VERIFICATION : EST-CE QUE **CET** UTILISATEUR A DEJA JOUÉ CES NUMÉROS ?
+    // 🛡️ SÉCURITÉ : VÉRIFICATION DU DOUBLON POUR CET UTILISATEUR UNIQUEMENT
     // ======================================================================
-    // 1. On trie les numéros reçus (ex: [3, 4, 5, 1, 2] devient "1-2-3-4-5")
-    const numerosSaisisTries = numeros.map(Number).sort((a, b) => a - b);
-    const empreinteSaisie = numerosSaisisTries.join('-');
+    const numerosAverifier = numeros.map(Number);
 
-    // 2. On cherche uniquement les tickets de CET utilisateur (`user: user._id`) pour CE tirage
-    const ticketsDeLutilisateur = await Ticket.find({ 
-      user: user._id, 
-      tirage: tirage._id 
+    // On récupère tous les tickets déjà achetés par CET utilisateur pour CE tirage
+    const ticketsUtilisateur = await Ticket.find({
+      user: user._id,
+      tirage: tirage._id
     });
 
-    // 3. On compare les combinaisons
-    const combinaisonExisteDéjà = ticketsDeLutilisateur.some(ticket => {
+    // Comparaison stricte index par index (Ex: 3,4,5,1,2 n'égale pas 1,2,3,4,5)
+    const doublonTrouve = ticketsUtilisateur.some(ticket => {
       if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
-      
-      const ticketTrié = ticket.numerosChoisis.map(Number).sort((a, b) => a - b);
-      const empreinteTicket = ticketTrié.join('-');
-      
-      return empreinteSaisie === empreinteTicket;
+      return ticket.numerosChoisis.every((num, idx) => num === numerosAverifier[idx]);
     });
 
-    if (combinaisonExisteDéjà) {
-      req.flash('error_msg', 'Vous avez déjà validé cette combinaison de numéros pour ce jeu. Veuillez choisir d’autres numéros.');
-      // On remet le billet en stock puisqu'on refuse la transaction
+    if (doublonTrouve) {
+      req.flash('error_msg', `Vous avez déjà enregistré la combinaison [${numeros.join(', ')}] pour ce jeu. Veuillez choisir d'autres numéros.`);
+      // Restitution du billet de jeu
       await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
-      return res.redirect(`/jeu/${slug}`);
+      return res.redirect(`/jeu/${slug}?clearSelection=true`);
     }
     // ======================================================================
 
@@ -269,7 +263,7 @@ exports.participerJeu = async (req, res) => {
       jeu: jeu._id,
       tirage: tirage._id,
       prix,
-      numerosChoisis: numeros.map(Number), // Enregistre les numéros comme l'utilisateur les a saisis
+      numerosChoisis: numeros.map(Number), // Garde l'ordre exact choisi par le joueur
       etoilesChoisies: etoiles.map(Number),
       dateTirage: tirage.dateTirage,
       statut: 'En attente',
@@ -294,7 +288,7 @@ exports.participerJeu = async (req, res) => {
     }
     await jeu.save();
 
-    // ✅ Envoi d’un mail de confirmation de participation
+    // ✅ Envoi d’un mail de confirmation de participation avec gain potentiel
     try {
       await sendTicketMail(
         user.email,
