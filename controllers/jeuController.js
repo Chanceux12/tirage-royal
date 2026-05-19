@@ -188,56 +188,40 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // Convertir en nombres et trier pour s'assurer que l'ordre des numéros ne permette pas de tricher
-    const numerosFormatte = numeros.map(Number).sort((a, b) => a - b);
-    const etoilesFormatte = etoiles.map(Number).sort((a, b) => a - b);
+    // Convertir proprement en nombres
+    const numerosFormatte = numeros.map(Number);
+    const etoilesFormatte = etoiles.map(Number);
 
-    const numerosValides = numerosFormatte.every(n => {
-      return Number.isInteger(n) && n >= NUM_MIN && n <= NUM_MAX;
-    });
-    const etoilesValides = etoilesFormatte.every(e => {
-      return Number.isInteger(e) && e >= ETOILE_MIN && e <= ETOILE_MAX;
-    });
+    const numerosValides = numerosFormatte.every(n => Number.isInteger(n) && n >= NUM_MIN && n <= NUM_MAX);
+    const etoilesValides = etoilesFormatte.every(e => Number.isInteger(e) && e >= ETOILE_MIN && e <= ETOILE_MAX);
 
     if (!numerosValides || !etoilesValides) {
       req.flash('error_msg', 'Numéros ou étoiles invalides.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 1. Trouver le jeu et s'assurer qu'il reste des billets
-    const jeu = await Jeu.findOne({ slug, billetsRestants: { $gt: 0 } });
-
-    if (!jeu) {
-      req.flash('error_msg', 'Tous les billets ont été vendus pour ce jeu.');
+    // 1. Récupérer le jeu
+    const jeu = await Jeu.findOne({ slug });
+    if (!jeu || jeu.billetsRestants <= 0) {
+      req.flash('error_msg', 'Ce jeu n\'est plus disponible ou tous les billets ont été vendus.');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 2. Trouver le tirage en cours
-    const tirage = await Tirage.findOne({
-      jeu: jeu._id,
-      resultatPublie: false
-    }).sort({ dateTirage: 1 });
-
-    if (!tirage) {
-      req.flash('error_msg', 'Aucun tirage planifié pour ce jeu actuellement.');
-      return res.redirect(`/jeu/${slug}`);
-    }
-
-    // 🚨 3. SÉCURITÉ ANTI-DOUBLON : Vérifier si cette combinaison existe déjà pour cet utilisateur sur ce tirage
+    // 🚨 2. LA VÉRIFICATION DU TICKET (Strictement sur le Jeu et l'User)
+    // On cherche si un ticket existe déjà pour cet utilisateur ET ce jeu AVEC ces numéros exacts
     const ticketExistant = await Ticket.findOne({
       user: req.user._id,
       jeu: jeu._id,
-      tirage: tirage._id,
-      numerosChoisis: { $eq: numerosFormatte },
-      etoilesChoisies: { $eq: etoilesFormatte }
+      numerosChoisis: { $all: numerosFormatte, $size: 5 },
+      etoilesChoisies: { $all: etoilesFormatte, $size: 2 }
     });
 
     if (ticketExistant) {
-      req.flash('error_msg', 'Vous avez déjà validé un ticket avec exactement ces mêmes numéros pour ce tirage.');
+      req.flash('error_msg', 'Vous avez déjà validé un ticket avec ces mêmes numéros pour ce jeu !');
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 4. Vérification du solde
+    // 3. Vérification du solde de l'utilisateur
     const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
     const user = await User.findById(req.user._id);
 
@@ -246,14 +230,21 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    // 5. Décrémenter le billet maintenant que toutes les validations sont OK
+    // 4. Récupérer le tirage (nécessaire uniquement pour l'enregistrement du ticket)
+    const tirage = await Tirage.findOne({ jeu: jeu._id, resultatPublie: false }).sort({ dateTirage: 1 });
+    if (!tirage) {
+      req.flash('error_msg', 'Aucun tirage disponible pour ce jeu.');
+      return res.redirect(`/jeu/${slug}`);
+    }
+
+    // 5. Tout est bon -> On décrémente le billet et on met à jour le statut du jeu si besoin
     jeu.billetsRestants -= 1;
     if (jeu.billetsRestants <= 0) {
       jeu.statut = "Fermé";
     }
     await jeu.save();
 
-    // 6. Création du ticket
+    // 6. Création et sauvegarde du ticket
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
@@ -265,10 +256,9 @@ exports.participerJeu = async (req, res) => {
       statut: 'En attente',
       gainPotentiel: tirage.gain || 0
     });
-
     await ticket.save();
 
-    // 7. Débit du solde et création de la transaction
+    // 7. Débit du joueur et log de la transaction
     user.solde -= prix;
     await user.save();
 
@@ -280,16 +270,11 @@ exports.participerJeu = async (req, res) => {
       status: 'réussi'
     });
 
-    // ✅ Envoi du mail de confirmation
+    // 8. Envoi du mail
     try {
-      await sendTicketMail(
-        user.email,
-        `🎟️ Confirmation de participation - ${jeu.nom}`,
-        // ... Ton code HTML pour le mail reste identique ...
-      );
-      console.log(`📧 Mail de confirmation envoyé à ${user.email}`);
+      await sendTicketMail(user.email, `🎟️ Confirmation de participation - ${jeu.nom}`, `...ton HTML...`);
     } catch (err) {
-      console.error('❌ Erreur lors de l’envoi du mail de ticket :', err);
+      console.error('❌ Erreur mail :', err);
     }
 
     res.render('pages/confirmation', {
@@ -301,7 +286,7 @@ exports.participerJeu = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ ERREUR attrapée :", err);
+    console.error("❌ ERREUR :", err);
     req.flash('error_msg', 'Une erreur est survenue.');
     res.redirect(`/jeu/${slug}`);
   }
