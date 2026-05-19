@@ -234,44 +234,41 @@ exports.participerJeu = async (req, res) => {
     }
 
     // ======================================================================
-// 🛡️ SÉCURITÉ STRETE : LE MÊME UTILISATEUR NE PEUT PAS REJOUER LA MÊME SUITE EXACTE
-// ======================================================================
-const numerosSaisisOrdreExact = numeros.map(Number);
+    // 🛡️ SÉCURITÉ STRICTE : ORDRE EXACT DES NUMÉROS SAISIS
+    // ======================================================================
+    const numerosSaisisOrdreExact = numeros.map(Number);
 
-// 1. On récupère TOUS les tickets que CET utilisateur a acheté pour CE tirage
-const ticketsUtilisateur = await Ticket.find({
-  user: user._id,
-  tirage: tirage._id
-});
+    // Récupération de tous les tickets de cet utilisateur pour ce tirage
+    const ticketsUtilisateur = await Ticket.find({
+      user: user._id,
+      tirage: tirage._id
+    });
 
-// 2. On compare si l'un de ses tickets contient exactement la même suite dans le même ordre
-// Exemple : si le joueur a joué [34, 7, 5, 6, 23] et qu'il resoumet [34, 7, 5, 6, 23], ça bloque.
-// S'il soumet [7, 5, 6, 23, 34], ça passe !
-const doublonStrictTrouve = ticketsUtilisateur.some(ticket => {
-  if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
-  return ticket.numerosChoisis.every((num, idx) => num === numerosSaisisOrdreExact[idx]);
-});
+    // Comparaison index par index (Ex: 34,7,5,6,23 bloque uniquement 34,7,5,6,23)
+    const doublonStrictTrouve = ticketsUtilisateur.some(ticket => {
+      if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
+      return ticket.numerosChoisis.every((num, idx) => num === numerosSaisisOrdreExact[idx]);
+    });
 
-if (doublonStrictTrouve) {
-  req.flash('error_msg', `Vous avez déjà validé un ticket avec la combinaison exacte [${numeros.join(', ')}] pour ce tirage.`);
-  // On annule la baisse du billet
-  await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
-  return res.redirect(`/jeu/${slug}?clearSelection=true`);
-}
-// ======================================================================
+    if (doublonStrictTrouve) {
+      req.flash('error_msg', `Vous avez déjà validé un ticket avec la combinaison exacte [${numeros.join(', ')}] pour ce tirage.`);
+      // Restitution du billet de jeu
+      await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
+      return res.redirect(`/jeu/${slug}?clearSelection=true`);
+    }
+    // ======================================================================
 
-// IMPORTANT : On enregistre les numéros dans l'ordre EXACT du formulaire (pas de tri !)
-const ticket = new Ticket({
-  user: user._id,
-  jeu: jeu._id,
-  tirage: tirage._id,
-  prix,
-  numerosChoisis: numerosSaisisOrdreExact, 
-  etoilesChoisies: etoiles.map(Number),
-  dateTirage: tirage.dateTirage,
-  statut: 'En attente',
-  gainPotentiel: tirage.gain || 0
-});
+    const ticket = new Ticket({
+      user: user._id,
+      jeu: jeu._id,
+      tirage: tirage._id,
+      prix,
+      numerosChoisis: numerosSaisisOrdreExact, // Sauvegarde de l'ordre exact du joueur
+      etoilesChoisies: etoiles.map(Number),
+      dateTirage: tirage.dateTirage,
+      statut: 'En attente',
+      gainPotentiel: tirage.gain || 0
+    });
 
     await ticket.save();
 
@@ -291,7 +288,7 @@ const ticket = new Ticket({
     }
     await jeu.save();
 
-    // ✅ Envoi d’un mail de confirmation de participation
+    // ✅ Envoi du mail de confirmation de participation
     try {
       await sendTicketMail(
         user.email,
@@ -323,25 +320,23 @@ const ticket = new Ticket({
             </div>
             <h2>Participation confirmée 🎟️</h2>
             <p>Bonjour ${user.nom || user.username},</p>
-            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> ! Nous sommes ravis de vous compter parmi nos participant(e) de ce jour.</p>
+            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> !</p>
             <p>Voici vos numéros joués :</p>
             
             <div style="text-align:center; margin:15px 0;">
               <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
-                ${numerosSaisisTries.map(n => `
+                ${numerosSaisisOrdreExact.map(n => `
                   <span style="display:inline-block; background:#080032; color:#ffffff; font-weight:bold; border-radius:50%; width:44px; height:44px; line-height:44px; text-align:center; margin:4px; font-size:17px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">${n}</span>
                 `).join('')}
               </div>
               <div style="display:flex; justify-content:center; flex-wrap:wrap;">
                 ${etoiles.map(e => `
                   <span style="display:inline-block; background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00); color:#000000; font-weight:bold; border-radius:50%; width:44px; height:44px; text-align:center; margin:4px; font-size:17px; line-height:44px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">⭐</span>
-                  <span style="display:none;">${e}</span>
                 `).join('')}
               </div>
             </div>
             <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
             <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
-            <p>Vous pouvez consulter vos participations ici :</p>
             <p><a href="https://tirageroyale.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
             <p class="footer">Cet e-mail est automatique — ne pas répondre à ce message.</p>
           </div>
@@ -357,7 +352,7 @@ const ticket = new Ticket({
     res.render('pages/confirmation', {
       ticket,
       jeu,
-      numeros: numerosSaisisTries,
+      numeros: numerosSaisisOrdreExact, // ✅ Corrigé ici aussi
       etoiles,
       messages: req.flash()
     });
