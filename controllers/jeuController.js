@@ -202,9 +202,23 @@ exports.participerJeu = async (req, res) => {
       return res.redirect(`/jeu/${slug}`);
     }
 
-    const jeu = await Jeu.findOne({ slug });
-    if (!jeu || jeu.billetsRestants <= 0) {
+    const jeu = await Jeu.findOneAndUpdate(
+      { slug, billetsRestants: { $gt: 0 } },
+      { $inc: { billetsRestants: -1 } },
+      { new: true }
+    );
+
+    if (!jeu) {
       req.flash('error_msg', 'Tous les billets ont été vendus pour ce jeu.');
+      return res.redirect(`/jeu/${slug}`);
+    }
+
+    const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
+    const user = await User.findById(req.user._id);
+
+    if (user.solde < prix) {
+      req.flash('error_msg', 'Solde insuffisant pour participer à ce jeu.');
+      await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
       return res.redirect(`/jeu/${slug}`);
     }
 
@@ -215,72 +229,44 @@ exports.participerJeu = async (req, res) => {
 
     if (!tirage) {
       req.flash('error_msg', 'Aucun tirage planifié pour ce jeu actuellement.');
+      await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
       return res.redirect(`/jeu/${slug}`);
     }
 
-    const prix = typeof jeu.montant === 'number' ? jeu.montant : (jeu.prix || 0);
-    const user = await User.findById(req.user._id);
+    // ======================================================================
+    // 🛡️ ZONE DE BLOCAGE DU DOUBLON POUR CET UTILISATEUR
+    // ======================================================================
+    const numerosSaisisTries = numeros.map(Number).sort((a, b) => a - b);
 
-    if (user.solde < prix) {
-      req.flash('error_msg', 'Solde insuffisant pour participer à ce jeu.');
-      return res.redirect(`/jeu/${slug}`);
-    }
-
-    // 🛡️ Génération de la clé unique triée (Ex: [3,4,5,1,2] -> "1-2-3-4-5")
-    const numerosTries = numeros.map(Number).sort((a, b) => a - b);
-    const combinaisonCle = numerosTries.join('-');
-
-    // Vérification préventive dans le code
-    const doublonExistant = await Ticket.findOne({
+    // On cherche si CE joueur possède déjà un ticket avec ces numéros précis pour CE tirage
+    const ticketDoublon = await Ticket.findOne({
+      user: user._id,
       tirage: tirage._id,
-      combinaisonCle: combinaisonCle
+      numerosChoisis: { $all: numerosSaisisTries, $size: 5 }
     });
 
-    if (doublonExistant) {
-      req.flash('error_msg', 'Cette combinaison de numéros a déjà été validée pour ce tirage. Veuillez en choisir une autre.');
-      return res.redirect(`/jeu/${slug}`);
+    if (ticketDoublon) {
+      req.flash('error_msg', `Désolé, vous avez déjà validé un ticket avec la combinaison [${numeros.join(', ')}] sur ce jeu. Veuillez choisir d'autres numéros.`);
+      // On ré-incrémente le billet puisqu'on refuse la transaction
+      await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
+      return res.redirect(`/jeu/${slug}?error_doublon=true`);
     }
+    // ======================================================================
 
-    // Décrémentation du billet
-    const jeuMisAJour = await Jeu.findOneAndUpdate(
-      { _id: jeu._id, billetsRestants: { $gt: 0 } },
-      { $inc: { billetsRestants: -1 } },
-      { new: true }
-    );
-
-    if (!jeuMisAJour) {
-      req.flash('error_msg', 'Plus de billets disponibles.');
-      return res.redirect(`/jeu/${slug}`);
-    }
-
-    // Création du ticket
     const ticket = new Ticket({
       user: user._id,
       jeu: jeu._id,
       tirage: tirage._id,
       prix,
-      numerosChoisis: numeros.map(Number), // Garde l'ordre initial affiché
-      combinaisonCle: combinaisonCle,      // Stocke la clé ordonnée anti-doublon
+      numerosChoisis: numerosSaisisTries, // Enregistré trié pour correspondre à $all
       etoilesChoisies: etoiles.map(Number),
       dateTirage: tirage.dateTirage,
       statut: 'En attente',
       gainPotentiel: tirage.gain || 0
     });
 
-    // Sauvegarde avec gestion de l'erreur d'index unique MongoDB
-    try {
-      await ticket.save();
-    } catch (saveError) {
-      // Code 11000 = Doublon détecté par l'index unique de MongoDB Atlas
-      if (saveError.code === 11000) {
-        await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
-        req.flash('error_msg', 'Cette combinaison de numéros a déjà été validée pour ce tirage. Veuillez en choisir une autre.');
-        return res.redirect(`/jeu/${slug}`);
-      }
-      throw saveError; // Relance si c'est une autre erreur de validation
-    }
+    await ticket.save();
 
-    // Débit du solde
     user.solde -= prix;
     await user.save();
 
@@ -292,12 +278,12 @@ exports.participerJeu = async (req, res) => {
       status: 'réussi'
     });
 
-    if (jeuMisAJour.billetsRestants <= 0) {
-      jeuMisAJour.statut = "Fermé";
-      await jeuMisAJour.save();
+    if (jeu.billetsRestants <= 0) {
+      jeu.statut = "Fermé";
     }
+    await jeu.save();
 
-    // Envoi du mail
+    // ✅ Envoi d’un mail de confirmation de participation
     try {
       await sendTicketMail(
         user.email,
@@ -307,44 +293,69 @@ exports.participerJeu = async (req, res) => {
         <html lang="fr">
         <head>
           <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Confirmation de participation</title>
           <style>
             body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin:0; padding:0; }
             .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 8px; }
             .header { text-align: center; padding-bottom: 20px; }
+            .header img { max-width: 150px; }
             h2 { color: #080032; }
             p { color: #333333; font-size: 16px; line-height: 1.5; }
-            .gain { background-color: #e0f7ff; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; color: #007acc; }
-            .button { display: inline-block; padding: 10px 20px; background-color: #080032; color: #ffffff; text-decoration: none; border-radius: 5px; }
+            .nums { background-color: #f0f0f0; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; letter-spacing: 3px; }
+            .gain { background-color: #e0f7ff; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 16px; margin-top: 10px; color: #007acc; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #080032; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+            .footer { font-size: 12px; color: #888888; text-align: center; margin-top: 20px; }
           </style>
         </head>
         <body>
           <div class="container">
+            <div class="header">
+              <img src="https://tirageroyale.com/image/logo.png" alt="Tirage Royal">
+            </div>
             <h2>Participation confirmée 🎟️</h2>
             <p>Bonjour ${user.nom || user.username},</p>
-            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> !</p>
-            <p>Vos numéros : <strong>${numeros.join(', ')}</strong></p>
+            <p>Merci d’avoir participé au jeu <strong>${jeu.nom}</strong> ! Nous sommes ravis de vous compter parmi nos participant(e) de ce jour.</p>
+            <p>Voici vos numéros joués :</p>
+            
+            <div style="text-align:center; margin:15px 0;">
+              <div style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+                ${numerosSaisisTries.map(n => `
+                  <span style="display:inline-block; background:#080032; color:#ffffff; font-weight:bold; border-radius:50%; width:44px; height:44px; line-height:44px; text-align:center; margin:4px; font-size:17px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">${n}</span>
+                `).join('')}
+              </div>
+              <div style="display:flex; justify-content:center; flex-wrap:wrap;">
+                ${etoiles.map(e => `
+                  <span style="display:inline-block; background:radial-gradient(circle at 30% 30%, #ffec80, #ffcc00); color:#000000; font-weight:bold; border-radius:50%; width:44px; height:44px; text-align:center; margin:4px; font-size:17px; line-height:44px; box-shadow:0 2px 6px rgba(0,0,0,0.25);">⭐</span>
+                  <span style="display:none;">${e}</span>
+                `).join('')}
+              </div>
+            </div>
             <p class="gain">💰 Gain potentiel : ${ticket.gainPotentiel.toFixed(2)} €</p>
+            <p>Date du tirage : <strong>${new Date(tirage.dateTirage).toLocaleDateString('fr-FR')}</strong></p>
+            <p>Vous pouvez consulter vos participations ici :</p>
             <p><a href="https://tirageroyale.com/jeu/mes-participations" class="button">Voir mes participations</a></p>
+            <p class="footer">Cet e-mail est automatique — ne pas répondre à ce message.</p>
           </div>
         </body>
         </html>
         `
       );
-    } catch (mailErr) {
-      console.error('❌ Erreur mail :', mailErr);
+      console.log(`📧 Mail de confirmation envoyé à ${user.email}`);
+    } catch (err) {
+      console.error('❌ Erreur lors de l’envoi du mail de ticket :', err);
     }
 
     res.render('pages/confirmation', {
       ticket,
-      jeu: jeuMisAJour,
-      numeros,
+      jeu,
+      numeros: numerosSaisisTries,
       etoiles,
       messages: req.flash()
     });
 
   } catch (err) {
-    console.error("❌ ERREUR générale :", err);
+    console.error("❌ ERREUR attrapée :", err);
     req.flash('error_msg', 'Une erreur est survenue.');
     res.redirect(`/jeu/${slug}`);
   }

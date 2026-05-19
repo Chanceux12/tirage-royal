@@ -1,4 +1,4 @@
-    <!DOCTYPE html>    
+<!DOCTYPE html>    
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -62,15 +62,15 @@
 
     /* ---------- APERÇU "Votre sélection" ---------- */
     .selection-cadre {
-      display: inline-flex;        /* largeur automatique selon le contenu */
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 15px;          /* espace interne du cadre */
-      border: 2px solid white;     /* cadre blanc */
+      padding: 10px 15px;
+      border: 2px solid white;
       border-radius: 12px;
       background: transparent;
-      margin: 10px auto;           /* centré */
+      margin: 10px auto;
     }
     .selection-cadre .bubble,
     .selection-cadre .bubble.star {
@@ -114,11 +114,11 @@
     /* ---------- Responsive ---------- */
     @media (max-width: 600px) {
       .boules-container {
-        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 50 boules */
+        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
       }
       .etoiles-container {
-        grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes pour 10 étoiles */
+        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
       }
       .boule { width: 45px; height: 45px; font-size: 16px; }
@@ -216,11 +216,10 @@
   <div style="margin-top:20px; text-align:center;">
     <form id="form-participation" action="/jeu/<%= jeu.slug %>/participer" method="POST">
       <div id="hidden-fields"></div>
-      <button type="submit" class="cta-btn">✅ Valider ma participation</button>
+      <button type="submit" class="cta-btn" id="submit-btn">✅ Valider ma participation</button>
     </form>
   </div>
 </section>
-
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -253,7 +252,7 @@
       selectionEtoiles.forEach(etoile => {
         const el = document.createElement('div');
         el.className = 'bubble star';
-        el.textContent = etoile;  // ★ ajouté via CSS (blanc)
+        el.textContent = etoile;
         preview.appendChild(el);
       });
       localStorage.setItem('selection', JSON.stringify({
@@ -264,6 +263,18 @@
     }
 
     function restoreSelection() {
+      // 🛡️ CORRECTION : Si le serveur a renvoyé une erreur de doublon, on vide le stockage et on décoche tout
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('error_doublon') === 'true') {
+        localStorage.removeItem('selection');
+        selectionNumeros = [];
+        selectionEtoiles = [];
+        boules.forEach(b => b.classList.remove('selected'));
+        etoiles.forEach(e => e.classList.remove('selected'));
+        updatePreview();
+        return;
+      }
+
       const saved = JSON.parse(localStorage.getItem('selection'));
       if (saved) {
         selectionNumeros = (saved.numeros || []).map(String);
@@ -353,18 +364,9 @@
   }
   setInterval(updateCountdown, 1000);
   updateCountdown();
+</script>
 
-  form.addEventListener('submit', function(e) {
-      if (selectionNumeros.length !== maxNumeros || selectionEtoiles.length !== maxEtoiles) {
-        alert(`Veuillez choisir ${maxNumeros} numéros et ${maxEtoiles} étoiles.`);
-        e.preventDefault();
-        return;
-      }
-      syncHiddenFields();
-      // 🔍 AJOUT ICI : On efface le localStorage juste après la soumission pour éviter le blocage de l'interface
-      localStorage.removeItem('selection');
-    });
-    </script>
+
   </body>
 </html> 
 
