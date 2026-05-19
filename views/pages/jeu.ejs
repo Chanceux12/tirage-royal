@@ -263,39 +263,39 @@
     }
 
     function restoreSelection() {
-      // 🛡️ CORRECTION : Si le serveur a renvoyé une erreur de doublon, on vide le stockage et on décoche tout
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('error_doublon') === 'true') {
-        localStorage.removeItem('selection');
-        selectionNumeros = [];
-        selectionEtoiles = [];
-        boules.forEach(b => b.classList.remove('selected'));
-        etoiles.forEach(e => e.classList.remove('selected'));
-        updatePreview();
-        return;
+  // 🔍 SI LE SERVEUR REJECTE LE TICKET : On nettoie TOUT pour débloquer le bouton valider
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('clearSelection') === 'true') {
+    localStorage.removeItem('selection');
+    selectionNumeros = [];
+    selectionEtoiles = [];
+    document.querySelectorAll('.boule').forEach(b => b.classList.remove('selected'));
+    updatePreview();
+    return; 
+  }
+
+  // Sinon, comportement normal de restauration
+  const saved = JSON.parse(localStorage.getItem('selection'));
+  if (saved) {
+    selectionNumeros = (saved.numeros || []).map(String);
+    selectionEtoiles = (saved.etoiles || []).map(String);
+
+    boules.forEach(b => {
+      if (selectionNumeros.includes(String(b.dataset.number))) {
+        b.classList.add('selected');
       }
-
-      const saved = JSON.parse(localStorage.getItem('selection'));
-      if (saved) {
-        selectionNumeros = (saved.numeros || []).map(String);
-        selectionEtoiles = (saved.etoiles || []).map(String);
-
-        boules.forEach(b => {
-          if (selectionNumeros.includes(String(b.dataset.number))) {
-            b.classList.add('selected');
-          }
-        });
-        etoiles.forEach(e => {
-          if (selectionEtoiles.includes(String(e.dataset.etoile))) {
-            e.classList.add('selected');
-          }
-        });
-
-        updatePreview();
-      } else {
-        syncHiddenFields();
+    });
+    etoiles.forEach(e => {
+      if (selectionEtoiles.includes(String(e.dataset.etoile))) {
+        b.classList.add('selected');
       }
-    }
+    });
+
+    updatePreview();
+  } else {
+    syncHiddenFields();
+  }
+}
 
     boules.forEach(boule => {
       boule.addEventListener('click', function() {

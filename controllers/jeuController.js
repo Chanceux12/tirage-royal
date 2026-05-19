@@ -234,36 +234,44 @@ exports.participerJeu = async (req, res) => {
     }
 
     // ======================================================================
-    // 🛡️ ZONE DE BLOCAGE DU DOUBLON POUR CET UTILISATEUR
-    // ======================================================================
-    const numerosSaisisTries = numeros.map(Number).sort((a, b) => a - b);
+// 🛡️ SÉCURITÉ STRETE : LE MÊME UTILISATEUR NE PEUT PAS REJOUER LA MÊME SUITE EXACTE
+// ======================================================================
+const numerosSaisisOrdreExact = numeros.map(Number);
 
-    // On cherche si CE joueur possède déjà un ticket avec ces numéros précis pour CE tirage
-    const ticketDoublon = await Ticket.findOne({
-      user: user._id,
-      tirage: tirage._id,
-      numerosChoisis: { $all: numerosSaisisTries, $size: 5 }
-    });
+// 1. On récupère TOUS les tickets que CET utilisateur a acheté pour CE tirage
+const ticketsUtilisateur = await Ticket.find({
+  user: user._id,
+  tirage: tirage._id
+});
 
-    if (ticketDoublon) {
-      req.flash('error_msg', `Désolé, vous avez déjà validé un ticket avec la combinaison [${numeros.join(', ')}] sur ce jeu. Veuillez choisir d'autres numéros.`);
-      // On ré-incrémente le billet puisqu'on refuse la transaction
-      await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
-      return res.redirect(`/jeu/${slug}?error_doublon=true`);
-    }
-    // ======================================================================
+// 2. On compare si l'un de ses tickets contient exactement la même suite dans le même ordre
+// Exemple : si le joueur a joué [34, 7, 5, 6, 23] et qu'il resoumet [34, 7, 5, 6, 23], ça bloque.
+// S'il soumet [7, 5, 6, 23, 34], ça passe !
+const doublonStrictTrouve = ticketsUtilisateur.some(ticket => {
+  if (!ticket.numerosChoisis || ticket.numerosChoisis.length !== 5) return false;
+  return ticket.numerosChoisis.every((num, idx) => num === numerosSaisisOrdreExact[idx]);
+});
 
-    const ticket = new Ticket({
-      user: user._id,
-      jeu: jeu._id,
-      tirage: tirage._id,
-      prix,
-      numerosChoisis: numerosSaisisTries, // Enregistré trié pour correspondre à $all
-      etoilesChoisies: etoiles.map(Number),
-      dateTirage: tirage.dateTirage,
-      statut: 'En attente',
-      gainPotentiel: tirage.gain || 0
-    });
+if (doublonStrictTrouve) {
+  req.flash('error_msg', `Vous avez déjà validé un ticket avec la combinaison exacte [${numeros.join(', ')}] pour ce tirage.`);
+  // On annule la baisse du billet
+  await Jeu.findByIdAndUpdate(jeu._id, { $inc: { billetsRestants: 1 } });
+  return res.redirect(`/jeu/${slug}?clearSelection=true`);
+}
+// ======================================================================
+
+// IMPORTANT : On enregistre les numéros dans l'ordre EXACT du formulaire (pas de tri !)
+const ticket = new Ticket({
+  user: user._id,
+  jeu: jeu._id,
+  tirage: tirage._id,
+  prix,
+  numerosChoisis: numerosSaisisOrdreExact, 
+  etoilesChoisies: etoiles.map(Number),
+  dateTirage: tirage.dateTirage,
+  statut: 'En attente',
+  gainPotentiel: tirage.gain || 0
+});
 
     await ticket.save();
 
