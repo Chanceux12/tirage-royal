@@ -24,32 +24,41 @@ async function actualiserParticipations(userId = null) {
     for (const tirage of tiragesPublies) {
       console.log(`🎯 Traitement du tirage ${tirage._id} (${tirage.jeu?.nom || 'Jeu inconnu'})`);
 
-      // 🔹 Récupération de TOUS les tickets "En attente" pour ce tirage
-      const filtreTickets = {
-        jeu: tirage.jeu._id || tirage.jeu,
-        dateTirage: tirage.dateTirage,
-        statut: 'En attente'
-      };
+    // 🔹 Récupération de TOUS les tickets "En attente" pour ce tirage
+const filtreTickets = {
+  jeu: tirage.jeu._id || tirage.jeu,
+  dateTirage: tirage.dateTirage,
+  statut: 'En attente'
+};
 
-      const tickets = await Ticket.find(filtreTickets);
+// 🛠️ MODIFICATION : On ajoute .populate('user') pour lire l'email de l'utilisateur
+const tickets = await Ticket.find(filtreTickets).populate('user');
 
-      if (!tickets.length) {
-        console.log(`⚠️ Aucun ticket en attente pour le tirage ${tirage._id}`);
-        continue;
-      }
+if (!tickets.length) {
+  console.log(`⚠️ Aucun ticket en attente pour le tirage ${tirage._id}`);
+  continue;
+}
 
-      // 🔹 Mise à jour des tickets
-      for (const ticket of tickets) {
-        const numerosGagnants = tirage.numerosGagnants || [];
-        const numerosJoues = ticket.numerosChoisis || [];
+// 🔹 Mise à jour des tickets
+for (const ticket of tickets) {
+  // 🛠️ SÉCURITÉ : Si c'est un utilisateur de la simulation, on change juste son statut sans lui envoyer de mail plus tard
+  if (ticket.user && ticket.user.email && ticket.user.email.endsWith('@tirageroyale-test.com')) {
+    ticket.statut = 'Perdant'; // La simulation ne gagne jamais d'après ton jeuController
+    ticket.gainAttribué = 0;
+    await ticket.save();
+    continue; // 👈 On passe au ticket suivant, on ignore la suite pour lui !
+  }
 
-        const estGagnant = numerosGagnants.every(num => numerosJoues.includes(num));
+  const numerosGagnants = tirage.numerosGagnants || [];
+  const numerosJoues = ticket.numerosChoisis || [];
 
-        ticket.statut = estGagnant ? 'Gagnant' : 'Perdant';
-        ticket.gainAttribué = estGagnant ? tirage.gain : 0;
+  const estGagnant = numerosGagnants.every(num => numerosJoues.includes(num));
 
-        await ticket.save();
-      }
+  ticket.statut = estGagnant ? 'Gagnant' : 'Perdant';
+  ticket.gainAttribué = estGagnant ? tirage.gain : 0;
+
+  await ticket.save();
+}
 
       console.log(`✅ ${tickets.length} ticket(s) mis à jour pour le tirage ${tirage._id}`);
 

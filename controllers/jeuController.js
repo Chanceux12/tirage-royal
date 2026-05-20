@@ -659,7 +659,6 @@ exports.simulerCentTickets = async (req, res) => {
       let usernameLettres = "";
       let userExiste = true;
 
-      // Sécurité : On s'assure que le username généré n'existe pas déjà par hasard en BDD
       while (userExiste) {
         const p1 = prefixes[Math.floor(Math.random() * prefixes.length)];
         const p2 = suffixes[Math.floor(Math.random() * suffixes.length)];
@@ -670,15 +669,14 @@ exports.simulerCentTickets = async (req, res) => {
         if (!checkUser) userExiste = false;
       }
 
-      // Pour l'email unique obligatoire, on utilise aussi le username sans chiffres
       const fakeEmail = `${usernameLettres}@tirageroyale-test.com`;
 
       // 3. Création de l'utilisateur requis par Mongoose
       const fakeUser = await User.create({
-        username: usernameLettres,                       // 100% lettres, sans chiffres
+        username: usernameLettres,
         email: fakeEmail,
         password: "$2b$10$X7xxxxxxxxxxxxxxxxxxxx",
-        nom: "Simulateur",                              // Gardé pour pouvoir faire le nettoyage facilement
+        nom: "Simulateur",
         prenom: "Fictif",
         devise: "EUR",
         langue: "fr",
@@ -723,7 +721,8 @@ exports.simulerCentTickets = async (req, res) => {
         etoilesChoisies: etoilesAleatoires,
         dateTirage: tirage.dateTirage,
         statut: 'En attente',
-        gainPotentiel: tirage.gain || 0
+        gainPotentiel: tirage.gain || 0,
+        estSimulation: true // 👈 Ajout ici : Marque le ticket pour qu'il soit ignoré lors des envois de mail du tirage
       });
 
       ticketsCrees++;
@@ -736,7 +735,7 @@ exports.simulerCentTickets = async (req, res) => {
     }
     await jeu.save();
 
-    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 nouveaux usernames (lettres uniquement, sans chiffres) ont été générés pour le jeu "${jeu.nom}".`);
+    res.status(200).send(`✅ Succès ! 100 tickets uniques associés à 100 nouveaux usernames ont été générés pour le jeu "${jeu.nom}".`);
 
   } catch (err) {
     console.error("❌ Erreur lors de la simulation :", err);
