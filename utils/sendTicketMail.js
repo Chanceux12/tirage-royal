@@ -14,12 +14,6 @@ const transporter = nodemailer.createTransport({
 // Fonction pour envoyer un e-mail avec cette adresse
 async function sendTicketMail(to, subject, html) {
   try {
-    // 🚨 SÉCURITÉ RADICALE : Si l'adresse de destination contient l'extension de test, on bloque l'envoi immédiatement !
-    if (to && to.includes('@tirageroyale-test.com')) {
-      console.log(`🚫 [BLOCAGE SIMULATION] Aucun e-mail envoyé à l'adresse fictive : ${to}`);
-      return; // 👈 On arrête la fonction ici, Nodemailer n'est jamais déclenché
-    }
-
     await transporter.sendMail({
       from: '"Tirage Royal - Tickets de Jeu" <support@tirageroyale.com>',
       to,
