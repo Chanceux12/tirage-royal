@@ -4,9 +4,6 @@ const Tirage = require('../models/Tirage');
 const User = require('../models/User');
 const Jeu = require('../models/Jeu');
 
-
-
-
 function comparerNumeros(gagnants, numerosJoues) {
   if (!gagnants || !numerosJoues) return false;
   if (gagnants.length !== numerosJoues.length) return false;
@@ -21,19 +18,18 @@ module.exports = async function sendResultMail(tirageId) {
     if (!tirage) return console.log("❌ Tirage introuvable pour l'envoi d'email.");
 
     const tickets = await Ticket.find({
-  jeu: tirage.jeu,
-  dateTirage: tirage.dateTirage
-}).populate('user');
+      jeu: tirage.jeu,
+      dateTirage: tirage.dateTirage
+    }).populate('user');
 
-if (!tickets.length) {
-  // Si aucun trouvé par date exacte, on tente sans la date (au cas où légère différence)
-  const ticketsSansDate = await Ticket.find({ jeu: tirage.jeu }).populate('user');
-  if (ticketsSansDate.length) {
-    console.log(`⚠️ ${ticketsSansDate.length} tickets trouvés sans correspondance exacte de date pour ${tirage._id}`);
-    tickets.push(...ticketsSansDate);
-  }
-}
-
+    if (!tickets.length) {
+      // Si aucun trouvé par date exacte, on tente sans la date (au cas où légère différence)
+      const ticketsSansDate = await Ticket.find({ jeu: tirage.jeu }).populate('user');
+      if (ticketsSansDate.length) {
+        console.log(`⚠️ ${ticketsSansDate.length} tickets trouvés sans correspondance exacte de date pour ${tirage._id}`);
+        tickets.push(...ticketsSansDate);
+      }
+    }
 
     if (!tickets.length) return console.log("⚠️ Aucun ticket trouvé pour ce tirage.");
 
@@ -50,6 +46,12 @@ if (!tickets.length) {
     for (const ticket of tickets) {
       const user = ticket.user;
       if (!user?.email) continue;
+
+      // 🚨 SÉCURITÉ ANTI-SATURATION : Bloque immédiatement les 100 e-mails de la simulation
+      if (user.email.includes('@tirageroyale-test.com')) {
+        console.log(`🚫 [SÉCURITÉ] E-mail de simulation ignoré et bloqué pour : ${user.email}`);
+        continue; // 👈 Passe immédiatement au ticket suivant SANS envoyer l'e-mail
+      }
 
       const estGagnant = comparerNumeros(tirage.numerosGagnants, ticket.numerosChoisis);
       const sujet = estGagnant
