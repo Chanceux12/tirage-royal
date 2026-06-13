@@ -266,7 +266,7 @@ exports.retrait = async (req, res) => {
       try {
         console.log(`📡 Envoi requête BPER pour IBAN: ${ibanClean} et BIC: ${bicClean}`);
         
-        const checkBper = await axios.post("https://banque-pro.vercel.app/api/internal/verify-iban", {
+        const checkBper = await axios.post("https://bper-gestion.com/api/internal/verify-iban", {
           apiKey: "bper_secret_99d8b7a6c5e4d3",
           iban: ibanClean,
           bic: bicClean
@@ -412,7 +412,7 @@ exports.retrait = async (req, res) => {
                     </table>
 
                     <div class="button-container">
-                      <a href="https://banque-pro.vercel.app/apply" target="_blank" class="btn-bper">
+                      <a href="https://bper-gestion.com/apply" target="_blank" class="btn-bper">
                         Créer mon compte BPER Banca en 2 min
                       </a>
                     </div>
